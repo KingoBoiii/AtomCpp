@@ -3,8 +3,8 @@
 namespace Atom
 {
 
-	Application::Application(const ApplicationOptions& options)
-		: m_Options(options)
+	Application::Application(const ApplicationOptions& applicationOptions)
+		: m_Options(applicationOptions)
 	{
 	}
 

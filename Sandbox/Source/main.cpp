@@ -6,8 +6,8 @@
 class SandboxApplication : public Atom::Application
 {
 public:
-	SandboxApplication(const Atom::ApplicationOptions& options)
-		: Atom::Application(options)
+	SandboxApplication(const Atom::ApplicationOptions& applicationOptions)
+		: Atom::Application(applicationOptions)
 	{
 		std::cout << "SandboxApplication::SandboxApplication()" << std::endl;
 	}

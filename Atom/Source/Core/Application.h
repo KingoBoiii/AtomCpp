@@ -11,12 +11,12 @@ namespace Atom
 	public:
 		Application() = delete;
 		Application(const Application&) = delete;
-		Application(const ApplicationOptions& options);
+		Application(const ApplicationOptions& applicationOptions);
 		virtual ~Application();
 
 		void Run();
 	private:
-		ApplicationOptions m_Options;
+		ApplicationOptions m_ApplicationOptions;
 	};
 
 	Application* CreateApplication(ApplicationCommandLineArgs args);
