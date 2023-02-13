@@ -13,7 +13,12 @@ project "Atom"
 	}
     
     includedirs {
-        "Source"
+        "Source",
+        "%{IncludeDir.spdlog}"
+    }
+
+    links {
+        "spdlog"
     }
 
 	defines {
