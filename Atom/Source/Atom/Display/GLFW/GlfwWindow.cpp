@@ -2,10 +2,14 @@
 #include "GlfwWindow.h"
 
 #include "Atom/Core/Assertion.h"
+#include "Atom/Graphics/RendererContext.h"
+#include "Atom/Graphics/SwapChain.h"
 
 #include "Atom/Events/WindowEvent.h"
 
 #include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 namespace Atom
 {
@@ -49,6 +53,16 @@ namespace Atom
 		m_WindowHandle = Utils::CreateGlfwWindow(m_WindowOptions);
 		AT_CORE_ASSERT(m_WindowHandle, "Failed to create GLFW window");
 
+		m_RendererContext = RendererContextFactory::Create(this);
+		m_RendererContext->Initialize();
+
+		SwapChainOptions swapChainOptions{ };
+		swapChainOptions.Width = m_WindowOptions.Width;
+		swapChainOptions.Height = m_WindowOptions.Height;
+		swapChainOptions.Window = this;
+		m_SwapChain = SwapChainFactory::Create(swapChainOptions);
+		m_SwapChain->Initialize();
+
 		glfwSetWindowUserPointer(m_WindowHandle, &m_WindowData);
 
 		SetupCallbacks();
@@ -61,7 +75,12 @@ namespace Atom
 
 	void GlfwWindow::Present() const
 	{
-		glfwSwapBuffers(m_WindowHandle);
+		m_SwapChain->Present();
+	}
+
+	void* GlfwWindow::GetNativeWindowHandle() const
+	{
+		return static_cast<void*>(glfwGetWin32Window(m_WindowHandle));
 	}
 
 	void GlfwWindow::SetupCallbacks()

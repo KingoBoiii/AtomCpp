@@ -17,10 +17,12 @@ namespace Atom
 		virtual void Present() const override;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) override { m_WindowData.EventCallback = callback; }
+
+		virtual void* GetNativeWindowHandle() const override;
 	private:
 		void SetupCallbacks();
 	private:
-		GLFWwindow* m_WindowHandle;
+		GLFWwindow* m_WindowHandle = nullptr;
 
 		struct WindowData
 		{

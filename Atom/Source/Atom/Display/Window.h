@@ -6,6 +6,9 @@
 namespace Atom
 {
 
+	class ATOM_API RendererContext;
+	class ATOM_API SwapChain;
+
 	class ATOM_API Window
 	{
 	public:
@@ -22,10 +25,14 @@ namespace Atom
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 
+		virtual void* GetNativeWindowHandle() const = 0;
+
 		const WindowOptions& GetWindowOptions() const { return m_WindowOptions; }
 		const WindowOptions& GetWindowOptions() { return m_WindowOptions; }
 	protected:
 		WindowOptions m_WindowOptions;
+		RendererContext* m_RendererContext;
+		SwapChain* m_SwapChain;
 	};
 
 }
