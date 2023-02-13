@@ -7,6 +7,9 @@ project "Atom"
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "ATPCH.h"
+	pchsource "Source/ATPCH.cpp"
+
 	files {
 		"Source/**.cpp",
 		"Source/**.h"
@@ -14,14 +17,17 @@ project "Atom"
     
     includedirs {
         "Source",
-        "%{IncludeDir.spdlog}"
+        "%{IncludeDir.spdlog}",
+        "%{IncludeDir.GLFW}"
     }
 
     links {
-        "spdlog"
+        "spdlog",
+        "GLFW"
     }
 
 	defines {
+        "ATOM_STATIC_LIB",
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 

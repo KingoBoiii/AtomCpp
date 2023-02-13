@@ -21,6 +21,10 @@ project "Sandbox"
 		"Atom"
 	}
 
+    defines {
+        "ATOM_STATIC_LIB"
+    }
+
 	filter "system:windows"
 		systemversion "latest"
 
