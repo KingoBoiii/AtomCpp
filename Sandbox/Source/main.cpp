@@ -1,7 +1,7 @@
 #include <Atom.h>
 #include <Atom/EntryPoint.h>
 
-#include <iostream>
+#include "Layers/SandboxLayer.h"
 
 class SandboxApplication : public Atom::Application
 {
@@ -9,12 +9,11 @@ public:
 	SandboxApplication(const Atom::ApplicationOptions& applicationOptions)
 		: Atom::Application(applicationOptions)
 	{
-		std::cout << "SandboxApplication::SandboxApplication()" << std::endl;
+		PushLayer(new SandboxLayer());
 	}
 
 	virtual ~SandboxApplication()
 	{
-		std::cout << "SandboxApplication::~SandboxApplication()" << std::endl;
 	}
 };
 

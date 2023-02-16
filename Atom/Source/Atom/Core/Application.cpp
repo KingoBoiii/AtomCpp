@@ -1,6 +1,7 @@
 #include "ATPCH.h"
 #include "Application.h"
 
+#include "Layer.h"
 #include "Atom/Display/WindowFactory.h"
 #include "Atom/Graphics/Renderer.h"
 
@@ -24,18 +25,17 @@ namespace Atom
 
 	}
 
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application(const ApplicationOptions& applicationOptions)
 		: m_ApplicationOptions(applicationOptions)
 	{
+		AT_CORE_ASSERT(!s_Instance, "Application already exists!");
+		s_Instance = this;
+
 		m_Window = Utils::CreateWinddow(m_ApplicationOptions);
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
-
-		RendererOptions rendererOptions{ };
-		rendererOptions.ClearColor = new float[4] { 0.1f, 0.1f, 0.1f, 1.0f };
-		rendererOptions.SwapChain = m_Window->GetSwapChain();
-		m_Renderer = RendererFactory::Create(rendererOptions);
-		m_Renderer->Initialize();
 	}
 
 	Application::~Application()
@@ -49,10 +49,24 @@ namespace Atom
 		{
 			m_Window->Update();
 
-			m_Renderer->Clear();
+			for(Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate();
+			}
 
 			m_Window->Present();
 		}
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+	}
+	void Application::PushOverlay(Layer* overlay)
+	{
+		m_LayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
 	void Application::OnEvent(Event& e)

@@ -10,7 +10,7 @@ namespace Atom
 		SwapChain* SwapChain;
 	};
 
-	class Renderer
+	class ATOM_API Renderer
 	{
 	public:
 		Renderer(const RendererOptions& rendererOptions);
@@ -23,7 +23,7 @@ namespace Atom
 		RendererOptions m_RendererOptions;
 	};
 
-	class RendererFactory
+	class ATOM_API RendererFactory
 	{
 	public:
 		static Renderer* Create(const RendererOptions& rendererOptions);
