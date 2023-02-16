@@ -27,15 +27,28 @@ namespace Atom
 
 		hr = m_Device->CreateRenderTargetView(backBuffer, NULL, &m_RenderTargetView);
 		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create render target view!");
-		
+
 		backBuffer->Release();
-		
+
 		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, NULL);
 	}
 
 	void DX11Renderer::Clear() const
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView, m_RendererOptions.ClearColor);
+	}
+
+	void DX11Renderer::RenderGeometry(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount) const
+	{
+		if(indexCount == 0)
+		{
+			indexCount = indexBuffer->GetIndexCount();
+		}
+
+		vertexBuffer->Bind();
+		indexBuffer->Bind();
+
+		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
 }

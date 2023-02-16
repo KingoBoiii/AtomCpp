@@ -16,4 +16,5 @@ public:
 private:
 	Atom::Renderer* m_Renderer = nullptr;
 	Atom::VertexBuffer* m_VertexBuffer = nullptr;
+	Atom::IndexBuffer* m_IndexBuffer = nullptr;
 };

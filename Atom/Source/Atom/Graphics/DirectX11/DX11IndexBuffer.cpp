@@ -1,27 +1,28 @@
 #include "ATPCH.h"
-#include "DX11VertexBuffer.h"
+#include "DX11IndexBuffer.h"
 
 #include "DX11RendererContext.h"
 
 namespace Atom
 {
-	DX11VertexBuffer::DX11VertexBuffer(const VertexBufferOptions& vertexBufferOptions)
-		: VertexBuffer(vertexBufferOptions)
+
+	DX11IndexBuffer::DX11IndexBuffer(const IndexBufferOptions& indexBufferOptions)
+		: IndexBuffer(indexBufferOptions)
 	{
 		Invalidate();
 	}
 
-	DX11VertexBuffer::~DX11VertexBuffer()
+	DX11IndexBuffer::~DX11IndexBuffer()
 	{
 		ReleaseCOM(m_Buffer);
 	}
 
-	void DX11VertexBuffer::Bind() const
+	void DX11IndexBuffer::Bind() const
 	{
-		m_DeviceContext->IASetVertexBuffers(0, 1, &m_Buffer, &m_VertexBufferOptions.Stride, &m_VertexBufferOptions.Offset);
+		m_DeviceContext->IASetIndexBuffer(m_Buffer, DXGI_FORMAT_R32_UINT, 0);
 	}
 
-	void DX11VertexBuffer::Invalidate()
+	void DX11IndexBuffer::Invalidate()
 	{
 		DX11RendererContext context = DX11RendererContext::Get();
 
@@ -30,19 +31,19 @@ namespace Atom
 
 		D3D11_BUFFER_DESC bufferDesc = {};
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = m_VertexBufferOptions.Size;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.ByteWidth = m_IndexBufferOptions.Count * sizeof(uint32_t);
+		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = 0;
-
+		
 		D3D11_SUBRESOURCE_DATA subResourceData = {};
-		subResourceData.pSysMem = m_VertexBufferOptions.Vertices;
+		subResourceData.pSysMem = m_IndexBufferOptions.Indices;
 		subResourceData.SysMemPitch = 0;
 		subResourceData.SysMemSlicePitch = 0;
 
 		HRESULT hr = m_Device->CreateBuffer(&bufferDesc, &subResourceData, &m_Buffer);
-		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create vertex buffer");
+		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create index buffer");
 	}
 
 }
