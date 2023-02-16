@@ -3,7 +3,7 @@
 namespace Atom
 {
 	
-	class Layer
+	class ATOM_API Layer
 	{
 	public:
 		Layer(const std::string& debugName);
