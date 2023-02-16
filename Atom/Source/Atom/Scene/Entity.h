@@ -6,7 +6,7 @@
 namespace Atom
 {
 
-	class Entity
+	class ATOM_API Entity
 	{
 	public:
 		Entity() = default;

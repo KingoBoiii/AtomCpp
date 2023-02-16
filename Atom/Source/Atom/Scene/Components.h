@@ -2,6 +2,7 @@
 
 #include "Components/IdentifierComponent.h"
 #include "Components/TransformComponent.h"
+#include "components/BasicRendererComponent.h"
 
 namespace Atom
 {
@@ -11,6 +12,6 @@ namespace Atom
 	{
 	};
 
-	using AllComponents = ComponentGroup<Component::Transform>;
+	using AllComponents = ComponentGroup<Component::Transform, Component::BasicRenderer>;
 
 }
