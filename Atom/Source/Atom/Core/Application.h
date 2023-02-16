@@ -10,6 +10,8 @@
 namespace Atom
 {
 
+	class ATOM_API Renderer;
+	
 	class ATOM_API Application
 	{
 	public:
@@ -27,6 +29,8 @@ namespace Atom
 		ApplicationOptions m_ApplicationOptions;
 		Window* m_Window = nullptr;
 		bool m_IsRunning = true;
+
+		Renderer* m_Renderer = nullptr;
 	};
 
 	Application* CreateApplication(ApplicationCommandLineArgs args);

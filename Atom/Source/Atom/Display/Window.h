@@ -27,6 +27,8 @@ namespace Atom
 
 		virtual void* GetNativeWindowHandle() const = 0;
 
+		SwapChain* GetSwapChain() const { return m_SwapChain; }
+
 		const WindowOptions& GetWindowOptions() const { return m_WindowOptions; }
 		const WindowOptions& GetWindowOptions() { return m_WindowOptions; }
 	protected:

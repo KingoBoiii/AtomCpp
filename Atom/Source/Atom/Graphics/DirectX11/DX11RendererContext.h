@@ -25,6 +25,7 @@ namespace Atom
 		static DX11RendererContext* s_Instance;
 
 		friend class DX11SwapChain;
+		friend class DX11Renderer;
 	};
 
 }

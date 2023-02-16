@@ -18,6 +18,8 @@ namespace Atom
 		void CreateSwapChain();
 	private:
 		IDXGISwapChain* m_SwapChain = nullptr;
+
+		friend class DX11Renderer;
 	};
 
 }

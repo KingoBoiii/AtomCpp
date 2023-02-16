@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Atom/Display/WindowFactory.h"
+#include "Atom/Graphics/Renderer.h"
 
 namespace Atom
 {
@@ -29,6 +30,12 @@ namespace Atom
 		m_Window = Utils::CreateWinddow(m_ApplicationOptions);
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
+
+		RendererOptions rendererOptions{ };
+		rendererOptions.ClearColor = new float[4] { 0.1f, 0.1f, 0.1f, 1.0f };
+		rendererOptions.SwapChain = m_Window->GetSwapChain();
+		m_Renderer = RendererFactory::Create(rendererOptions);
+		m_Renderer->Initialize();
 	}
 
 	Application::~Application()
@@ -41,6 +48,8 @@ namespace Atom
 		while(m_IsRunning)
 		{
 			m_Window->Update();
+
+			m_Renderer->Clear();
 
 			m_Window->Present();
 		}
