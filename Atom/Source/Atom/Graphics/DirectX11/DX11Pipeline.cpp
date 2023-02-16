@@ -21,7 +21,22 @@ namespace Atom
 				case ShaderDataType::None:
 				default: break;
 			}
+			
 			return DXGI_FORMAT_UNKNOWN;
+		}
+
+		D3D11_PRIMITIVE_TOPOLOGY AtomPrimitiveTopologyToDirectX(PrimitiveTopology primitiveTopology)
+		{
+			switch(primitiveTopology)
+			{
+				case Atom::PrimitiveTopology::Points:		return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+				case Atom::PrimitiveTopology::Lines:		return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+				case Atom::PrimitiveTopology::Triangles:	return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+				case Atom::PrimitiveTopology::None:
+				default: break;
+			}
+
+			return D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		}
 
 	}
@@ -49,6 +64,7 @@ namespace Atom
 	{
 		m_PipelineOptions.Shader->Bind();
 
+		m_DeviceContext->IASetPrimitiveTopology(Utils::AtomPrimitiveTopologyToDirectX(m_PipelineOptions.PrimitiveTopology));
 		m_DeviceContext->IASetInputLayout(m_InputLayout);
 		m_DeviceContext->RSSetState(m_RasterizerState);
 	}

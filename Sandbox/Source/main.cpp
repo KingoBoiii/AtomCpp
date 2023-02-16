@@ -3,6 +3,7 @@
 
 #include "Layers/SandboxLayer.h"
 #include "Layers/Renderer2DLayer.h"
+#include "Layers/SceneTestLayer.h"
 
 class SandboxApplication : public Atom::Application
 {
@@ -11,7 +12,8 @@ public:
 		: Atom::Application(applicationOptions)
 	{
 		//PushLayer(new SandboxLayer());
-		PushLayer(new Renderer2DLayer());
+		//PushLayer(new Renderer2DLayer());
+		PushLayer(new SceneTestLayer());
 	}
 
 	virtual ~SandboxApplication()

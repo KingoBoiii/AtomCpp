@@ -5,10 +5,19 @@
 namespace Atom
 {
 
+	enum class PrimitiveTopology
+	{
+		None,
+		Points,
+		Lines,
+		Triangles
+	};
+
 	struct ATOM_API PipelineOptions
 	{
 		Shader* Shader;
 		BufferLayout InputLayout;
+		PrimitiveTopology PrimitiveTopology = PrimitiveTopology::Triangles;
 		bool Wireframe = false;
 	};
 

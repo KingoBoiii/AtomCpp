@@ -6,7 +6,8 @@
 namespace Atom
 {
 
-	Scene::Scene()
+	Scene::Scene(Renderer2D* renderer2D)
+		: m_Renderer2D(renderer2D)
 	{
 	}
 
@@ -39,9 +40,80 @@ namespace Atom
 		m_Registry.destroy(entity);
 	}
 
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	{
+		if(m_ViewportWidth == width && m_ViewportHeight == height)
+		{
+			return;
+		}
+
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		// Resize our non-FixedAspectRatio cameras
+		auto view = m_Registry.view<Component::Camera>();
+		for(auto entity : view)
+		{
+			auto& cameraComponent = view.get<Component::Camera>(entity);
+			if(!cameraComponent.FixedAspectRatio)
+			{
+				cameraComponent.SceneCamera.SetViewportSize(width, height);
+			}
+		}
+	}
+
 	void Scene::OnUpdateRuntime()
 	{
-		
+		// Renderer 2D
+		{
+			Camera* mainCamera = nullptr;
+			glm::mat4 cameraTransform;
+			{
+				auto view = m_Registry.view<Component::Transform, Component::Camera>();
+				for(auto entity : view)
+				{
+					auto [transform, camera] = view.get<Component::Transform, Component::Camera>(entity);
+
+					if(camera.Primary)
+					{
+						mainCamera = &camera.SceneCamera;
+						cameraTransform = transform.GetTransform();
+						break;
+					}
+				}
+			}
+
+			if(mainCamera)
+			{
+				m_Renderer2D->BeginScene(*mainCamera, cameraTransform);
+
+				{
+					auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
+					for(auto entity : group)
+					{
+						auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
+
+						m_Renderer2D->RenderQuad(transform.GetTransform(), basic.Color);
+					}
+				}
+
+				m_Renderer2D->EndScene();
+			}
+		}
+	}
+
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = m_Registry.view<Component::Camera>();
+		for(auto entity : view)
+		{
+			const auto& camera = view.get<Component::Camera>(entity);
+			if(camera.Primary)
+			{
+				return Entity{ entity, this };
+			}
+		}
+		return {};
 	}
 
 }

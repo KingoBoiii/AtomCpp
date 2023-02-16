@@ -125,6 +125,15 @@ namespace Atom
 		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
 	}
 
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& cameraTransform)
+	{
+		s_Renderer2DData.CameraData.ProjectionViewMatrix = glm::perspective(90.0f, 1280.0f / 720.0f, 0.001f, 1000.0f) * glm::inverse(cameraTransform);
+		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
+
+		s_Renderer2DData.QuadIndexCount = 0;
+		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
+	}
+
 	void Renderer2D::EndScene()
 	{
 		Flush();

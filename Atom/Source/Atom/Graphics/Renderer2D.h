@@ -17,6 +17,7 @@ namespace Atom
 		void Shutdown();
 
 		void BeginScene(const Camera& camera);
+		void BeginScene(const Camera& camera, const glm::mat4& cameraTransform);
 		void EndScene();
 
 		// Draw calls
