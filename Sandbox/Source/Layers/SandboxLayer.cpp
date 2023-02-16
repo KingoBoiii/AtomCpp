@@ -5,11 +5,6 @@
 
 void SandboxLayer::OnAttach()
 {
-	m_Scene = new Atom::Scene();
-	
-	auto entity = m_Scene->CreateEntity("Quad");
-	entity.AddComponent<Atom::Component::BasicRenderer>(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
 	Atom::Window* window = Atom::Application::Get().GetWindow();
 
 	Atom::RendererOptions rendererOptions{ };
@@ -78,4 +73,6 @@ void SandboxLayer::OnUpdate()
 	m_Renderer->Clear();
 
 	m_Renderer->RenderGeometry(m_Pipeline, m_VertexBuffer, m_IndexBuffer, m_UniformBuffer);
+
+	m_Scene->OnUpdateRuntime();
 }

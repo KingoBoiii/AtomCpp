@@ -14,8 +14,6 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnUpdate() override;
 private:
-	Atom::Scene* m_Scene = nullptr;
-
 	Atom::Renderer* m_Renderer = nullptr;
 	Atom::Pipeline* m_Pipeline = nullptr;
 	Atom::VertexBuffer* m_VertexBuffer = nullptr;
