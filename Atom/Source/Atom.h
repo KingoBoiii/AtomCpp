@@ -14,3 +14,4 @@
 #include "Atom/Graphics/IndexBuffer.h"
 #include "Atom/Graphics/Pipeline.h"
 #include "Atom/Graphics/Shader.h"
+#include "Atom/Graphics/UniformBuffer.h"
