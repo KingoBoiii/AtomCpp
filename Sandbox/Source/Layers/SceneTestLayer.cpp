@@ -32,7 +32,7 @@ void SceneTestLayer::OnDetach()
 	delete m_Renderer;
 }
 
-void SceneTestLayer::OnUpdate()
+void SceneTestLayer::OnUpdate(float deltaTime)
 {
 	m_Renderer->Clear();
 

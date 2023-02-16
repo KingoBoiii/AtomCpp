@@ -19,7 +19,7 @@ void Renderer2DLayer::OnDetach()
 	m_Renderer2D->Shutdown();
 }
 
-void Renderer2DLayer::OnUpdate()
+void Renderer2DLayer::OnUpdate(float deltaTime)
 {
 	m_Renderer->Clear();
 

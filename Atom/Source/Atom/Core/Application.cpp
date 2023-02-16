@@ -2,6 +2,8 @@
 #include "Application.h"
 
 #include "Layer.h"
+#include "Timer.h"
+
 #include "Atom/Display/WindowFactory.h"
 #include "Atom/Graphics/Renderer.h"
 
@@ -45,13 +47,19 @@ namespace Atom
 
 	void Application::Run()
 	{
+		Timer timer;
+
 		while(m_IsRunning)
 		{
 			m_Window->Update();
 
+			float time = timer.Elapsed();
+			m_DeltaTime = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			for(Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate();
+				layer->OnUpdate(m_DeltaTime);
 			}
 
 			m_Window->Present();

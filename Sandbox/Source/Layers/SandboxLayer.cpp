@@ -68,7 +68,7 @@ void SandboxLayer::OnDetach()
 {
 }
 
-void SandboxLayer::OnUpdate()
+void SandboxLayer::OnUpdate(float deltaTime)
 {
 	m_Renderer->Clear();
 

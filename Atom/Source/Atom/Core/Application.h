@@ -38,6 +38,8 @@ namespace Atom
 		LayerStack m_LayerStack;
 		Window* m_Window = nullptr;
 		bool m_IsRunning = true;
+		float m_DeltaTime = 0.0f;
+		float m_LastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
 	};

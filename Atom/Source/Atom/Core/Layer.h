@@ -11,7 +11,7 @@ namespace Atom
 
 		virtual void OnAttach() { }
 		virtual void OnDetach() { }
-		virtual void OnUpdate() { }
+		virtual void OnUpdate(float deltaTime) { }
 	private:
 		std::string m_DebugName;
 	};
