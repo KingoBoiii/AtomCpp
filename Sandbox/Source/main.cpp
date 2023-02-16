@@ -2,6 +2,7 @@
 #include <Atom/EntryPoint.h>
 
 #include "Layers/SandboxLayer.h"
+#include "Layers/Renderer2DLayer.h"
 
 class SandboxApplication : public Atom::Application
 {
@@ -9,7 +10,8 @@ public:
 	SandboxApplication(const Atom::ApplicationOptions& applicationOptions)
 		: Atom::Application(applicationOptions)
 	{
-		PushLayer(new SandboxLayer());
+		//PushLayer(new SandboxLayer());
+		PushLayer(new Renderer2DLayer());
 	}
 
 	virtual ~SandboxApplication()

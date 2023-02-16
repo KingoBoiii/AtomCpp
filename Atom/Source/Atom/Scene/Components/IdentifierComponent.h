@@ -13,6 +13,7 @@ namespace Atom::Component
 
 		Identifier() = default;
 		Identifier(const Identifier&) = default;
+		Identifier(const UUID& uuid) : ID(uuid) { }
 	};
 
 }

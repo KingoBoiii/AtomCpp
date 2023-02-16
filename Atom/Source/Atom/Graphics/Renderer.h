@@ -31,10 +31,4 @@ namespace Atom
 		RendererOptions m_RendererOptions;
 	};
 
-	class ATOM_API RendererFactory
-	{
-	public:
-		static Renderer* Create(const RendererOptions& rendererOptions);
-	};
-
 }

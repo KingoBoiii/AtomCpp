@@ -23,6 +23,8 @@ namespace Atom
 		entt::registry m_Registry;
 
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
+
+		friend class Entity;
 	};
 
 }

@@ -10,7 +10,7 @@ void SandboxLayer::OnAttach()
 	Atom::RendererOptions rendererOptions{ };
 	rendererOptions.ClearColor = new float[4] { 0.1f, 0.1f, 0.1f, 1.0f };
 	rendererOptions.SwapChain = window->GetSwapChain();
-	m_Renderer = Atom::RendererFactory::Create(rendererOptions);
+	m_Renderer = Atom::RendererFactory::CreateRenderer(rendererOptions);
 	m_Renderer->Initialize();
 
 	Atom::ShaderOptions shaderOptions{ };

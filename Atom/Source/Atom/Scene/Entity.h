@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "Components.h"
 
 #include "entt.hpp"
 
@@ -58,7 +59,7 @@ namespace Atom
 		}
 	private:
 		entt::entity m_EntityHandle{ entt::null };
-		Scene* m_Scene;
+		Scene* m_Scene = nullptr;
 	};
 
 }

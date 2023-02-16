@@ -12,6 +12,8 @@ namespace Atom
 		DX11VertexBuffer(const VertexBufferOptions& vertexBufferOptions);
 		virtual ~DX11VertexBuffer();
 
+		virtual void SetData(void* vertices, uint32_t size) const override;
+
 		virtual void Bind() const override;
 	private:
 		void Invalidate();

@@ -18,6 +18,8 @@ namespace Atom
 		VertexBuffer(const VertexBufferOptions& vertexBufferOptions);
 		virtual ~VertexBuffer() = default;
 
+		virtual void SetData(void* vertices, uint32_t size) const = 0;
+
 		virtual void Bind() const = 0;
 	protected:
 		VertexBufferOptions m_VertexBufferOptions;
