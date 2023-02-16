@@ -39,4 +39,9 @@ namespace Atom
 		m_Registry.destroy(entity);
 	}
 
+	void Scene::OnUpdateRuntime()
+	{
+		
+	}
+
 }

@@ -17,6 +17,8 @@ namespace Atom
 		Entity CreateEntity(const std::string& name = std::string());
 		Entity CreateEntity(UUID uuid, const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
+
+		void OnUpdateRuntime();
 	private:
 		entt::registry m_Registry;
 
