@@ -15,4 +15,5 @@ public:
 	virtual void OnUpdate() override;
 private:
 	Atom::Renderer* m_Renderer = nullptr;
+	Atom::VertexBuffer* m_VertexBuffer = nullptr;
 };

@@ -9,6 +9,13 @@ void SandboxLayer::OnAttach()
 	rendererOptions.SwapChain = window->GetSwapChain();
 	m_Renderer = Atom::RendererFactory::Create(rendererOptions);
 	m_Renderer->Initialize();
+
+	Atom::VertexBufferOptions vertexBufferOptions{ };
+	vertexBufferOptions.Vertices = new float[3 * 3] { -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f };
+	vertexBufferOptions.Size = 3 * 3 * sizeof(float);
+	vertexBufferOptions.Stride = 3 * sizeof(float);
+	vertexBufferOptions.Offset = 0;
+	m_VertexBuffer = Atom::VertexBufferFactory::Create(vertexBufferOptions);
 }
 
 void SandboxLayer::OnDetach()

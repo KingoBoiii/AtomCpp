@@ -26,6 +26,7 @@ namespace Atom
 
 		friend class DX11SwapChain;
 		friend class DX11Renderer;
+		friend class DX11VertexBuffer;
 	};
 
 }
