@@ -17,6 +17,7 @@ IncludeDir = {}
 IncludeDir['spdlog'] = "%{wks.location}/Atom/vendor/spdlog/include";
 IncludeDir["GLFW"] = "%{wks.location}/Atom/Vendor/glfw/include"
 IncludeDir["glm"] = "%{wks.location}/Atom/Vendor/glm"
+IncludeDir["entt"] = "%{wks.location}/Atom/Vendor/entt/include"
 
 LibraryDir = {}
 Library = {}

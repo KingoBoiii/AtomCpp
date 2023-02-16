@@ -21,7 +21,8 @@ project "Atom"
         "Source",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.GLFW}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
     }
 
     links {
