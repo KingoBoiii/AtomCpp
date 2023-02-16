@@ -16,6 +16,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir['spdlog'] = "%{wks.location}/Atom/vendor/spdlog/include";
 IncludeDir["GLFW"] = "%{wks.location}/Atom/Vendor/glfw/include"
+IncludeDir["glm"] = "%{wks.location}/Atom/Vendor/glm"
 
 LibraryDir = {}
 Library = {}
