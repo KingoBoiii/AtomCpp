@@ -11,3 +11,4 @@
 #include "Atom/Graphics/Renderer.h"
 #include "Atom/Graphics/VertexBuffer.h"
 #include "Atom/Graphics/IndexBuffer.h"
+#include "Atom/Graphics/Shader.h"

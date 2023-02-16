@@ -26,6 +26,14 @@ void SandboxLayer::OnAttach()
 	indexBufferOptions.Indices = new uint32_t[3]{ 0, 1, 2 };
 	indexBufferOptions.Count = 3;
 	m_IndexBuffer = Atom::IndexBufferFactory::Create(indexBufferOptions);
+
+	Atom::ShaderOptions shaderOptions{ };
+	shaderOptions.Filepath = "Assets/Shaders/Basic.shader";
+	shaderOptions.VertexShaderEntryPoint = "VSMain";
+	shaderOptions.VertexShaderTarget = "vs_5_0";
+	shaderOptions.PixelShaderEntryPoint = "PSMain";
+	shaderOptions.PixelShaderTarget = "ps_5_0";
+	m_Shader = Atom::ShaderFactory::Create(shaderOptions);
 }
 
 void SandboxLayer::OnDetach()

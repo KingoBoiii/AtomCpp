@@ -28,6 +28,7 @@ namespace Atom
 		friend class DX11Renderer;
 		friend class DX11VertexBuffer;
 		friend class DX11IndexBuffer;
+		friend class DX11Shader;
 	};
 
 }
