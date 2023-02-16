@@ -15,3 +15,5 @@
 #include "Atom/Graphics/Pipeline.h"
 #include "Atom/Graphics/Shader.h"
 #include "Atom/Graphics/UniformBuffer.h"
+
+#include "Atom/Graphics/Camera.h"

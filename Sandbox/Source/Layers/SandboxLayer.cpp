@@ -49,6 +49,8 @@ void SandboxLayer::OnAttach()
 	indexBufferOptions.Count = 6;
 	m_IndexBuffer = Atom::IndexBufferFactory::Create(indexBufferOptions);
 
+	Atom::Camera camera = Atom::Camera({ 0.0f, 0.0f, 0.5f });
+
 	struct Data
 	{
 		glm::mat4 ProjectionViewMatrix;
@@ -57,7 +59,7 @@ void SandboxLayer::OnAttach()
 	Data data{};
 	
 	float aspectRatio = window->GetAspectRatio();
-	data.ProjectionViewMatrix = glm::perspective(90.0f, aspectRatio, 0.001f, 1000.0f) * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	data.ProjectionViewMatrix = glm::perspective(90.0f, aspectRatio, 0.001f, 1000.0f) * camera.GetViewMatrix();
 
 	m_UniformBuffer = Atom::UniformBufferFactory::Create(&data, sizeof(Data));
 }
