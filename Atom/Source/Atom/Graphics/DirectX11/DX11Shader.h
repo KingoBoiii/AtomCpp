@@ -20,6 +20,10 @@ namespace Atom
 		ID3D11DeviceContext* m_DeviceContext = nullptr;
 		ID3D11VertexShader* m_VertexShader = nullptr;
 		ID3D11PixelShader* m_PixelShader = nullptr;
+
+		ID3DBlob* m_VertexSourceBlob = nullptr;
+
+		friend class DX11Pipeline;
 	};
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "SwapChain.h"
 
+#include "Pipeline.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
@@ -23,7 +24,7 @@ namespace Atom
 
 		virtual void Clear() const = 0;
 
-		virtual void RenderGeometry(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const = 0;
+		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const = 0;
 	protected:
 		RendererOptions m_RendererOptions;
 	};

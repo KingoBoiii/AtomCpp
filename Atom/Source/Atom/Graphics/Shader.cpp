@@ -1,6 +1,8 @@
 #include "ATPCH.h"
 #include "Shader.h"
 
+#include "DirectX11/DX11Shader.h"
+
 namespace Atom
 {
 
@@ -11,7 +13,7 @@ namespace Atom
 
 	Shader* ShaderFactory::Create(const ShaderOptions& shaderOptions)
 	{
-		return nullptr;
+		return new DX11Shader(shaderOptions);
 	}
 
 }

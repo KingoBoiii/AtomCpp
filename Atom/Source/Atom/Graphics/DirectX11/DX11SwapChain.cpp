@@ -31,7 +31,7 @@ namespace Atom
 
 	void DX11SwapChain::CreateSwapChain()
 	{
-		DX11RendererContext context = DX11RendererContext::Get();
+		DX11RendererContext& context = DX11RendererContext::Get();
 
 		IDXGIFactory* dxgiFactory = nullptr;
 		CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory);

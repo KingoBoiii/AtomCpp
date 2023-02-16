@@ -9,6 +9,8 @@
 #include "Atom/Core/Layer.h"
 
 #include "Atom/Graphics/Renderer.h"
+#include "Atom/Graphics/BufferLayout.h"
 #include "Atom/Graphics/VertexBuffer.h"
 #include "Atom/Graphics/IndexBuffer.h"
+#include "Atom/Graphics/Pipeline.h"
 #include "Atom/Graphics/Shader.h"

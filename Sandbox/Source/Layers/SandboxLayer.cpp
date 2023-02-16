@@ -10,23 +10,6 @@ void SandboxLayer::OnAttach()
 	m_Renderer = Atom::RendererFactory::Create(rendererOptions);
 	m_Renderer->Initialize();
 
-	Atom::VertexBufferOptions vertexBufferOptions{ };
-	vertexBufferOptions.Vertices = new float[3 * 3]
-	{
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
-	};
-	vertexBufferOptions.Size = 3 * 3 * sizeof(float);
-	vertexBufferOptions.Stride = 3 * sizeof(float);
-	vertexBufferOptions.Offset = 0;
-	m_VertexBuffer = Atom::VertexBufferFactory::Create(vertexBufferOptions);
-
-	Atom::IndexBufferOptions indexBufferOptions{ };
-	indexBufferOptions.Indices = new uint32_t[3]{ 0, 1, 2 };
-	indexBufferOptions.Count = 3;
-	m_IndexBuffer = Atom::IndexBufferFactory::Create(indexBufferOptions);
-
 	Atom::ShaderOptions shaderOptions{ };
 	shaderOptions.Filepath = "Assets/Shaders/Basic.shader";
 	shaderOptions.VertexShaderEntryPoint = "VSMain";
@@ -34,6 +17,34 @@ void SandboxLayer::OnAttach()
 	shaderOptions.PixelShaderEntryPoint = "PSMain";
 	shaderOptions.PixelShaderTarget = "ps_5_0";
 	m_Shader = Atom::ShaderFactory::Create(shaderOptions);
+
+	Atom::PipelineOptions pipelineOptions{ };
+	pipelineOptions.Shader = m_Shader;
+	pipelineOptions.InputLayout = {
+		{ Atom::ShaderDataType::Float3, "POSITION" }
+	};
+	m_Pipeline = Atom::PipelineFactory::Create(pipelineOptions);
+
+	Atom::VertexBufferOptions vertexBufferOptions{ };
+	vertexBufferOptions.Vertices = new float[6 * 3]
+	{
+		0.5f, 0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f, 0.5f, 0.0f   // top left 
+	};
+	vertexBufferOptions.Size = 6 * 3 * sizeof(float);
+	vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride(); // 3 * sizeof(float);
+	vertexBufferOptions.Offset = 0;
+	m_VertexBuffer = Atom::VertexBufferFactory::Create(vertexBufferOptions);
+
+	Atom::IndexBufferOptions indexBufferOptions{ };
+	indexBufferOptions.Indices = new uint32_t[6]{
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
+	indexBufferOptions.Count = 6;
+	m_IndexBuffer = Atom::IndexBufferFactory::Create(indexBufferOptions);
 }
 
 void SandboxLayer::OnDetach()
@@ -44,5 +55,5 @@ void SandboxLayer::OnUpdate()
 {
 	m_Renderer->Clear();
 
-	m_Renderer->RenderGeometry(m_VertexBuffer, m_IndexBuffer);
+	m_Renderer->RenderGeometry(m_Pipeline, m_VertexBuffer, m_IndexBuffer);
 }

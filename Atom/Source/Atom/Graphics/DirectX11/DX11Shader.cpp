@@ -3,6 +3,8 @@
 
 #include "DX11RendererContext.h"
 
+#pragma comment(lib, "d3dcompiler")
+
 namespace Atom
 {
 
@@ -14,13 +16,13 @@ namespace Atom
 		m_Device = context.m_Device;
 		m_DeviceContext = context.m_DeviceContext;
 
-		ID3DBlob* vertexShaderBlob = CompileShader(m_ShaderOptions.VertexShaderEntryPoint.c_str(), m_ShaderOptions.VertexShaderTarget.c_str());
+		m_VertexSourceBlob = CompileShader(m_ShaderOptions.VertexShaderEntryPoint.c_str(), m_ShaderOptions.VertexShaderTarget.c_str());
 		ID3DBlob* pixelShaderBlob = CompileShader(m_ShaderOptions.PixelShaderEntryPoint.c_str(), m_ShaderOptions.PixelShaderTarget.c_str());
 		
 		// Create vertex shader
 		HRESULT hr = m_Device->CreateVertexShader(
-			vertexShaderBlob->GetBufferPointer(),
-			vertexShaderBlob->GetBufferSize(),
+			m_VertexSourceBlob->GetBufferPointer(),
+			m_VertexSourceBlob->GetBufferSize(),
 			nullptr,
 			&m_VertexShader
 		);
@@ -35,12 +37,12 @@ namespace Atom
 		);
 		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create pixel shader!");
 
-		vertexShaderBlob->Release();
-		pixelShaderBlob->Release();
+		ReleaseCOM(pixelShaderBlob);
 	}
 
 	DX11Shader::~DX11Shader()
 	{
+		ReleaseCOM(m_VertexSourceBlob);
 		ReleaseCOM(m_VertexShader);
 		ReleaseCOM(m_PixelShader);
 	}
@@ -54,6 +56,7 @@ namespace Atom
 	ID3DBlob* DX11Shader::CompileShader(const char* entryPoint, const char* target) const
 	{
 		ID3DBlob* shaderBlob = nullptr;
+		ID3DBlob* errorBlob = nullptr;
 
 		HRESULT hr = D3DCompileFromFile(
 			m_ShaderOptions.Filepath.c_str(),
@@ -64,10 +67,10 @@ namespace Atom
 			D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 			0,
 			&shaderBlob,
-			nullptr
+			&errorBlob
 		);
-		
-		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to compile shader");
+
+		AT_CORE_ASSERT(SUCCEEDED(hr), (char*)errorBlob->GetBufferPointer());
 
 		return shaderBlob;
 	}

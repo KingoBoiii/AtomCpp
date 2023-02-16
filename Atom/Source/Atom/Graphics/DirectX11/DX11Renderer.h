@@ -17,11 +17,17 @@ namespace Atom
 
 		virtual void Clear() const override;
 
-		virtual void RenderGeometry(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const override;
+		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const override;
+	private:
+		void CreateRenderTargetView(IDXGISwapChain* swapChain);
+		void CreateDepthStencilBufferAndView(IDXGISwapChain* swapChain);
 	private:
 		ID3D11Device* m_Device = nullptr;
 		ID3D11DeviceContext* m_DeviceContext = nullptr;
 		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
+		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
+		ID3D11Texture2D* m_DepthStencilBuffer = nullptr;
+		D3D11_VIEWPORT m_Viewport;
 	};
 
 }

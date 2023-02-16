@@ -45,21 +45,14 @@ namespace Atom
 
 	DX11RendererContext::~DX11RendererContext()
 	{
-		if(m_Device)
-		{
-			m_Device->Release();
-		}
-
-		if(m_DeviceContext)
-		{
-			m_DeviceContext->Release();
-		}
+		ReleaseCOM(m_Device);
+		ReleaseCOM(m_DeviceContext);
 	}
 
 	void DX11RendererContext::Initialize()
 	{
 		UINT deviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED; //  D3D11_CREATE_DEVICE_BGRA_SUPPORT;
-#if defined(KE_DEBUG)
+#if defined(AT_DEBUG)
 		deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -88,7 +81,7 @@ namespace Atom
 		char* renderer = reinterpret_cast<char*>(malloc(sizeof(desc.Description)));
 		wcstombs(renderer, desc.Description, sizeof(desc.Description));
 
-		m_RendererContextInfo.RendererName = "DirectX 11";
+		m_RendererContextInfo.RendererAPI = "DirectX 11";
 		m_RendererContextInfo.RendererName = renderer;
 		m_RendererContextInfo.VendorName = Utils::GetVendor(desc.VendorId);
 
