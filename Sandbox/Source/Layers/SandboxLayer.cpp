@@ -20,8 +20,6 @@ void SandboxLayer::OnAttach()
 	shaderOptions.PixelShaderTarget = "ps_5_0";
 	m_Shader = Atom::ShaderFactory::Create(shaderOptions);
 
-	glm::vec3 vector = { 1.0f, 0.5f, 1.0f };
-
 	Atom::PipelineOptions pipelineOptions{ };
 	pipelineOptions.Shader = m_Shader;
 	pipelineOptions.InputLayout = {
