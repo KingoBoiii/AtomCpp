@@ -73,6 +73,4 @@ void SandboxLayer::OnUpdate()
 	m_Renderer->Clear();
 
 	m_Renderer->RenderGeometry(m_Pipeline, m_VertexBuffer, m_IndexBuffer, m_UniformBuffer);
-
-	m_Scene->OnUpdateRuntime();
 }
