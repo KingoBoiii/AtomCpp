@@ -18,6 +18,7 @@ namespace Atom
 		virtual void Clear() const override;
 
 		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const override;
+		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, UniformBuffer* uniformBuffer, int indexCount = 0) const override;
 	private:
 		void CreateRenderTargetView(IDXGISwapChain* swapChain);
 		void CreateDepthStencilBufferAndView(IDXGISwapChain* swapChain);

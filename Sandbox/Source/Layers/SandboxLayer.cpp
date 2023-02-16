@@ -1,6 +1,7 @@
 #include "SandboxLayer.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 void SandboxLayer::OnAttach()
 {
@@ -13,15 +14,15 @@ void SandboxLayer::OnAttach()
 	m_Renderer->Initialize();
 
 	Atom::ShaderOptions shaderOptions{ };
-	shaderOptions.Filepath = "Assets/Shaders/Basic.shader";
+	shaderOptions.Filepath = "Assets/Shaders/BasicCamera.shader";
 	shaderOptions.VertexShaderEntryPoint = "VSMain";
 	shaderOptions.VertexShaderTarget = "vs_5_0";
 	shaderOptions.PixelShaderEntryPoint = "PSMain";
 	shaderOptions.PixelShaderTarget = "ps_5_0";
-	m_Shader = Atom::ShaderFactory::Create(shaderOptions);
+	Atom::Shader* shader = Atom::ShaderFactory::Create(shaderOptions);
 
 	Atom::PipelineOptions pipelineOptions{ };
-	pipelineOptions.Shader = m_Shader;
+	pipelineOptions.Shader = shader;
 	pipelineOptions.InputLayout = {
 		{ Atom::ShaderDataType::Float3, "POSITION" }
 	};
@@ -47,6 +48,18 @@ void SandboxLayer::OnAttach()
 	};
 	indexBufferOptions.Count = 6;
 	m_IndexBuffer = Atom::IndexBufferFactory::Create(indexBufferOptions);
+
+	struct Data
+	{
+		glm::mat4 ProjectionViewMatrix;
+	};
+
+	Data data{};
+	
+	float aspectRatio = window->GetAspectRatio();
+	data.ProjectionViewMatrix = glm::perspective(90.0f, aspectRatio, 0.001f, 1000.0f) * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+
+	m_UniformBuffer = Atom::UniformBufferFactory::Create(&data, sizeof(Data));
 }
 
 void SandboxLayer::OnDetach()
@@ -57,5 +70,5 @@ void SandboxLayer::OnUpdate()
 {
 	m_Renderer->Clear();
 
-	m_Renderer->RenderGeometry(m_Pipeline, m_VertexBuffer, m_IndexBuffer);
+	m_Renderer->RenderGeometry(m_Pipeline, m_VertexBuffer, m_IndexBuffer, m_UniformBuffer);
 }

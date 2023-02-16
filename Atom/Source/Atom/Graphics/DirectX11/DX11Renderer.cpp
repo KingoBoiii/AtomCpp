@@ -51,6 +51,21 @@ namespace Atom
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
+	void DX11Renderer::RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, UniformBuffer* uniformBuffer, int indexCount) const
+	{
+		if(indexCount == 0)
+		{
+			indexCount = indexBuffer->GetIndexCount();
+		}
+
+		pipeline->Bind();
+		vertexBuffer->Bind();
+		indexBuffer->Bind();
+		uniformBuffer->Bind(0);
+
+		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+	}
+
 	void DX11Renderer::CreateRenderTargetView(IDXGISwapChain* swapChain)
 	{
 		// Create the render target view

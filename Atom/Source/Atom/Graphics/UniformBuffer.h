@@ -3,7 +3,7 @@
 namespace Atom
 {
 
-	class UniformBuffer
+	class ATOM_API UniformBuffer
 	{
 	public:
 		virtual ~UniformBuffer() = default;
@@ -13,7 +13,7 @@ namespace Atom
 		virtual void Bind(uint32_t slot) const = 0;
 	};
 
-	class UniformBufferFactory
+	class ATOM_API UniformBufferFactory
 	{
 	public:
 		static UniformBuffer* Create(const void* data, uint32_t size);

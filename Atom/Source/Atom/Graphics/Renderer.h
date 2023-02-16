@@ -4,6 +4,7 @@
 #include "Pipeline.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "UniformBuffer.h"
 
 namespace Atom
 {
@@ -25,6 +26,7 @@ namespace Atom
 		virtual void Clear() const = 0;
 
 		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, int indexCount = 0) const = 0;
+		virtual void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, UniformBuffer* uniformBuffer, int indexCount = 0) const = 0;
 	protected:
 		RendererOptions m_RendererOptions;
 	};
