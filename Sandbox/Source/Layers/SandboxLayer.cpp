@@ -26,14 +26,14 @@ void SandboxLayer::OnAttach()
 	m_Pipeline = Atom::PipelineFactory::Create(pipelineOptions);
 
 	Atom::VertexBufferOptions vertexBufferOptions{ };
-	vertexBufferOptions.Vertices = new float[6 * 3]
+	vertexBufferOptions.Vertices = new float[4 * 3]
 	{
 		0.5f, 0.5f, 0.0f,  // top right
 		0.5f, -0.5f, 0.0f,  // bottom right
 		-0.5f, -0.5f, 0.0f,  // bottom left
 		-0.5f, 0.5f, 0.0f   // top left 
 	};
-	vertexBufferOptions.Size = 6 * 3 * sizeof(float);
+	vertexBufferOptions.Size = 4 * 3 * sizeof(float);
 	vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride(); // 3 * sizeof(float);
 	vertexBufferOptions.Offset = 0;
 	m_VertexBuffer = Atom::VertexBufferFactory::Create(vertexBufferOptions);
