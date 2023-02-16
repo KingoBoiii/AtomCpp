@@ -29,6 +29,8 @@ namespace Atom
 
 		SwapChain* GetSwapChain() const { return m_SwapChain; }
 
+		virtual float GetAspectRatio() const { return (float)m_WindowOptions.Width / (float)m_WindowOptions.Height; }
+
 		const WindowOptions& GetWindowOptions() const { return m_WindowOptions; }
 		const WindowOptions& GetWindowOptions() { return m_WindowOptions; }
 	protected:
