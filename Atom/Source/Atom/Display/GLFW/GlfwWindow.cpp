@@ -46,9 +46,11 @@ namespace Atom
 		int success = glfwInit();
 		AT_CORE_ASSERT(success, "Failed to initialize GLFW!");
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 
 		m_WindowHandle = Utils::CreateGlfwWindow(m_WindowOptions);
 		AT_CORE_ASSERT(m_WindowHandle, "Failed to create GLFW window");
@@ -62,6 +64,8 @@ namespace Atom
 		swapChainOptions.Window = this;
 		m_SwapChain = SwapChainFactory::Create(swapChainOptions);
 		m_SwapChain->Initialize();
+		
+		glfwMakeContextCurrent(m_WindowHandle);
 
 		glfwSetWindowUserPointer(m_WindowHandle, &m_WindowData);
 
