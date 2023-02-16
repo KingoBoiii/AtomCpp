@@ -22,12 +22,14 @@ project "Atom"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.mono}"
     }
 
     links {
         "spdlog",
-        "GLFW"
+        "GLFW",
+        "%{Library.mono}"
     }
 
 	defines {
@@ -37,6 +39,13 @@ project "Atom"
 
 	filter "system:windows"
 		systemversion "latest"
+
+        links {
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}",
+		}
 
 	filter "configurations:Debug"
 		defines "AT_DEBUG"
