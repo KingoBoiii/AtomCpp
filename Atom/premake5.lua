@@ -31,7 +31,8 @@ project "Atom"
         "spdlog",
         "GLFW",
         "ImGui",
-        "%{Library.mono}"
+        "%{Library.mono}",
+        "opengl32.lib"
     }
 
 	defines {

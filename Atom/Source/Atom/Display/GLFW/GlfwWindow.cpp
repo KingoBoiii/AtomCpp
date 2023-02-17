@@ -5,6 +5,8 @@
 #include "Atom/Graphics/RendererContext.h"
 #include "Atom/Graphics/SwapChain.h"
 
+#include "Atom/Events/KeyEvent.h"
+#include "Atom/Events/MouseEvent.h"
 #include "Atom/Events/WindowEvent.h"
 
 #include <GLFW/glfw3.h>
@@ -73,7 +75,7 @@ namespace Atom
 		swapChainOptions.Window = this;
 		m_SwapChain = SwapChainFactory::Create(swapChainOptions);
 		m_SwapChain->Initialize();
-		
+
 		//glfwMakeContextCurrent(m_WindowHandle);
 
 		glfwSetWindowUserPointer(m_WindowHandle, &m_WindowData);
@@ -104,6 +106,62 @@ namespace Atom
 
 			WindowCloseEvent e;
 			data.EventCallback(e);
+		});
+
+		glfwSetScrollCallback(m_WindowHandle, [](GLFWwindow* window, double xOffset, double yOffset)
+		{
+			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			MouseScrolledEvent e((float)xOffset, (float)yOffset);
+			data.EventCallback(e);
+		});
+
+		glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow* window, int button, int action, int mods)
+		{
+			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			switch(action)
+			{
+				case GLFW_PRESS:
+				{
+					MouseButtonPressedEvent e(button);
+					data.EventCallback(e);
+				}
+				break;
+				case GLFW_RELEASE:
+				{
+					MouseButtonReleasedEvent e(button);
+					data.EventCallback(e);
+				}
+				break;
+			}
+		});
+
+		glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			switch(action)
+			{
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent e(key, 0);
+					data.EventCallback(e);
+				}
+				break;
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent e(key);
+					data.EventCallback(e);
+				}
+				break;
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent e(key, 1);
+					data.EventCallback(e);
+				}
+				break;
+			}
 		});
 	}
 

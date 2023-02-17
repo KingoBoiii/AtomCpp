@@ -17,7 +17,8 @@ project "Atomic"
 		"%{wks.location}/Atom/Vendor",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGui}"
     }
 
 	links {

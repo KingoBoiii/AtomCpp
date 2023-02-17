@@ -31,6 +31,7 @@ namespace Atom
 		WindowData m_WindowData;
 
 		friend class Input;
+		friend class ImGuiLayer;
 	};
 
 }

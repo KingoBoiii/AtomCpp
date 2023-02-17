@@ -31,6 +31,8 @@ namespace Atom
 		friend class DX11Shader;
 		friend class DX11Pipeline;
 		friend class DX11UniformBuffer;
+
+		friend class ImGuiLayer;
 	};
 
 }

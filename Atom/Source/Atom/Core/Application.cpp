@@ -38,6 +38,9 @@ namespace Atom
 		m_Window = Utils::CreateWinddow(m_ApplicationOptions);
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
+
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application()
@@ -62,6 +65,15 @@ namespace Atom
 				layer->OnUpdate(m_DeltaTime);
 			}
 
+			m_ImGuiLayer->Begin();
+			{
+				for(Layer* layer : m_LayerStack)
+				{
+					layer->OnGUI();
+				}
+			}
+			m_ImGuiLayer->End();
+
 			m_Window->Present();
 		}
 	}
@@ -81,6 +93,13 @@ namespace Atom
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(AT_BIND_EVENT_FN(Application::OnWindowCloseEvent));
+
+		for(auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			(*it)->OnEvent(e);
+			if(e.Handled)
+				break;
+		}
 	}
 
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& e)

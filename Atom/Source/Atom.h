@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Atom/Core/Base.h"
 #include "Atom/Core/Log.h"
 
 #include "Atom/Core/Application.h"
@@ -10,6 +11,8 @@
 
 #include "Atom/Core/Input.h"
 #include "Atom/Core/KeyCodes.h"
+
+#include "Atom/ImGui/ImGuiLayer.h"
 
 #include "Atom/Graphics/RendererFactory.h"
 #include "Atom/Graphics/Renderer.h"

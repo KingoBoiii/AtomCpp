@@ -14,7 +14,7 @@ workspace "Atom"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir['spdlog'] = "%{wks.location}/Atom/vendor/spdlog/include";
+IncludeDir['spdlog'] = "%{wks.location}/Atom/Vendor/spdlog/include";
 IncludeDir["GLFW"] = "%{wks.location}/Atom/Vendor/glfw/include";
 IncludeDir["glm"] = "%{wks.location}/Atom/Vendor/glm";
 IncludeDir["entt"] = "%{wks.location}/Atom/Vendor/entt/include";
@@ -35,8 +35,8 @@ Library["BCrypt"] = "Bcrypt.lib"
 
 group "Dependencies"
     include "Atom/Vendor/spdlog"
-    include "Atom/vendor/glfw"
-    include "Atom/vendor/imgui"
+    include "Atom/Vendor/glfw"
+    include "Atom/Vendor/imgui"
 group ""
 
 group "Core" 

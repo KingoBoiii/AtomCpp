@@ -9,6 +9,8 @@
 #include "Atom/Events/Event.h"
 #include "Atom/Events/WindowEvent.h"
 
+#include "Atom/ImGui/ImGuiLayer.h"
+
 namespace Atom
 {
 
@@ -35,8 +37,10 @@ namespace Atom
 		bool OnWindowCloseEvent(WindowCloseEvent& e);
 	private:
 		ApplicationOptions m_ApplicationOptions;
-		LayerStack m_LayerStack;
 		Window* m_Window = nullptr;
+		ImGuiLayer* m_ImGuiLayer = nullptr;
+
+		LayerStack m_LayerStack;
 		bool m_IsRunning = true;
 		float m_DeltaTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
