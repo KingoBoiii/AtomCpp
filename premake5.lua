@@ -37,7 +37,10 @@ group "Dependencies"
     include "Atom/vendor/glfw"
 group ""
 
-include "Atom"
+group "Core" 
+    include "Atom"
+    include "Atom.Core"
+group ""
 
 include "Sandbox"
 

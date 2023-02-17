@@ -23,3 +23,5 @@
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
 #include "Atom/Scene/Components.h"
+
+#include "Atom/Scripting/ScriptEngine.h"
