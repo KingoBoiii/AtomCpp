@@ -21,7 +21,8 @@
     <OutputPath>..\Sandbox\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Sandbox\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,7 +34,8 @@
     <OutputPath>..\Sandbox\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Sandbox\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -42,6 +44,8 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\InternalCalls.cs" />
+    <Compile Include="Source\Log.cs" />
     <Compile Include="Source\Main.cs" />
   </ItemGroup>
   <ItemGroup>

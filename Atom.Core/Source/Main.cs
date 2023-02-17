@@ -27,33 +27,23 @@ namespace Atom
 
         public Main()
         {
-            Console.WriteLine("Main constructor!");
+            Log.Info("Main constructor!");
 
-            CppFunction();
-            NativeLog("Atom Game Engine is awesome!", 235);
-
-            var pos = new Vector3(5, 2, 1);
-            NativeLog_Vector3(ref pos);
+            Log.Trace("Trace");
+            Log.Information("Info");
+            Log.Warning("Warn");
+            Log.Error("Error");
         }
 
         public void PrintMessage()
         {
-            Console.WriteLine("Hello world from C#!");
+            Log.Trace("Hello world from C#!");
         }
 
         public void PrintCustomMessage(string message)
         {
-            Console.WriteLine($"C# says: {message}");
+            Log.Information($"C# says: {message}");
         }
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        extern static void CppFunction();
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        extern static void NativeLog(string text, int parameter);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        extern static void NativeLog_Vector3(ref Vector3 vector);
     }
 
 }

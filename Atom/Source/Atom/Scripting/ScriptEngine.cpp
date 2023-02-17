@@ -1,5 +1,6 @@
 #include "ATPCH.h"
 #include "ScriptEngine.h"
+#include "ScriptGlue.h"
 
 #include <glm/glm.hpp>
 
@@ -92,6 +93,7 @@ namespace Atom
 		MonoDomain* AppDomain = nullptr;
 
 		MonoAssembly* CoreAssembly = nullptr;
+		MonoImage* CoreAssemblyImage = nullptr;
 	};
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
@@ -115,30 +117,27 @@ namespace Atom
 	void ScriptEngine::Initialize()
 	{
 		InitializeMono();
+		LoadAssembly("Resources/Scripts/Atom.Core.dll");
+
+		ScriptGlue::RegisterInternalCalls();
+		
+#if 0
+		MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Main");
+		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
+		mono_runtime_object_init(instance);
+
+		MonoMethod* printMessageMethod = mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
+		mono_runtime_invoke(printMessageMethod, instance, nullptr, nullptr);
+
+		MonoString* str = mono_string_new(s_ScriptEngineData->AppDomain, "Hello world from C++");
+		MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
+		mono_runtime_invoke(printCustomMessageMethod, instance, (void**)&str, nullptr);
+#endif
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
-	}
-
-	static void CppFunction()
-	{
-		AT_CORE_TRACE("Hello from C++!");
-	}
-
-	static void NativeLog(MonoString* string, int parameter)
-	{
-		char* cStr = mono_string_to_utf8(string);
-		std::string str(cStr);
-		mono_free(cStr);
-
-		AT_CORE_TRACE("Native Log: {} ({})", str, parameter);
-	}
-
-	static void NativeLog_Vector(glm::vec3* vector)
-	{
-		AT_CORE_WARN("Vector3: {}", *vector);
 	}
 
 	void ScriptEngine::InitializeMono()
@@ -149,29 +148,6 @@ namespace Atom
 		AT_CORE_ASSERT(rootDomain);
 
 		s_ScriptEngineData->RootDomain = rootDomain;
-
-		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
-		mono_domain_set(s_ScriptEngineData->AppDomain, true);
-
-		mono_add_internal_call("Atom.Main::CppFunction", CppFunction);
-		mono_add_internal_call("Atom.Main::NativeLog", NativeLog);
-		mono_add_internal_call("Atom.Main::NativeLog_Vector3", NativeLog_Vector);
-
-		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
-		Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
-
-		MonoImage* monoImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
-		MonoClass* monoClass = mono_class_from_name(monoImage, "Atom", "Main");
-
-		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
-		mono_runtime_object_init(instance);
-
-		MonoMethod* printMessageMethod = mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
-		mono_runtime_invoke(printMessageMethod, instance, nullptr, nullptr);
-
-		MonoString* str = mono_string_new(s_ScriptEngineData->AppDomain, "Hello world from C++");
-		MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
-		mono_runtime_invoke(printCustomMessageMethod, instance, (void**)&str, nullptr);
 	}
 
 	void ScriptEngine::ShutdownMono()
@@ -180,6 +156,16 @@ namespace Atom
 
 		mono_jit_cleanup(s_ScriptEngineData->RootDomain);
 		s_ScriptEngineData->RootDomain = nullptr;
+	}
+
+	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	{
+		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
+		mono_domain_set(s_ScriptEngineData->AppDomain, true);
+
+		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
+		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
+		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
 	}
 
 }
