@@ -307,6 +307,11 @@ namespace Atom
 		return s_ScriptEngineData->CoreAssemblyImage;
 	}
 
+	MonoDomain* ScriptEngine::GetAppDomain()
+	{
+		return s_ScriptEngineData->AppDomain;
+	}
+
 	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className)
 		: m_ClassNamespace(classNameSpace), m_ClassName(className)
 	{

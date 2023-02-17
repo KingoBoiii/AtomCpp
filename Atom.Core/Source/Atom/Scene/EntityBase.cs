@@ -21,6 +21,12 @@ namespace Atom
 
         public ulong Id { get; }
 
+        public string Name
+        {
+            get { return GetComponent<Identifier>().Name; }
+            set { GetComponent<Identifier>().Name = value; }
+        }
+
         public Transform Transform
         {
             get

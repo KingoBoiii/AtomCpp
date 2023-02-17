@@ -26,6 +26,14 @@ namespace Atom
 
 #pragma endregion
 
+#pragma region Identifier
+
+		void Identifier_GetName(UUID uuid, MonoString** outName);
+		void Identifier_SetName(UUID uuid, MonoString* name);
+
+#pragma endregion
+
+
 #pragma region Transform
 
 		void Transform_GetPosition(UUID uuid, glm::vec3* outPosition);

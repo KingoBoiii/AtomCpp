@@ -49,6 +49,7 @@
     <Compile Include="Source\Atom\Core\InternalCalls.cs" />
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
+    <Compile Include="Source\Atom\Scene\Components\Identifier.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\Sandbox\Player.cs" />

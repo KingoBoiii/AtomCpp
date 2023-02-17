@@ -50,6 +50,9 @@ namespace Atom
 	{
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
 
+		AT_ADD_INTERNAL_CALL(Identifier_GetName);
+		AT_ADD_INTERNAL_CALL(Identifier_SetName);
+
 		AT_ADD_INTERNAL_CALL(Transform_GetPosition);
 		AT_ADD_INTERNAL_CALL(Transform_SetPosition);
 
@@ -78,6 +81,34 @@ namespace Atom
 			AT_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end(), "Entity_HasComponent: No function registered for this type!");
 
 			return s_EntityHasComponentFuncs.at(managedType)(entity);
+		}
+
+#pragma endregion
+
+#pragma region Identifier
+
+		void Identifier_GetName(UUID uuid, MonoString** outName)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			std::string entityName = entity.GetComponent<Component::Identifier>().Name;
+			
+			*outName = mono_string_new(ScriptEngine::GetAppDomain(), entityName.c_str());
+		}
+
+		void Identifier_SetName(UUID uuid, MonoString* name)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			std::string entityName = mono_string_to_utf8(name);
+			mono_free(name);
+			entity.GetComponent<Component::Identifier>().Name = entityName;
 		}
 
 #pragma endregion

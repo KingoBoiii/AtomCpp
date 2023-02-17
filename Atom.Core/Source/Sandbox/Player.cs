@@ -11,7 +11,7 @@ namespace Sandbox
 
         public void OnCreate()
         {
-            Log.Info($"Player.OnCreate({Id})");
+            Log.Info("Player.OnCreate({0}, {1})", Id, Name);
             Log.Info("Has Transform Component: {0}", HasComponent<Transform>());
 
             m_Transform = GetComponent<Transform>();
@@ -44,7 +44,7 @@ namespace Sandbox
 
         public void OnDestroy()
         {
-            Log.Info($"Player.OnDestroy({Id})");
+            Log.Info("Player.OnDestroy({0}, {1})", Id, Name);
         }
     }
 

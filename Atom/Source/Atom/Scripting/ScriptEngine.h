@@ -6,6 +6,7 @@ extern "C" {
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
 	typedef struct _MonoMethod MonoMethod;
+	typedef struct _MonoDomain MonoDomain;
 }
 
 namespace Atom
@@ -38,6 +39,8 @@ namespace Atom
 		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
 
 		static MonoImage* GetCoreAssemblyImage();
+		static MonoDomain* GetAppDomain();
+
 		inline static Scene* GetScene() { return s_Instance->m_Scene; }
 		inline static ScriptEngine& Get() { return *s_Instance; }
 	private:

@@ -14,6 +14,6 @@ namespace Atom
 	{
 	};
 
-	using AllComponents = ComponentGroup<Component::Transform, Component::Camera, Component::BasicRenderer, Component::Script>;
+	using AllComponents = ComponentGroup<Component::Identifier, Component::Transform, Component::Camera, Component::BasicRenderer, Component::Script>;
 
 }

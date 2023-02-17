@@ -13,6 +13,16 @@ namespace Atom
 
         #endregion
 
+        #region Identifier
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Identifier_GetName(ulong entityId, out string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Identifier_SetName(ulong entityId, ref string name);
+
+        #endregion
+
         #region Transform
 
         [MethodImpl(MethodImplOptions.InternalCall)]
