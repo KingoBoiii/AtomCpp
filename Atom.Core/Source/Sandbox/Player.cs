@@ -17,7 +17,23 @@ namespace Sandbox
             Log.Info($"Player.OnUpdate({deltaTime})");
 
             Vector3 position = Position;
-            position.X += Speed * deltaTime;
+            if (Input.IsKeyDown(KeyCode.A))
+            {
+                position.X -= Speed * deltaTime;
+            }
+            else if (Input.IsKeyDown(KeyCode.D))
+            {
+                position.X += Speed * deltaTime;
+            }
+
+            if (Input.IsKeyDown(KeyCode.W))
+            {
+                position.Y += Speed * deltaTime;
+            }
+            else if (Input.IsKeyDown(KeyCode.S))
+            {
+                position.Y -= Speed * deltaTime;
+            }
             Position = position;
         }
 

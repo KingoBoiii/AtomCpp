@@ -31,6 +31,11 @@ namespace Atom
 
 	}
 
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		AT_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	}
+
 	GlfwWindow::GlfwWindow(const WindowOptions& windowOptions)
 		: Window(windowOptions)
 	{
@@ -39,12 +44,16 @@ namespace Atom
 	GlfwWindow::~GlfwWindow()
 	{
 		glfwDestroyWindow(m_WindowHandle);
+
+		glfwTerminate();
 	}
 
 	void GlfwWindow::Initialize()
 	{
 		int success = glfwInit();
 		AT_CORE_ASSERT(success, "Failed to initialize GLFW!");
+
+		glfwSetErrorCallback(GLFWErrorCallback);
 
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -65,7 +74,7 @@ namespace Atom
 		m_SwapChain = SwapChainFactory::Create(swapChainOptions);
 		m_SwapChain->Initialize();
 		
-		glfwMakeContextCurrent(m_WindowHandle);
+		//glfwMakeContextCurrent(m_WindowHandle);
 
 		glfwSetWindowUserPointer(m_WindowHandle, &m_WindowData);
 

@@ -34,7 +34,8 @@ project "Atom"
 
 	defines {
         "ATOM_STATIC_LIB",
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
 	}
 
 	filter "system:windows"

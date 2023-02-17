@@ -35,6 +35,8 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Entity_GetPosition);
 		AT_ADD_INTERNAL_CALL(Entity_SetPosition);
 
+		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
+
 		AT_ADD_INTERNAL_CALL(Log_LogMessage);
 		AT_ADD_INTERNAL_CALL(Log_Trace);
 		AT_ADD_INTERNAL_CALL(Log_Information);
@@ -67,6 +69,15 @@ namespace Atom
 			Entity entity = scene->GetEntityByUUID(uuid);
 
 			entity.GetComponent<Component::Transform>().Position = *position;
+		}
+
+#pragma endregion
+
+#pragma region Input
+
+		bool Input_IsKeyDown(KeyCode keycode)
+		{
+			return Input::IsKeyDown(keycode);
 		}
 		
 #pragma endregion

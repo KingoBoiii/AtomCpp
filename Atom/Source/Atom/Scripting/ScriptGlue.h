@@ -1,5 +1,6 @@
 #pragma once
 #include "Atom/Core/UUID.h"
+#include "Atom/Core/Input.h"
 
 extern "C" {
 	typedef struct _MonoString MonoString;
@@ -24,6 +25,11 @@ namespace Atom
 
 #pragma endregion
 
+#pragma region Input
+
+		bool Input_IsKeyDown(KeyCode keycode);
+
+#pragma endregion
 
 #pragma region Log
 

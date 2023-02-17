@@ -29,6 +29,8 @@ namespace Atom
 			EventCallbackFn EventCallback;
 		};
 		WindowData m_WindowData;
+
+		friend class Input;
 	};
 
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Atom
 {
@@ -13,6 +14,13 @@ namespace Atom
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Entity_SetPosition(ulong entityId, ref Vector3 position);
+
+        #endregion
+
+        #region Input
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool Input_IsKeyDown(KeyCode keycode);
 
         #endregion
 

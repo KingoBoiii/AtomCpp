@@ -22,7 +22,9 @@ namespace Atom
 	bool Input::IsKeyDown(KeyCode keycode)
 	{
 		auto window = static_cast<GlfwWindow*>(Application::Get().GetWindow());
-		auto state = glfwGetKey(static_cast<GLFWwindow*>(window->GetNativeWindowHandle()), static_cast<int32_t>(keycode));
+
+		auto state = glfwGetKey(window->m_WindowHandle, static_cast<int32_t>(keycode));
+
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
@@ -60,7 +62,5 @@ namespace Atom
 			}
 		}
 	}
-
-}
 
 }

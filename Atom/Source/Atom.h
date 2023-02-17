@@ -8,6 +8,9 @@
 
 #include "Atom/Core/Layer.h"
 
+#include "Atom/Core/Input.h"
+#include "Atom/Core/KeyCodes.h"
+
 #include "Atom/Graphics/RendererFactory.h"
 #include "Atom/Graphics/Renderer.h"
 #include "Atom/Graphics/Renderer2D.h"
