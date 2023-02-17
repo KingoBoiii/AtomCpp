@@ -23,12 +23,14 @@ project "Atom"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.mono}"
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.ImGui}"
     }
 
     links {
         "spdlog",
         "GLFW",
+        "ImGui",
         "%{Library.mono}"
     }
 

@@ -13,8 +13,7 @@ Intermediates/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+**.csproj
 
 # Directories
-MooseEngine/vendor/VulkanSDK
-MooseEditor/assets/cache
 scripts/__pycache__
