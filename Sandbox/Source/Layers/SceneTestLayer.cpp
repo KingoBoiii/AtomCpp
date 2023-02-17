@@ -27,7 +27,9 @@ void SceneTestLayer::OnAttach()
 
 void SceneTestLayer::OnDetach()
 {
+	m_Scene->OnRuntimeStop();
 	delete m_Scene;
+	
 	delete m_Renderer2D;
 	delete m_Renderer;
 }
@@ -36,5 +38,5 @@ void SceneTestLayer::OnUpdate(float deltaTime)
 {
 	m_Renderer->Clear();
 
-	m_Scene->OnUpdateRuntime();
+	m_Scene->OnRuntimeUpdate(deltaTime);
 }

@@ -44,10 +44,13 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Entity.cs" />
-    <Compile Include="Source\InternalCalls.cs" />
-    <Compile Include="Source\Log.cs" />
+    <Compile Include="Source\Scene\ComponentBase.cs" />
+    <Compile Include="Source\Core\FormatUtils.cs" />
+    <Compile Include="Source\Scene\EntityBase.cs" />
+    <Compile Include="Source\Core\InternalCalls.cs" />
+    <Compile Include="Source\Core\Log.cs" />
     <Compile Include="Source\Main.cs" />
+    <Compile Include="Source\Sandbox\Player.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

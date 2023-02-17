@@ -1,6 +1,9 @@
 #include "ATPCH.h"
 #include "ScriptGlue.h"
 
+#include "Atom/Scene/Scene.h"
+#include "Atom/Scene/Entity.h"
+
 #include <mono/metadata/object.h>
 
 namespace Atom
@@ -29,6 +32,10 @@ namespace Atom
 
 	void ScriptGlue::RegisterInternalCalls()
 	{
+		AT_ADD_INTERNAL_CALL(Entity_GetPosition);
+		AT_ADD_INTERNAL_CALL(Entity_SetPosition);
+
+		AT_ADD_INTERNAL_CALL(Log_LogMessage);
 		AT_ADD_INTERNAL_CALL(Log_Trace);
 		AT_ADD_INTERNAL_CALL(Log_Information);
 		AT_ADD_INTERNAL_CALL(Log_Warning);
@@ -42,6 +49,60 @@ namespace Atom
 	namespace InternalCalls
 	{
 		
+#pragma region Entity
+
+		void Entity_GetPosition(UUID uuid, glm::vec3* outPosition)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+
+			Entity entity = scene->GetEntityByUUID(uuid);
+
+			*outPosition = entity.GetComponent<Component::Transform>().Position;
+		}
+
+		void Entity_SetPosition(UUID uuid, glm::vec3* position)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+
+			Entity entity = scene->GetEntityByUUID(uuid);
+
+			entity.GetComponent<Component::Transform>().Position = *position;
+		}
+		
+#pragma endregion
+
+
+#pragma region Log
+
+		void Log_LogMessage(LogLevel level, MonoString* message)
+		{
+			char* cStr = mono_string_to_utf8(message);
+			std::string messageStr(cStr);
+			mono_free(cStr);
+
+			switch(level)
+			{
+				case LogLevel::Trace:
+					AT_TRACE(messageStr);
+					break;
+				case LogLevel::Debug:
+					AT_INFO(messageStr);
+					break;
+				case LogLevel::Info:
+					AT_INFO(messageStr);
+					break;
+				case LogLevel::Warn:
+					AT_WARN(messageStr);
+					break;
+				case LogLevel::Error:
+					AT_ERROR(messageStr);
+					break;
+				case LogLevel::Critical:
+					AT_CRITICAL(messageStr);
+					break;
+			}
+		}
+
 		void Log_Trace(MonoString* string)
 		{
 			char* cStr = mono_string_to_utf8(string);
@@ -77,6 +138,8 @@ namespace Atom
 
 			AT_ERROR("{}", str);
 		}
+
+#pragma endregion
 
 	}
 

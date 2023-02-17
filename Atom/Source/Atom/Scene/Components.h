@@ -4,6 +4,7 @@
 #include "Components/TransformComponent.h"
 #include "Components/CameraComponent.h"
 #include "components/BasicRendererComponent.h"
+#include "components/ScriptComponent.h"
 
 namespace Atom
 {
@@ -13,6 +14,6 @@ namespace Atom
 	{
 	};
 
-	using AllComponents = ComponentGroup<Component::Transform, Component::Camera, Component::BasicRenderer>;
+	using AllComponents = ComponentGroup<Component::Transform, Component::Camera, Component::BasicRenderer, Component::Script>;
 
 }

@@ -14,7 +14,5 @@ private:
 	Atom::Renderer* m_Renderer = nullptr;
 	Atom::Renderer2D* m_Renderer2D = nullptr;
 	Atom::Scene* m_Scene = nullptr;
-
-	Atom::ScriptEngine* m_ScriptEngine = nullptr;
 };
 

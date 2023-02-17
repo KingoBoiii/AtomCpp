@@ -1,6 +1,7 @@
 #pragma once
 #include "Atom/Core/UUID.h"
 #include "Atom/Graphics/Renderer2D.h"
+#include "Atom/Scripting/ScriptEngine.h"
 
 #include "entt.hpp"
 
@@ -21,8 +22,11 @@ namespace Atom
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
-		void OnUpdateRuntime();
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+		void OnRuntimeUpdate(float deltaTime);
 
+		Entity GetEntityByUUID(UUID uuid);
 		Entity GetPrimaryCameraEntity();
 
 		template<typename... Components>
@@ -37,6 +41,7 @@ namespace Atom
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 		Renderer2D* m_Renderer2D = nullptr;
+		ScriptEngine* m_ScriptEngine = nullptr;
 
 		friend class Entity;
 	};

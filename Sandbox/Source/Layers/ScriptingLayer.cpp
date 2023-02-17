@@ -22,17 +22,18 @@ void ScriptingLayer::OnAttach()
 	auto quadEntity = m_Scene->CreateEntity("Quad");
 	quadEntity.AddComponent<Atom::Component::BasicRenderer>(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
+	std::string playerClassName = "Sandbox.Player";
+	const auto& entityClasses = Atom::ScriptEngine::GetEntityClasses();
+	AT_ASSERT(entityClasses.find(playerClassName) != entityClasses.end());
+	quadEntity.AddComponent<Atom::Component::Script>(playerClassName);
+	
 	m_Scene->OnViewportResize(window->GetWindowOptions().Width, window->GetWindowOptions().Height);
-
-	m_ScriptEngine = new Atom::ScriptEngine();
-	m_ScriptEngine->Initialize();
+	m_Scene->OnRuntimeStart();
 }
 
 void ScriptingLayer::OnDetach()
 {
-	m_ScriptEngine->Shutdown();
-	delete m_ScriptEngine;
-
+	m_Scene->OnRuntimeStop();
 	delete m_Scene;
 
 	m_Renderer2D->Shutdown();
@@ -44,5 +45,5 @@ void ScriptingLayer::OnUpdate(float deltaTime)
 {
 	m_Renderer->Clear();
 
-	m_Scene->OnUpdateRuntime();
+	m_Scene->OnRuntimeUpdate(deltaTime);
 }

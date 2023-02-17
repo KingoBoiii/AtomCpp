@@ -9,10 +9,13 @@ namespace Atom
 	Scene::Scene(Renderer2D* renderer2D)
 		: m_Renderer2D(renderer2D)
 	{
+		m_ScriptEngine = new ScriptEngine(this);
+		m_ScriptEngine->Initialize();
 	}
 
 	Scene::~Scene()
 	{
+		delete m_ScriptEngine;
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -62,8 +65,49 @@ namespace Atom
 		}
 	}
 
-	void Scene::OnUpdateRuntime()
+	void Scene::OnRuntimeStart()
 	{
+		// Script
+		{
+			m_ScriptEngine->OnRuntimeStart();
+
+			auto view = m_Registry.view<Component::Script>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+				m_ScriptEngine->OnCreateEntity(entity);
+			}
+		}
+	}
+
+	void Scene::OnRuntimeStop()
+	{
+		// Script
+		{
+			// TODO: Maybe call OnDestroyEntity?
+			auto view = m_Registry.view<Component::Script>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+				m_ScriptEngine->OnDestroyEntity(entity);
+			}
+
+			m_ScriptEngine->OnRuntimeStop();
+		}
+	}
+
+	void Scene::OnRuntimeUpdate(float deltaTime)
+	{
+		// Script 
+		{
+			auto view = m_Registry.view<Component::Script>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+				m_ScriptEngine->OnUpdateEntity(entity, deltaTime);
+			}
+		}
+
 		// Renderer 2D
 		{
 			Camera* mainCamera = nullptr;
@@ -99,6 +143,14 @@ namespace Atom
 
 				m_Renderer2D->EndScene();
 			}
+		}
+	}
+
+	Entity Scene::GetEntityByUUID(UUID uuid)
+	{
+		if(m_EntityMap.find(uuid) != m_EntityMap.end())
+		{
+			return { m_EntityMap[uuid], this };
 		}
 	}
 
