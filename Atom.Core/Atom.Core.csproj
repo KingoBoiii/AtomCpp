@@ -49,6 +49,8 @@
     <Compile Include="Source\Atom\Core\InternalCalls.cs" />
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
+    <Compile Include="Source\Atom\Graphics\Color.cs" />
+    <Compile Include="Source\Atom\Scene\Components\BasicRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Identifier.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Main.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="Source\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Source\Atom\Maths\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

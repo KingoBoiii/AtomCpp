@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Atom
+﻿namespace Atom
 {
 
     public interface IEntity

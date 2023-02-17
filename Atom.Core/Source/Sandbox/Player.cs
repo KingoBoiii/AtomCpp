@@ -7,20 +7,26 @@ namespace Sandbox
     {
         public float Speed { get; set; } = 1.0f;
 
-        private Transform m_Transform;
+        private BasicRenderer m_Renderer;
 
         public void OnCreate()
         {
             Log.Info("Player.OnCreate({0}, {1})", Id, Name);
             Log.Info("Has Transform Component: {0}", HasComponent<Transform>());
 
-            m_Transform = GetComponent<Transform>();
+            m_Renderer = GetComponent<BasicRenderer>();
+            m_Renderer.Color = new Color(1.0f, 0.0f, 1.0f, 1.0f);
         }
 
         public void OnUpdate(float deltaTime)
         {
             Log.Info($"Player.OnUpdate({deltaTime})");
 
+            HandleMovement(deltaTime);
+        }
+
+        private void HandleMovement(float deltaTime)
+        {
             Vector3 position = Transform.Position;
             if (Input.IsKeyDown(KeyCode.A))
             {
@@ -28,7 +34,7 @@ namespace Sandbox
             }
             else if (Input.IsKeyDown(KeyCode.D))
             {
-                position.X += Speed * deltaTime; 
+                position.X += Speed * deltaTime;
             }
 
             if (Input.IsKeyDown(KeyCode.W))

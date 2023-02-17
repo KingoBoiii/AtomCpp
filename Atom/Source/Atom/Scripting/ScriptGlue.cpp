@@ -56,6 +56,9 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Transform_GetPosition);
 		AT_ADD_INTERNAL_CALL(Transform_SetPosition);
 
+		AT_ADD_INTERNAL_CALL(BasicRenderer_GetColor);
+		AT_ADD_INTERNAL_CALL(BasicRenderer_SetColor);
+		
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
 		AT_ADD_INTERNAL_CALL(Log_LogMessage);
@@ -133,6 +136,30 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 
 			entity.GetComponent<Component::Transform>().Position = *position;
+		}
+
+#pragma endregion
+
+#pragma region Basic Renderer
+
+		void BasicRenderer_GetColor(UUID uuid, glm::vec4* outColor)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*outColor = entity.GetComponent<Component::BasicRenderer>().Color;
+		}
+
+		void BasicRenderer_SetColor(UUID uuid, glm::vec4* color)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+			
+			entity.GetComponent<Component::BasicRenderer>().Color = *color;
 		}
 
 #pragma endregion

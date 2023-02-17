@@ -41,6 +41,12 @@ namespace Atom
 
 #pragma endregion
 
+#pragma region Basic Renderer
+
+		void BasicRenderer_GetColor(UUID uuid, glm::vec4* outColor);
+		void BasicRenderer_SetColor(UUID uuid, glm::vec4* color);
+
+#pragma endregion
 
 #pragma region Input
 

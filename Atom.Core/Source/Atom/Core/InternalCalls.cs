@@ -33,6 +33,16 @@ namespace Atom
 
         #endregion
 
+        #region Basic Renderer
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void BasicRenderer_GetColor(ulong entityId, out Color color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void BasicRenderer_SetColor(ulong entityId, ref Color color);
+
+        #endregion
+
         #region Input
 
         [MethodImpl(MethodImplOptions.InternalCall)]
