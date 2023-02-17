@@ -12,6 +12,7 @@ namespace Sandbox
         public void OnCreate()
         {
             Log.Info($"Player.OnCreate({Id})");
+            Log.Info("Has Transform Component: {0}", HasComponent<Transform>());
 
             m_Transform = GetComponent<Transform>();
         }
