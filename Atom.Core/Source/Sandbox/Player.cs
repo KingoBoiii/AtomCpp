@@ -20,13 +20,6 @@ namespace Sandbox
 
         public void OnUpdate(float deltaTime)
         {
-            Log.Info($"Player.OnUpdate({deltaTime})");
-
-            HandleMovement(deltaTime);
-        }
-
-        private void HandleMovement(float deltaTime)
-        {
             Vector3 position = Transform.Position;
             if (Input.IsKeyDown(KeyCode.A))
             {
