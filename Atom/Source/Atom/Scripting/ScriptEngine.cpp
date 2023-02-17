@@ -2,6 +2,8 @@
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
 
+#include "ScriptClass.h"
+
 #include <glm/glm.hpp>
 
 #include <mono/jit/jit.h>
@@ -94,6 +96,8 @@ namespace Atom
 
 		MonoAssembly* CoreAssembly = nullptr;
 		MonoImage* CoreAssemblyImage = nullptr;
+
+		ScriptClass EntityClass;
 	};
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
@@ -120,7 +124,18 @@ namespace Atom
 		LoadAssembly("Resources/Scripts/Atom.Core.dll");
 
 		ScriptGlue::RegisterInternalCalls();
+
+		s_ScriptEngineData->EntityClass = ScriptClass(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Main");
+
+		MonoObject* instance = s_ScriptEngineData->EntityClass.Instantiate();
+		MonoMethod* printMessageMethod = s_ScriptEngineData->EntityClass.GetMethod("PrintMessage");
+		s_ScriptEngineData->EntityClass.InvokeMethod(instance, printMessageMethod);
+
+		MonoMethod* printCustomMessageMethod = s_ScriptEngineData->EntityClass.GetMethod("PrintCustomMessage", 1);
+		MonoString* str = mono_string_new(s_ScriptEngineData->AppDomain, "Hello world from C++");
+		s_ScriptEngineData->EntityClass.InvokeMethod(instance, printCustomMessageMethod, (void**)&str);
 		
+
 #if 0
 		MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Main");
 		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
@@ -138,6 +153,16 @@ namespace Atom
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
+	}
+
+	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	{
+		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
+		mono_domain_set(s_ScriptEngineData->AppDomain, true);
+
+		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
+		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
+		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
 	}
 
 	void ScriptEngine::InitializeMono()
@@ -158,14 +183,11 @@ namespace Atom
 		s_ScriptEngineData->RootDomain = nullptr;
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
 	{
-		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
-		mono_domain_set(s_ScriptEngineData->AppDomain, true);
-
-		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
-		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
-		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
+		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
+		mono_runtime_object_init(instance);
+		return instance;
 	}
 
 }
