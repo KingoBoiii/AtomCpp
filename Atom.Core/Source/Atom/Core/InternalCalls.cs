@@ -9,10 +9,17 @@ namespace Atom
         #region Entity
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Entity_GetPosition(ulong entityId, out Vector3 position);
+        internal static extern bool Entity_HasComponent(ulong entityId, Type componentType);
+
+        #endregion
+
+        #region Transform
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Entity_SetPosition(ulong entityId, ref Vector3 position);
+        internal static extern void Transform_GetPosition(ulong entityId, out Vector3 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Transform_SetPosition(ulong entityId, ref Vector3 position);
 
         #endregion
 
@@ -41,7 +48,7 @@ namespace Atom
         [MethodImpl(MethodImplOptions.InternalCall)]
         [Obsolete]
         internal static extern void Log_Warning(string message);
-        
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         [Obsolete]
         internal static extern void Log_Error(string message);

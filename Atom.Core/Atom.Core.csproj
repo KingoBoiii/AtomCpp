@@ -49,10 +49,12 @@
     <Compile Include="Source\Atom\Core\InternalCalls.cs" />
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
+    <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\Sandbox\Player.cs" />
     <Compile Include="Source\Atom\Scene\ComponentBase.cs" />
     <Compile Include="Source\Atom\Scene\EntityBase.cs" />
+    <Compile Include="Source\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -4,6 +4,7 @@
 
 extern "C" {
 	typedef struct _MonoString MonoString;
+	typedef struct _MonoReflectionType MonoReflectionType;
 }
 
 namespace Atom
@@ -12,6 +13,7 @@ namespace Atom
 	class ScriptGlue
 	{
 	public:
+		static void RegisterComponents();
 		static void RegisterInternalCalls();
 	};
 
@@ -20,10 +22,17 @@ namespace Atom
 		
 #pragma region Entity
 
-		void Entity_GetPosition(UUID uuid, glm::vec3* outPosition);
-		void Entity_SetPosition(UUID uuid, glm::vec3* position);
+		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
 
 #pragma endregion
+
+#pragma region Transform
+
+		void Transform_GetPosition(UUID uuid, glm::vec3* outPosition);
+		void Transform_SetPosition(UUID uuid, glm::vec3* position);
+
+#pragma endregion
+
 
 #pragma region Input
 

@@ -37,6 +37,7 @@ namespace Atom
 
 		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
 
+		static MonoImage* GetCoreAssemblyImage();
 		inline static Scene* GetScene() { return s_Instance->m_Scene; }
 		inline static ScriptEngine& Get() { return *s_Instance; }
 	private:
@@ -47,6 +48,7 @@ namespace Atom
 		static void LoadAssemblyClasses(MonoAssembly* assembly, MonoImage* image);
 
 		friend class ScriptClass;
+		friend class ScriptGlue;
 	private:
 		Scene* m_Scene;
 	private:

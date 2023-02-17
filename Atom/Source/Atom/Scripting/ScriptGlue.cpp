@@ -5,35 +5,53 @@
 #include "Atom/Scene/Entity.h"
 
 #include <mono/metadata/object.h>
+#include <mono/metadata/reflection.h>
 
 namespace Atom
 {
 
+	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
+
 #define AT_ADD_INTERNAL_CALL(icall) mono_add_internal_call("Atom.InternalCalls::"#icall, (void*)InternalCalls::icall)
 
-	static void CppFunction()
+	template<typename Component>
+	static void RegisterComponent()
 	{
-		AT_CORE_TRACE("Hello from C++!");
+		std::string_view typeName = typeid(Component).name();
+
+		size_t pos = typeName.find_last_of(":");
+		std::string_view structName = typeName.substr(pos + 1);
+		std::string managedTypeName = fmt::format("Atom.{}", structName);
+
+		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
+		if(!managedType)
+		{
+			AT_CORE_ERROR("Could not find managed component type: {}", managedTypeName);
+			return;
+		}
+		s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
 	}
 
-	static void NativeLog(MonoString* string, int parameter)
+	template<typename... Component>
+	static void RegisterComponent(ComponentGroup<Component...>)
 	{
-		char* cStr = mono_string_to_utf8(string);
-		std::string str(cStr);
-		mono_free(cStr);
-
-		AT_CORE_TRACE("Native Log: {} ({})", str, parameter);
+		([]()
+		{
+			RegisterComponent<Component>();
+		}(), ...);
 	}
 
-	static void NativeLog_Vector(glm::vec3* vector)
+	void ScriptGlue::RegisterComponents()
 	{
-		AT_CORE_WARN("Vector3: {}", *vector);
+		RegisterComponent(AllComponents{});
 	}
 
 	void ScriptGlue::RegisterInternalCalls()
 	{
-		AT_ADD_INTERNAL_CALL(Entity_GetPosition);
-		AT_ADD_INTERNAL_CALL(Entity_SetPosition);
+		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
+
+		AT_ADD_INTERNAL_CALL(Transform_GetPosition);
+		AT_ADD_INTERNAL_CALL(Transform_SetPosition);
 
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
@@ -42,31 +60,46 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Log_Information);
 		AT_ADD_INTERNAL_CALL(Log_Warning);
 		AT_ADD_INTERNAL_CALL(Log_Error);
-
-		mono_add_internal_call("Atom.Main::CppFunction", CppFunction);
-		mono_add_internal_call("Atom.Main::NativeLog", NativeLog);
-		mono_add_internal_call("Atom.Main::NativeLog_Vector3", NativeLog_Vector);
 	}
 
 	namespace InternalCalls
 	{
-		
+
 #pragma region Entity
 
-		void Entity_GetPosition(UUID uuid, glm::vec3* outPosition)
+		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType)
 		{
 			Scene* scene = ScriptEngine::GetScene();
-
+			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			MonoType* managedType = mono_reflection_type_get_type(monoReflectionType);
+			AT_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end(), "Entity_HasComponent: No function registered for this type!");
+
+			return s_EntityHasComponentFuncs.at(managedType)(entity);
+		}
+
+#pragma endregion
+
+#pragma region Transform
+
+		void Transform_GetPosition(UUID uuid, glm::vec3* outPosition)
+		{
+			Scene* scene = ScriptEngine::GetScene();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
 
 			*outPosition = entity.GetComponent<Component::Transform>().Position;
 		}
 
-		void Entity_SetPosition(UUID uuid, glm::vec3* position)
+		void Transform_SetPosition(UUID uuid, glm::vec3* position)
 		{
 			Scene* scene = ScriptEngine::GetScene();
-
+			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
 
 			entity.GetComponent<Component::Transform>().Position = *position;
 		}
@@ -79,7 +112,7 @@ namespace Atom
 		{
 			return Input::IsKeyDown(keycode);
 		}
-		
+
 #pragma endregion
 
 
@@ -122,7 +155,7 @@ namespace Atom
 
 			AT_TRACE("{}", str);
 		}
-		
+
 		void Log_Information(MonoString* string)
 		{
 			char* cStr = mono_string_to_utf8(string);

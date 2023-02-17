@@ -3,7 +3,7 @@
     
     public abstract class ComponentBase
     {
-        protected EntityBase Entity { get; }
+        public EntityBase Entity { get; internal set; }
     }
 
 }

@@ -1,4 +1,6 @@
-﻿namespace Atom
+﻿using System;
+
+namespace Atom
 {
 
     public interface IEntity
@@ -19,17 +21,28 @@
 
         public ulong Id { get; }
 
-        public Vector3 Position
+        public Transform Transform
         {
             get
             {
-                InternalCalls.Entity_GetPosition(Id, out var position);
-                return position;
+                return GetComponent<Transform>();
             }
-            set
+        }
+
+        public bool HasComponent<TComponent>() where TComponent : ComponentBase
+        {
+            var componentType = typeof(TComponent);
+            return InternalCalls.Entity_HasComponent(Id, componentType);
+        }
+
+        public TComponent GetComponent<TComponent>() where TComponent : ComponentBase, new()
+        {
+            if(!HasComponent<TComponent>())
             {
-                InternalCalls.Entity_SetPosition(Id, ref value);
+                return default;
             }
+
+            return new TComponent { Entity = this };
         }
     }
 

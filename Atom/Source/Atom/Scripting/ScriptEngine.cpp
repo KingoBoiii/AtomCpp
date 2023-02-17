@@ -130,6 +130,7 @@ namespace Atom
 		LoadAssembly("Resources/Scripts/Atom.Core.dll");
 		LoadAssemblyClasses(s_ScriptEngineData->CoreAssembly, s_ScriptEngineData->CoreAssemblyImage);
 
+		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
 
 		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "EntityBase");
@@ -299,6 +300,11 @@ namespace Atom
 				s_ScriptEngineData->EntityClasses[fullName] = new ScriptClass(nameSpace, name);
 			}
 		}
+	}
+
+	MonoImage* ScriptEngine::GetCoreAssemblyImage()
+	{
+		return s_ScriptEngineData->CoreAssemblyImage;
 	}
 
 	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className)
