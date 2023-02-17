@@ -2,8 +2,6 @@
 
 extern "C" {
 	typedef struct _MonoString MonoString;
-	typedef struct _MonoArray MonoArray;
-	typedef struct _MonoReflectionType MonoReflectionType;
 }
 
 namespace Atom
