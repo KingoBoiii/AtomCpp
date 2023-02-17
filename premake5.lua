@@ -1,6 +1,6 @@
 workspace "Atom"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "Atomic"
 
 	configurations { 
 		"Debug",
@@ -40,6 +40,10 @@ group ""
 group "Core" 
     include "Atom"
     include "Atom.Core"
+group ""
+    
+group "Tools"
+    include "Atomic"
 group ""
 
 include "Sandbox"
