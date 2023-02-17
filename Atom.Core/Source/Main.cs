@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Atom
 {
@@ -10,6 +11,9 @@ namespace Atom
         public Main()
         {
             Console.WriteLine("Main constructor!");
+
+            CppFunction();
+            NativeLog("Atom Game Engine is awesome!", 235);
         }
 
         public void PrintMessage()
@@ -22,6 +26,11 @@ namespace Atom
             Console.WriteLine($"C# says: {message}");
         }
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        extern static void CppFunction();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        extern static void NativeLog(string text, int parameter);
     }
 
 }

@@ -120,6 +120,18 @@ namespace Atom
 		ShutdownMono();
 	}
 
+	static void CppFunction()
+	{
+		AT_CORE_TRACE("Hello from C++!");
+	}
+
+	static void NativeLog(MonoString* string, int parameter)
+	{
+		char* str = mono_string_to_utf8(string);
+
+		AT_CORE_TRACE("Native Log: {} ({})", str, parameter);
+	}
+
 	void ScriptEngine::InitializeMono()
 	{
 		mono_set_assemblies_path("mono/lib");
@@ -131,6 +143,9 @@ namespace Atom
 
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
+
+		mono_add_internal_call("Atom.Main::CppFunction", CppFunction);
+		mono_add_internal_call("Atom.Main::NativeLog", NativeLog);
 
 		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
 		Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
