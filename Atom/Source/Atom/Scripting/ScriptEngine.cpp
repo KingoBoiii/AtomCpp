@@ -1,6 +1,8 @@
 #include "ATPCH.h"
 #include "ScriptEngine.h"
 
+#include <glm/glm.hpp>
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
@@ -127,9 +129,16 @@ namespace Atom
 
 	static void NativeLog(MonoString* string, int parameter)
 	{
-		char* str = mono_string_to_utf8(string);
+		char* cStr = mono_string_to_utf8(string);
+		std::string str(cStr);
+		mono_free(cStr);
 
 		AT_CORE_TRACE("Native Log: {} ({})", str, parameter);
+	}
+
+	static void NativeLog_Vector(glm::vec3* vector)
+	{
+		AT_CORE_WARN("Vector3: {}", *vector);
 	}
 
 	void ScriptEngine::InitializeMono()
@@ -146,6 +155,7 @@ namespace Atom
 
 		mono_add_internal_call("Atom.Main::CppFunction", CppFunction);
 		mono_add_internal_call("Atom.Main::NativeLog", NativeLog);
+		mono_add_internal_call("Atom.Main::NativeLog_Vector3", NativeLog_Vector);
 
 		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
 		Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
