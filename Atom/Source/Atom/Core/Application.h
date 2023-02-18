@@ -14,8 +14,6 @@
 namespace Atom
 {
 
-	class ATOM_API Renderer;
-	
 	class ATOM_API Application
 	{
 	public:

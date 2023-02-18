@@ -6,6 +6,7 @@
 
 #include "Atom/Display/WindowFactory.h"
 #include "Atom/Renderer/Renderer.h"
+#include "Atom/Scripting/ScriptEngine.h"
 #include "Input/Input.h"
 
 namespace Atom
@@ -46,6 +47,7 @@ namespace Atom
 		m_Window->Initialize();
 
 		Renderer::Initialize(m_Window);
+		ScriptEngine::Initialize();
 		Input::Initialize();
 
 		m_ImGuiLayer = new ImGuiLayer();
@@ -55,6 +57,7 @@ namespace Atom
 	Application::~Application()
 	{
 		Input::Shutdown();
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 
 		delete m_Window;

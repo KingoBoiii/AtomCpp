@@ -21,7 +21,8 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,7 +34,8 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -54,11 +56,9 @@
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\EntityBase.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\Sandbox\Player.cs" />
     <Compile Include="Source\Vector3.cs" />
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

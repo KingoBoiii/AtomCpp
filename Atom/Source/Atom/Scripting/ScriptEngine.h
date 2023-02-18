@@ -19,50 +19,43 @@ namespace Atom
 	class ATOM_API ScriptEngine
 	{
 	public:
-		ScriptEngine(Scene* m_Scene);
-		~ScriptEngine();
+		static void Initialize();
+		static void Shutdown();
 
-		void Initialize();
-		void Shutdown();
+		static void OnRuntimeStart(Scene* scene);
+		static void OnRuntimeStop();
 
-		void OnRuntimeStart();
-		void OnRuntimeStop();
+		static void OnCreateEntity(Entity entity);
+		static void OnDestroyEntity(Entity entity);
+		static void OnUpdateEntity(Entity entity, float deltaTime);
 
-		void OnCreateEntity(Entity entity);
-		void OnDestroyEntity(Entity entity);
-		void OnUpdateEntity(Entity entity, float deltaTime);
+		static void LoadAssembly(const std::filesystem::path& filepath);
+		static void LoadAppAssembly(const std::filesystem::path& filepath);
 
-		void LoadAssembly(const std::filesystem::path& filepath);
-
-		bool EntityClassExists(const std::string& fullName);
+		static bool EntityClassExists(const std::string& fullName);
 
 		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
 
 		static MonoImage* GetCoreAssemblyImage();
 		static MonoDomain* GetAppDomain();
-
-		inline static Scene* GetScene() { return s_Instance->m_Scene; }
-		inline static ScriptEngine& Get() { return *s_Instance; }
+		
+		static Scene* GetSceneContext();
 	private:
-		void InitializeMono();
-		void ShutdownMono();
+		static void InitializeMono();
+		static void ShutdownMono();
 
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
-		static void LoadAssemblyClasses(MonoAssembly* assembly, MonoImage* image);
+		static void LoadAssemblyClasses();
 
 		friend class ScriptClass;
 		friend class ScriptGlue;
-	private:
-		Scene* m_Scene;
-	private:
-		static ScriptEngine* s_Instance;
 	};
 
 	class ScriptClass
 	{
 	public:
 		ScriptClass() = default;
-		ScriptClass(const std::string& classNameSpace, const std::string& className);
+		ScriptClass(const std::string& classNameSpace, const std::string& className, bool isCore = false);
 
 		MonoObject* Instantiate() const;
 		MonoMethod* GetMethod(const std::string& methodName, int parameterCount = 0) const;

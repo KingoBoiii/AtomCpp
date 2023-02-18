@@ -3,6 +3,8 @@
 #include "Entity.h"
 #include "Components.h"
 
+#include "Atom/Scripting/ScriptEngine.h"
+
 #include "Atom/Renderer/Renderer2D.h"
 
 namespace Atom
@@ -10,13 +12,10 @@ namespace Atom
 
 	Scene::Scene()
 	{
-		m_ScriptEngine = new ScriptEngine(this);
-		m_ScriptEngine->Initialize();
 	}
 
 	Scene::~Scene()
 	{
-		delete m_ScriptEngine;
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -70,13 +69,13 @@ namespace Atom
 	{
 		// Script
 		{
-			m_ScriptEngine->OnRuntimeStart();
+			ScriptEngine::OnRuntimeStart(this);
 
 			auto view = m_Registry.view<Component::Script>();
 			for(auto e : view)
 			{
 				Entity entity{ e, this };
-				m_ScriptEngine->OnCreateEntity(entity);
+				ScriptEngine::OnCreateEntity(entity);
 			}
 		}
 	}
@@ -90,10 +89,10 @@ namespace Atom
 			for(auto e : view)
 			{
 				Entity entity{ e, this };
-				m_ScriptEngine->OnDestroyEntity(entity);
+				ScriptEngine::OnDestroyEntity(entity);
 			}
 
-			m_ScriptEngine->OnRuntimeStop();
+			ScriptEngine::OnRuntimeStop();
 		}
 	}
 
@@ -105,7 +104,7 @@ namespace Atom
 			for(auto e : view)
 			{
 				Entity entity{ e, this };
-				m_ScriptEngine->OnUpdateEntity(entity, deltaTime);
+				ScriptEngine::OnUpdateEntity(entity, deltaTime);
 			}
 		}
 

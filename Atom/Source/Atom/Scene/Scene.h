@@ -1,6 +1,5 @@
 #pragma once
 #include "Atom/Core/UUID.h"
-#include "Atom/Scripting/ScriptEngine.h"
 
 #include "entt.hpp"
 
@@ -38,8 +37,6 @@ namespace Atom
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
-
-		ScriptEngine* m_ScriptEngine = nullptr;
 
 		friend class Entity;
 	};

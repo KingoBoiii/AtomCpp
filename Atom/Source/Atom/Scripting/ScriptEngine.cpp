@@ -98,7 +98,12 @@ namespace Atom
 		MonoAssembly* CoreAssembly = nullptr;
 		MonoImage* CoreAssemblyImage = nullptr;
 
+		MonoAssembly* AppAssembly = nullptr;
+		MonoImage* AppAssemblyImage = nullptr;
+
 		ScriptClass EntityClass;
+
+		Scene* SceneContext;
 
 		std::unordered_map<std::string, ScriptClass*> EntityClasses;
 		std::unordered_map<UUID, ScriptInstance*> EntityInstances;
@@ -106,73 +111,37 @@ namespace Atom
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
 
-	ScriptEngine* ScriptEngine::s_Instance = nullptr;
-
-	ScriptEngine::ScriptEngine(Scene* scene)
-		: m_Scene(scene)
-	{
-		AT_CORE_ASSERT(!s_Instance, "ScriptEngine already exists!");
-		s_Instance = this;
-
-		s_ScriptEngineData = new ScriptEngineData();
-	}
-
-	ScriptEngine::~ScriptEngine()
-	{
-		Shutdown();
-
-		delete s_ScriptEngineData;
-	}
-
 	void ScriptEngine::Initialize()
 	{
+		s_ScriptEngineData = new ScriptEngineData();
+
 		InitializeMono();
 		LoadAssembly("Resources/Scripts/Atom.Core.dll");
-		LoadAssemblyClasses(s_ScriptEngineData->CoreAssembly, s_ScriptEngineData->CoreAssemblyImage);
+		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
 
-		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "EntityBase");
-
-#if 0
-		s_ScriptEngineData->EntityClass = ScriptClass(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Main");
-
-		MonoObject* instance = s_ScriptEngineData->EntityClass.Instantiate();
-		MonoMethod* printMessageMethod = s_ScriptEngineData->EntityClass.GetMethod("PrintMessage");
-		s_ScriptEngineData->EntityClass.InvokeMethod(instance, printMessageMethod);
-
-		MonoMethod* printCustomMessageMethod = s_ScriptEngineData->EntityClass.GetMethod("PrintCustomMessage", 1);
-		MonoString* str = mono_string_new(s_ScriptEngineData->AppDomain, "Hello world from C++");
-		s_ScriptEngineData->EntityClass.InvokeMethod(instance, printCustomMessageMethod, (void**)&str);
-#endif
-
-
-#if 0
-		MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Main");
-		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
-		mono_runtime_object_init(instance);
-
-		MonoMethod* printMessageMethod = mono_class_get_method_from_name(monoClass, "PrintMessage", 0);
-		mono_runtime_invoke(printMessageMethod, instance, nullptr, nullptr);
-
-		MonoString* str = mono_string_new(s_ScriptEngineData->AppDomain, "Hello world from C++");
-		MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
-		mono_runtime_invoke(printCustomMessageMethod, instance, (void**)&str, nullptr);
-#endif
+		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "EntityBase", true);
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
+
+		delete s_ScriptEngineData;
 	}
 
-	void ScriptEngine::OnRuntimeStart()
+	void ScriptEngine::OnRuntimeStart(Scene* scene)
 	{
+		s_ScriptEngineData->SceneContext = scene;
 	}
 
 	void ScriptEngine::OnRuntimeStop()
 	{
+		s_ScriptEngineData->SceneContext = nullptr;
+		
 		s_ScriptEngineData->EntityInstances.clear();
 	}
 
@@ -217,9 +186,16 @@ namespace Atom
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
 
-		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly("Resources/Scripts/Atom.Core.dll");
+		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly(filepath.string());
 		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
 		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
+	}
+
+	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	{
+		s_ScriptEngineData->AppAssembly = Utils::LoadCSharpAssembly(filepath.string());
+		s_ScriptEngineData->AppAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssembly);
+		//Utils::PrintAssemblyTypes(s_ScriptEngineData->AppAssembly);
 	}
 
 	bool ScriptEngine::EntityClassExists(const std::string& fullName)
@@ -257,22 +233,22 @@ namespace Atom
 		return instance;
 	}
 
-	void ScriptEngine::LoadAssemblyClasses(MonoAssembly* assembly, MonoImage* image)
+	void ScriptEngine::LoadAssemblyClasses()
 	{
 		s_ScriptEngineData->EntityClasses.clear();
 
-		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_ScriptEngineData->AppAssemblyImage, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-		MonoClass* entityBaseClass = mono_class_from_name(image, "Atom", "EntityBase");
+		MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "EntityBase");
 
 		for(int32_t i = 0; i < numTypes; i++)
 		{
 			uint32_t cols[MONO_TYPEDEF_SIZE];
 			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
-			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+			const char* nameSpace = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
 			std::string fullName;
 			if(strlen(nameSpace) != 0)
 			{
@@ -283,7 +259,7 @@ namespace Atom
 				fullName = name;
 			}
 
-			MonoClass* monoClass = mono_class_from_name(image, nameSpace, name);
+			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyImage, nameSpace, name);
 			if(monoClass == nullptr)
 			{
 				continue;
@@ -294,8 +270,8 @@ namespace Atom
 				continue;
 			}
 
-			bool isComponent = mono_class_is_subclass_of(monoClass, entityBaseClass, false);
-			if(isComponent)
+			bool isEntity = mono_class_is_subclass_of(monoClass, entityBaseClass, false);
+			if(isEntity)
 			{
 				s_ScriptEngineData->EntityClasses[fullName] = new ScriptClass(nameSpace, name);
 			}
@@ -312,10 +288,15 @@ namespace Atom
 		return s_ScriptEngineData->AppDomain;
 	}
 
-	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className)
+	Scene* ScriptEngine::GetSceneContext()
+	{
+		return s_ScriptEngineData->SceneContext;
+	}
+
+	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className, bool isCore)
 		: m_ClassNamespace(classNameSpace), m_ClassName(className)
 	{
-		m_MonoClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, classNameSpace.c_str(), className.c_str());
+		m_MonoClass = mono_class_from_name(isCore ? s_ScriptEngineData->CoreAssemblyImage : s_ScriptEngineData->AppAssemblyImage, classNameSpace.c_str(), className.c_str());
 	}
 
 	MonoObject* ScriptClass::Instantiate() const

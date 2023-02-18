@@ -1,5 +1,6 @@
 #include "ATPCH.h"
 #include "ScriptGlue.h"
+#include "ScriptEngine.h"
 
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
@@ -75,7 +76,7 @@ namespace Atom
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -92,7 +93,7 @@ namespace Atom
 
 		void Identifier_GetName(UUID uuid, MonoString** outName)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -104,7 +105,7 @@ namespace Atom
 
 		void Identifier_SetName(UUID uuid, MonoString* name)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -120,7 +121,7 @@ namespace Atom
 
 		void Transform_GetPosition(UUID uuid, glm::vec3* outPosition)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -130,7 +131,7 @@ namespace Atom
 
 		void Transform_SetPosition(UUID uuid, glm::vec3* position)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -144,7 +145,7 @@ namespace Atom
 
 		void BasicRenderer_GetColor(UUID uuid, glm::vec4* outColor)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
@@ -154,7 +155,7 @@ namespace Atom
 
 		void BasicRenderer_SetColor(UUID uuid, glm::vec4* color)
 		{
-			Scene* scene = ScriptEngine::GetScene();
+			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
