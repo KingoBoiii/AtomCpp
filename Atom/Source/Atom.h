@@ -24,6 +24,7 @@
 #include "Atom/Renderer/Shader.h"
 #include "Atom/Renderer/FrameBuffer.h"
 #include "Atom/Renderer/UniformBuffer.h"
+#include "Atom/Renderer/Texture2D.h"
 
 #include "Atom/Renderer/Camera.h"
 

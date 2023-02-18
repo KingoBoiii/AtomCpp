@@ -20,6 +20,7 @@ namespace Atomic
 	private:
 		Atom::Scene* m_Scene = nullptr;
 		Atom::Framebuffer* m_Framebuffer = nullptr;
+		Atom::Texture2D* m_Texture = nullptr;
 	};
 
 }

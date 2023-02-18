@@ -20,6 +20,8 @@ namespace Atomic
 		framebufferOptions.Height = window->GetHeight();
 		m_Framebuffer = Atom::Framebuffer::Create(framebufferOptions);
 
+		m_Texture = Atom::Texture2D::Create("Assets/Textures/dickbutt.jpg");
+
 		auto cameraEntity = m_Scene->CreateEntity("Camera");
 		auto& transform = cameraEntity.GetComponent<Atom::Component::Transform>();
 		transform.Position = { 0.0f, 0.0f, 1.0f };
@@ -61,6 +63,8 @@ namespace Atomic
 
 		ImGui::End();
 
+		ImGui::Image(m_Texture->GetTexture(), { (float)m_Texture->GetWidth(), (float)m_Texture->GetHeight() }, { 0, 1 }, { 1, 0 });
+		
 #if 1
 		static bool opened = true;
 		ImGui::ShowDemoWindow(&opened);

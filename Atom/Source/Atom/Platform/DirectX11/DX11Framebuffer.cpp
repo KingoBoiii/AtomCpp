@@ -42,8 +42,10 @@ namespace Atom
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void DX11Framebuffer::Bind() const
+	void DX11Framebuffer::Bind()
 	{
+		m_DeviceContext->OMGetRenderTargets(1, &m_OldRenderTargetView, &m_OldDepthStencilView);
+
 		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
@@ -52,6 +54,8 @@ namespace Atom
 	void DX11Framebuffer::Unbind()
 	{
 		CreateShaderResourceView();
+
+		m_DeviceContext->OMSetRenderTargets(1, &m_OldRenderTargetView, m_OldDepthStencilView);
 	}
 
 	void* DX11Framebuffer::GetImage() const

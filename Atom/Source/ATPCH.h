@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <map>
 #include <chrono>
+#include <filesystem>
 
 #ifdef AT_PLATFORM_WINDOWS
 	#include <Windows.h>

@@ -15,7 +15,7 @@ namespace Atom
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
 		virtual void Clear() const override;
-		virtual void Bind() const override;
+		virtual void Bind() override;
 		virtual void Unbind() override;
 
 		virtual void* GetImage() const override;
@@ -38,6 +38,9 @@ namespace Atom
 		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
 		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
 		ID3D11ShaderResourceView* m_ShaderResourceView = nullptr;
+
+		ID3D11RenderTargetView* m_OldRenderTargetView = nullptr;
+		ID3D11DepthStencilView* m_OldDepthStencilView = nullptr;
 	};
 
 }

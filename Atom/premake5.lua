@@ -24,7 +24,8 @@ project "Atom"
         "%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.mono}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.stb}"
     }
 
     links {

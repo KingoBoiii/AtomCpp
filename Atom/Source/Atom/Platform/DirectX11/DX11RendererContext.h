@@ -39,6 +39,7 @@ namespace Atom
 		friend class DX11IndexBuffer;
 		friend class DX11UniformBuffer;
 		friend class DX11Shader;
+		friend class DX11Texture2D;
 		friend class ImGuiLayer;
 	private:
 		static DX11RendererContext* s_Instance;
