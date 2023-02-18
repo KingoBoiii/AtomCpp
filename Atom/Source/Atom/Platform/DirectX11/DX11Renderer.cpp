@@ -28,6 +28,7 @@ namespace Atom
 
 	void DX11Renderer::Initialize()
 	{
+		SetD3D11Viewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 	}
 
 	void DX11Renderer::Shutdown()
@@ -74,12 +75,19 @@ namespace Atom
 		pipeline->Bind();
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		uniformBuffer->Bind(0);
+		uniformBuffer->Bind();
 
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
 	void DX11Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	{
+		SetD3D11Viewport(x, y, width, height);
+		
+		m_SwapChain->Resize(width, height);
+	}
+
+	void DX11Renderer::SetD3D11Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
 		m_Viewport.TopLeftX = static_cast<float>(x);
 		m_Viewport.TopLeftY = static_cast<float>(y);
@@ -87,8 +95,6 @@ namespace Atom
 		m_Viewport.Height = static_cast<float>(height);
 		m_Viewport.MinDepth = 0.0f;
 		m_Viewport.MaxDepth = 1.0f;
-		
-		m_SwapChain->Resize(width, height);
 	}
 
 }

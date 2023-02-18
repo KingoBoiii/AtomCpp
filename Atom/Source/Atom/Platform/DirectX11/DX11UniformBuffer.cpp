@@ -5,7 +5,8 @@
 namespace Atom
 {
 
-	DX11UniformBuffer::DX11UniformBuffer(const void* data, uint32_t size)
+	DX11UniformBuffer::DX11UniformBuffer(const void* data, uint32_t size, uint32_t slot)
+		: m_Slot(slot)
 	{
 		DX11RendererContext& context = DX11RendererContext::Get();
 
@@ -28,9 +29,9 @@ namespace Atom
 		m_DeviceContext->Unmap(m_Buffer, 0);
 	}
 
-	void DX11UniformBuffer::Bind(uint32_t slot) const
+	void DX11UniformBuffer::Bind() const
 	{
-		m_DeviceContext->VSSetConstantBuffers(slot, 1, &m_Buffer);
+		m_DeviceContext->VSSetConstantBuffers(m_Slot, 1, &m_Buffer);
 		//m_DeviceContext->PSSetConstantBuffers(slot, 1, &m_Buffer);
 	}
 

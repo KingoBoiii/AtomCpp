@@ -7,7 +7,7 @@
 namespace Atom
 {
 
-#define USE_MODERN_SWAPCHAIN 0
+#define USE_MODERN_SWAPCHAIN 1
 
 	DX11SwapChain::DX11SwapChain(Window* window)
 		: m_Window(window)
@@ -78,8 +78,11 @@ namespace Atom
 		swapChainDesc1.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 		swapChainDesc1.Flags = 0;
 
-		HRESULT hr = dxgiFactory->CreateSwapChainForHwnd(device, hwnd, &swapChainDesc1, nullptr, nullptr, &m_SwapChain);
+		IDXGISwapChain1* swapChain = nullptr;
+		HRESULT hr = dxgiFactory->CreateSwapChainForHwnd(device, hwnd, &swapChainDesc1, nullptr, nullptr, &swapChain);
 		AT_CORE_ASSERT(SUCCEEDED(hr));
+
+		m_SwapChain = swapChain;
 #else
 		DXGI_SWAP_CHAIN_DESC swapChainDesc;
 		ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));

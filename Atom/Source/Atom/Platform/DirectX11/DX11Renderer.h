@@ -26,6 +26,8 @@ namespace Atom
 
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 	private:
+		void SetD3D11Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+	private:
 		Window* m_Window = nullptr;
 
 		DX11SwapChain* m_SwapChain = nullptr;

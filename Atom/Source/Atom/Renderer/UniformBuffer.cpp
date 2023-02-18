@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	UniformBuffer* UniformBuffer::Create(const void* data, uint32_t size)
+	UniformBuffer* UniformBuffer::Create(const void* data, uint32_t size, uint32_t slot)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11UniformBuffer(data, size);
+			case RendererAPI::DirectX11:	return new DX11UniformBuffer(data, size, slot);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;
