@@ -1,4 +1,5 @@
 #include "ATPCH.h"
+#if 0
 #include "Atom/Core/Input.h"
 #include "GlfwWindow.h"
 
@@ -19,3 +20,4 @@ namespace Atom
 	}
 
 }
+#endif

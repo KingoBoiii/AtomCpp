@@ -1,6 +1,6 @@
 #pragma once
 #include "Atom/Core/UUID.h"
-#include "Atom/Core/Input.h"
+#include "Atom/Core/Input/Input.h"
 
 extern "C" {
 	typedef struct _MonoString MonoString;

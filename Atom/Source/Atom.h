@@ -9,8 +9,9 @@
 
 #include "Atom/Core/Layer.h"
 
-#include "Atom/Core/Input.h"
-#include "Atom/Core/KeyCodes.h"
+#include "Atom/Core/Input/Input.h"
+#include "Atom/Core/Input/KeyCodes.h"
+#include "Atom/Core/Input/MouseButtons.h"
 
 #include "Atom/ImGui/ImGuiLayer.h"
 

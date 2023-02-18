@@ -4,7 +4,7 @@
 #include "Atom/Renderer/RendererContext.h"
 #include "Atom/Renderer/SwapChain.h"
 
-#include "Atom/Core/MouseButtons.h"
+#include "Atom/Core/Input/MouseButtons.h"
 
 #include "Atom/Events/WindowEvent.h"
 #include "Atom/Events/MouseEvent.h"

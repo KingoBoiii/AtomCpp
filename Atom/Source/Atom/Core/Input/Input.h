@@ -1,8 +1,5 @@
 #pragma once
-
 #include "KeyCodes.h"
-#include "MouseButtons.h"
-#include <map>
 
 namespace Atom
 {
@@ -10,6 +7,9 @@ namespace Atom
 	class Input
 	{
 	public:
+		static void Initialize();
+		static void Shutdown();
+
 		static bool IsKeyDown(KeyCode keycode);
 	};
 
