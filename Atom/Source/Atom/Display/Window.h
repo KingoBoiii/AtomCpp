@@ -25,6 +25,8 @@ namespace Atom
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
 		virtual void* GetNativeWindowHandle() const = 0;
 
 		SwapChain* GetSwapChain() const { return m_SwapChain; }

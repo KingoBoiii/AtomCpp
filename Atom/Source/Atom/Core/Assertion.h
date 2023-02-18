@@ -3,6 +3,8 @@
 #include "Base.h"
 #include <filesystem>
 
+#include "Log.h"
+
 #ifdef AT_DEBUG
 	#define AT_ENABLE_ASSERTS
 #endif

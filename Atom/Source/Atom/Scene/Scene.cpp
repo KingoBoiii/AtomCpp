@@ -3,11 +3,12 @@
 #include "Entity.h"
 #include "Components.h"
 
+#include "Atom/Renderer/Renderer2D.h"
+
 namespace Atom
 {
 
-	Scene::Scene(Renderer2D* renderer2D)
-		: m_Renderer2D(renderer2D)
+	Scene::Scene()
 	{
 		m_ScriptEngine = new ScriptEngine(this);
 		m_ScriptEngine->Initialize();
@@ -129,7 +130,7 @@ namespace Atom
 
 			if(mainCamera)
 			{
-				m_Renderer2D->BeginScene(*mainCamera, cameraTransform);
+				Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 				{
 					auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
@@ -137,11 +138,11 @@ namespace Atom
 					{
 						auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
-						m_Renderer2D->RenderQuad(transform.GetTransform(), basic.Color);
+						Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
 					}
 				}
 
-				m_Renderer2D->EndScene();
+				Renderer2D::EndScene();
 			}
 		}
 	}

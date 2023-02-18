@@ -20,6 +20,7 @@ namespace Sandbox
 
         public void OnUpdate(float deltaTime)
         {
+            //Log.Info("Player.OnUpdate({0})", deltaTime);
             Vector3 position = Transform.Position;
             if (Input.IsKeyDown(KeyCode.A))
             {

@@ -4,11 +4,11 @@ project "Atom.Core"
 	language "C#"
     dotnetframework "4.7.2"
 
-	targetdir ("../Sandbox/Resources/Scripts")
-	objdir ("../Sandbox/Resources/Scripts/Intermediates")
+	targetdir ("../Atomic/Resources/Scripts")
+	objdir ("../Atomic/Resources/Scripts/Intermediates")
 
 	files {
-		"Source/**.cs",
+		"**.cs",
 		"Properties/**.cs"
 	}
 

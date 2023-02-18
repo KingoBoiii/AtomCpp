@@ -14,17 +14,16 @@
 
 #include "Atom/ImGui/ImGuiLayer.h"
 
-#include "Atom/Graphics/RendererFactory.h"
-#include "Atom/Graphics/Renderer.h"
-#include "Atom/Graphics/Renderer2D.h"
-#include "Atom/Graphics/BufferLayout.h"
-#include "Atom/Graphics/VertexBuffer.h"
-#include "Atom/Graphics/IndexBuffer.h"
-#include "Atom/Graphics/Pipeline.h"
-#include "Atom/Graphics/Shader.h"
-#include "Atom/Graphics/UniformBuffer.h"
+#include "Atom/Renderer/Renderer.h"
+#include "Atom/Renderer/Renderer2D.h"
+#include "Atom/Renderer/BufferLayout.h"
+#include "Atom/Renderer/VertexBuffer.h"
+#include "Atom/Renderer/IndexBuffer.h"
+#include "Atom/Renderer/Pipeline.h"
+#include "Atom/Renderer/Shader.h"
+#include "Atom/Renderer/UniformBuffer.h"
 
-#include "Atom/Graphics/Camera.h"
+#include "Atom/Renderer/Camera.h"
 
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"

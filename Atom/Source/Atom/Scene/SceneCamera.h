@@ -1,5 +1,5 @@
 #pragma once
-#include "Atom/Graphics/Camera.h"
+#include "Atom/Renderer/Camera.h"
 
 namespace Atom
 {

@@ -4,14 +4,14 @@
 #include "Atom/Core/Application.h"
 #include "Atom/Display/GLFW/GlfwWindow.h"
 
-#include "Atom/Graphics/DirectX11/DX11RendererContext.h"
+#include "Atom/Platform/DirectX11/DX11RendererContext.h"
 
 #include <Windows.h>
 
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include <backends/imgui_impl_glfw.h>
+//#include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
@@ -38,9 +38,9 @@ namespace Atom
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-		//float fontSize = 18.0f;// *2.0f;
-		//io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", fontSize);
-		//io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Regular.ttf", fontSize);
+		float fontSize = 18.0f;// *2.0f;
+		io.Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Bold.ttf", fontSize);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Regular.ttf", fontSize);
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
@@ -63,16 +63,16 @@ namespace Atom
 		DX11RendererContext& context = DX11RendererContext::Get();
 
 		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOther(glfwWindow, true);
-		//ImGui_ImplWin32_Init(app.GetWindow()->GetNativeWindowHandle());
+		//ImGui_ImplGlfw_InitForOther(glfwWindow, true);
+		ImGui_ImplWin32_Init(app.GetWindow()->GetNativeWindowHandle());
 		ImGui_ImplDX11_Init(context.m_Device, context.m_DeviceContext);
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
 		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		//ImGui_ImplWin32_Shutdown();
+		//ImGui_ImplGlfw_Shutdown();
+		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
 	}
 
@@ -86,8 +86,8 @@ namespace Atom
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		//ImGui_ImplWin32_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
+		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
 
@@ -95,7 +95,7 @@ namespace Atom
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
-		io.DisplaySize = ImVec2((float)app.GetWindow()->GetWindowOptions().Width, (float)app.GetWindow()->GetWindowOptions().Height);
+		io.DisplaySize = ImVec2((float)app.GetWindow()->GetWidth(), (float)app.GetWindow()->GetHeight());
 
 		// Rendering
 		ImGui::Render();

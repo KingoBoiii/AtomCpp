@@ -18,7 +18,7 @@ namespace Atomic
 		virtual void OnUpdate(float deltaTime) override;
 		virtual void OnGUI() override;
 	private:
-		Atom::Renderer* m_Renderer = nullptr;
+		Atom::Scene* m_Scene = nullptr;
 	};
 
 }

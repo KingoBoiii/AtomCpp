@@ -5,7 +5,7 @@
 #include "Timer.h"
 
 #include "Atom/Display/WindowFactory.h"
-#include "Atom/Graphics/Renderer.h"
+#include "Atom/Renderer/Renderer.h"
 
 namespace Atom
 {
@@ -44,12 +44,16 @@ namespace Atom
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
 
+		Renderer::Initialize(m_Window);
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application()
 	{
+		Renderer::Shutdown();
+
 		delete m_Window;
 	}
 
@@ -65,6 +69,7 @@ namespace Atom
 			m_DeltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
+			Renderer::BeginFrame();
 			for(Layer* layer : m_LayerStack)
 			{
 				layer->OnUpdate(m_DeltaTime);
@@ -78,6 +83,7 @@ namespace Atom
 				}
 			}
 			m_ImGuiLayer->End();
+			Renderer::EndFrame();
 
 			m_Window->Present();
 		}
