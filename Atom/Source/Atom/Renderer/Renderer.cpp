@@ -64,6 +64,16 @@ namespace Atom
 		s_Renderer->RenderGeometry(pipeline, vertexBuffer, indexBuffer, uniformBuffer, indexCount);
 	}
 
+	void Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+	{
+		if(!s_Renderer)
+		{
+			return;
+		}
+
+		s_Renderer->SetViewport(x, y, width, height);
+	}
+
 	void Renderer::SetRendererAPI(RendererAPI rendererAPI)
 	{
 		AT_CORE_ASSERT(rendererAPI == RendererAPI::DirectX11, "DirectX 11 is currently the only supported Renderer API!");

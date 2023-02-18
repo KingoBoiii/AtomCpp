@@ -35,6 +35,7 @@ namespace Atom
 		static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowCloseEvent(WindowCloseEvent& e);
+		bool OnWindowResizeEvent(WindowResizeEvent& e);
 	private:
 		ApplicationOptions m_ApplicationOptions;
 		Window* m_Window = nullptr;

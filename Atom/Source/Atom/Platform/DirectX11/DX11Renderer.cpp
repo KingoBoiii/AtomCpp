@@ -44,6 +44,12 @@ namespace Atom
 	{
 	}
 
+	void DX11Renderer::Clear() const
+	{
+		m_DeviceContext->ClearRenderTargetView(m_SwapChain->m_RenderTargetView, new float[4] { 0.1f, 0.1f, 0.1f, 1.0f });
+		m_DeviceContext->ClearDepthStencilView(m_SwapChain->m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	}
+
 	void DX11Renderer::RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, uint32_t indexCount) const
 	{
 		if(indexCount == 0)
@@ -73,10 +79,16 @@ namespace Atom
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void DX11Renderer::Clear() const
+	void DX11Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
-		m_DeviceContext->ClearRenderTargetView(m_SwapChain->m_RenderTargetView, new float[4] { 0.1f, 0.1f, 0.1f, 1.0f });
-		m_DeviceContext->ClearDepthStencilView(m_SwapChain->m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_Viewport.TopLeftX = static_cast<float>(x);
+		m_Viewport.TopLeftY = static_cast<float>(y);
+		m_Viewport.Width = static_cast<float>(width);
+		m_Viewport.Height = static_cast<float>(height);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
+		
+		m_SwapChain->Resize(width, height);
 	}
 
 }

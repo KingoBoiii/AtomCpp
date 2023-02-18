@@ -17,22 +17,43 @@ namespace Atom
 	DX11SwapChain::~DX11SwapChain()
 	{
 		ReleaseCOM(m_SwapChain);
+
+		ReleaseCOM(m_RenderTargetView);
+		ReleaseCOM(m_DepthStencilView);
+		ReleaseCOM(m_DepthStencilBuffer);
 	}
 
 	void DX11SwapChain::Initialize()
 	{
-		DX11RendererContext& context = DX11RendererContext::Get();
-		
-		CreateSwapChain(context.m_Device);
-
-		CreateRenderTargetView(context.m_Device);
-
-		CreateDepthStencilBufferAndView(context.m_Device);
+		Invalidate();
 	}
 
 	void DX11SwapChain::Present() const
 	{
 		m_SwapChain->Present(1, 0);
+	}
+
+	void DX11SwapChain::Resize(uint32_t width, uint32_t height)
+	{
+		Invalidate();
+	}
+
+	void DX11SwapChain::Invalidate()
+	{
+		if(m_SwapChain)
+		{
+			ReleaseCOM(m_SwapChain);
+
+			ReleaseCOM(m_RenderTargetView);
+			ReleaseCOM(m_DepthStencilView);
+			ReleaseCOM(m_DepthStencilBuffer);
+		}
+
+		DX11RendererContext& context = DX11RendererContext::Get();
+
+		CreateSwapChain(context.m_Device);
+		CreateRenderTargetView(context.m_Device);
+		CreateDepthStencilBufferAndView(context.m_Device);
 	}
 
 	void DX11SwapChain::CreateSwapChain(ID3D11Device* device)

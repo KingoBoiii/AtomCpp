@@ -14,7 +14,11 @@ namespace Atom
 
 		virtual void Initialize() override;
 		virtual void Present() const override;
+
+		virtual void Resize(uint32_t width, uint32_t height) override;
 	private:
+		void Invalidate();
+
 		void CreateSwapChain(ID3D11Device* device);
 		void CreateRenderTargetView(ID3D11Device* device);
 		void CreateDepthStencilBufferAndView(ID3D11Device* device);

@@ -107,6 +107,7 @@ namespace Atom
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(AT_BIND_EVENT_FN(Application::OnWindowCloseEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(AT_BIND_EVENT_FN(Application::OnWindowResizeEvent));
 
 		for(auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -119,6 +120,18 @@ namespace Atom
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& e)
 	{
 		m_IsRunning = false;
+		return true;
+	}
+
+	bool Application::OnWindowResizeEvent(WindowResizeEvent& e)
+	{
+		if(e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			return false;
+		}
+
+		Renderer::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+
 		return true;
 	}
 
