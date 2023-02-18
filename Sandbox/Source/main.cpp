@@ -28,6 +28,8 @@ Atom::Application* Atom::CreateApplication(Atom::ApplicationCommandLineArgs args
 	Atom::ApplicationOptions applicationOptions{};
 	applicationOptions.CommandLineArgs = args;
 
+	applicationOptions.WorkingDirectory = "../Atomic";
+
 	applicationOptions.Title = "Atom Engine - Sandbox";
 	applicationOptions.Width = 1280;
 	applicationOptions.Height = 720;

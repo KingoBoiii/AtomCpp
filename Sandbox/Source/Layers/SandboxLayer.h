@@ -14,7 +14,6 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnUpdate(float deltaTime) override;
 private:
-	Atom::Renderer* m_Renderer = nullptr;
 	Atom::Pipeline* m_Pipeline = nullptr;
 	Atom::VertexBuffer* m_VertexBuffer = nullptr;
 	Atom::IndexBuffer* m_IndexBuffer = nullptr;

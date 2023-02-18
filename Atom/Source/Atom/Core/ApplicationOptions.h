@@ -7,6 +7,8 @@ namespace Atom
 	
 	struct ATOM_API ApplicationOptions
 	{
+		std::filesystem::path WorkingDirectory;
+
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;

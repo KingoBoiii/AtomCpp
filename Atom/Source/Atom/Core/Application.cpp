@@ -35,6 +35,11 @@ namespace Atom
 		AT_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
+		if(!m_ApplicationOptions.WorkingDirectory.empty())
+		{
+			std::filesystem::current_path(m_ApplicationOptions.WorkingDirectory);
+		}
+
 		m_Window = Utils::CreateWinddow(m_ApplicationOptions);
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
