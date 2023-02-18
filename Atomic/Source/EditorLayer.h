@@ -19,6 +19,7 @@ namespace Atomic
 		virtual void OnGUI() override;
 	private:
 		Atom::Scene* m_Scene = nullptr;
+		Atom::Framebuffer* m_Framebuffer = nullptr;
 	};
 
 }

@@ -14,6 +14,12 @@ namespace Atomic
 
 		m_Scene = new Atom::Scene();
 
+		Atom::FramebufferOptions framebufferOptions{ };
+		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
+		framebufferOptions.Width = window->GetWidth();
+		framebufferOptions.Height = window->GetHeight();
+		m_Framebuffer = Atom::Framebuffer::Create(framebufferOptions);
+
 		auto cameraEntity = m_Scene->CreateEntity("Camera");
 		auto& transform = cameraEntity.GetComponent<Atom::Component::Transform>();
 		transform.Position = { 0.0f, 0.0f, 1.0f };
@@ -21,6 +27,7 @@ namespace Atomic
 
 		auto quadEntity = m_Scene->CreateEntity("Quad");
 		quadEntity.AddComponent<Atom::Component::BasicRenderer>(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+		quadEntity.AddComponent<Atom::Component::Script>("Sandbox.Player");
 
 		m_Scene->OnViewportResize(window->GetWidth(), window->GetHeight());
 		m_Scene->OnRuntimeStart();
@@ -37,10 +44,23 @@ namespace Atomic
 		Atom::Renderer::Clear();
 
 		m_Scene->OnRuntimeUpdate(deltaTime);
+
+		m_Framebuffer->Bind();
+		m_Framebuffer->Clear();
+
+		m_Scene->OnRuntimeUpdate(deltaTime);
+
+		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnGUI()
 	{
+		ImGui::Begin("Test");
+
+		ImGui::Image(m_Framebuffer->GetImage(), { 1280.0f, 720.0f });
+
+		ImGui::End();
+
 #if 1
 		static bool opened = true;
 		ImGui::ShowDemoWindow(&opened);

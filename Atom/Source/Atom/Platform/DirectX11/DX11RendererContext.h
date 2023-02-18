@@ -32,6 +32,7 @@ namespace Atom
 		D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL_11_0;
 
 		friend class DX11SwapChain;
+		friend class DX11Framebuffer;
 		friend class DX11Renderer;
 		friend class DX11Pipeline;
 		friend class DX11VertexBuffer;

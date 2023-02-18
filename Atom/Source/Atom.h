@@ -22,6 +22,7 @@
 #include "Atom/Renderer/IndexBuffer.h"
 #include "Atom/Renderer/Pipeline.h"
 #include "Atom/Renderer/Shader.h"
+#include "Atom/Renderer/FrameBuffer.h"
 #include "Atom/Renderer/UniformBuffer.h"
 
 #include "Atom/Renderer/Camera.h"
