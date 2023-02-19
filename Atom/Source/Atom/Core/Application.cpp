@@ -56,6 +56,12 @@ namespace Atom
 
 	Application::~Application()
 	{
+		for(Layer* layer : m_LayerStack)
+		{
+			layer->OnDetach();
+			delete layer;
+		}
+
 		Input::Shutdown();
 		ScriptEngine::Shutdown();
 		Renderer::Shutdown();

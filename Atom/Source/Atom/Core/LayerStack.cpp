@@ -7,11 +7,13 @@ namespace Atom
 
 	LayerStack::~LayerStack()
 	{
+#if 0
 		for(Layer* layer : m_Layers)
 		{
 			layer->OnDetach();
 			delete layer;
 		}
+#endif
 	}
 
 	void LayerStack::PushLayer(Layer* layer)

@@ -14,10 +14,6 @@ namespace Atomic
 		{
 			PushLayer(new EditorLayer());
 		}
-
-		virtual ~AtomicEditorApplication()
-		{
-		}
 	};
 
 }
