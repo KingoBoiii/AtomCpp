@@ -6,7 +6,7 @@ namespace Atom::Component
 
 	struct BasicRenderer
 	{
-		glm::vec4 Color;
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		BasicRenderer() = default;
 		BasicRenderer(const BasicRenderer&) = default;
