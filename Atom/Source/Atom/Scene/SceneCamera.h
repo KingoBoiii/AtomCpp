@@ -33,6 +33,8 @@ namespace Atom
 
 		ProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(ProjectionType projectionType) { m_ProjectionType = projectionType; RecalculateProjection(); }
+
+		virtual glm::mat4 GetProjectionMatrix() const override { return m_Projection; }
 	private:
 		void RecalculateProjection();
 	private:

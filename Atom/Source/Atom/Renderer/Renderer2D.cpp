@@ -111,7 +111,7 @@ namespace Atom
 
 	void Renderer2D::BeginScene(const Camera& camera)
 	{
-		s_Renderer2DData.CameraData.ProjectionViewMatrix = glm::perspective(90.0f, 1280.0f / 720.0f, 0.001f, 1000.0f) * camera.GetViewMatrix();
+		s_Renderer2DData.CameraData.ProjectionViewMatrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
 
 		s_Renderer2DData.QuadIndexCount = 0;
@@ -120,7 +120,7 @@ namespace Atom
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& cameraTransform)
 	{
-		s_Renderer2DData.CameraData.ProjectionViewMatrix = glm::perspective(90.0f, 1280.0f / 720.0f, 0.001f, 1000.0f) * glm::inverse(cameraTransform);
+		s_Renderer2DData.CameraData.ProjectionViewMatrix = camera.GetProjectionMatrix() * glm::inverse(cameraTransform);
 		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
 
 		s_Renderer2DData.QuadIndexCount = 0;

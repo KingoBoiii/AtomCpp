@@ -30,6 +30,7 @@ namespace Atom
         {
 			return glm::lookAt(position, position + front, up);
         }
+        virtual glm::mat4 GetProjectionMatrix() const = 0;
     protected:
         void UpdateCameraVectors()
         {
