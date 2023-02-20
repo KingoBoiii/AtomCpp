@@ -21,6 +21,7 @@ IncludeDir["entt"] = "%{wks.location}/Atom/Vendor/entt/include";
 IncludeDir["mono"] = "%{wks.location}/Atom/Vendor/mono/include";
 IncludeDir["ImGui"] = "%{wks.location}/Atom/Vendor/imgui";
 IncludeDir["stb"] = "%{wks.location}/Atom/Vendor/stb/include";
+IncludeDir["yaml_cpp"] = "%{wks.location}/Atom/Vendor/yaml-cpp/include";
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/Atom/Vendor/mono/lib/%{cfg.buildcfg}";
@@ -38,6 +39,7 @@ group "Dependencies"
     include "Atom/Vendor/spdlog"
     include "Atom/Vendor/glfw"
     include "Atom/Vendor/imgui"
+    include "Atom/Vendor/yaml-cpp"
 group ""
 
 group "Core" 

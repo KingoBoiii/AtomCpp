@@ -25,13 +25,15 @@ project "Atom"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.stb}"
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.yaml_cpp}"
     }
 
     links {
         "spdlog",
         "GLFW",
         "ImGui",
+        "yaml-cpp",
         "%{Library.mono}",
         "opengl32.lib"
     }
