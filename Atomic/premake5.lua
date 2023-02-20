@@ -18,7 +18,8 @@ project "Atomic"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImGuizmo}"
     }
 
 	links {

@@ -14,7 +14,10 @@ project "Atom"
 		"Source/**.cpp",
 		"Source/**.h",
         "Vendor/glm/glm/**.hpp",
-		"Vendor/glm/glm/**.inl"
+		"Vendor/glm/glm/**.inl",
+
+		"Vendor/ImGuizmo/ImGuizmo.h",
+		"Vendor/ImGuizmo/ImGuizmo.cpp"
 	}
     
     includedirs {
@@ -26,7 +29,8 @@ project "Atom"
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.stb}",
-		"%{IncludeDir.yaml_cpp}"
+		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.ImGuizmo}"
     }
 
     links {
@@ -43,6 +47,9 @@ project "Atom"
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE"
 	}
+
+	filter "files:Vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"
