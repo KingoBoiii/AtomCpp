@@ -9,6 +9,7 @@ namespace Atomic
 {
 
 #define ATOM_SCENE_FILE_EXTENSIONS "atsc"
+#define ATOM_SCENE_FILE_DIALOG_FILTER "Atom Scene (*.atsc)\0*.atsc\0"
 
 	void EditorLayer::OnAttach()
 	{
@@ -148,7 +149,7 @@ namespace Atomic
 
 	void EditorLayer::OpenScene()
 	{
-		std::string filepath = Atom::FileDialogs::OpenFile("Atom Scene (*.atsc)\0*.atsc\0");
+		std::string filepath = Atom::FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled open file dialog!");
@@ -166,7 +167,7 @@ namespace Atomic
 
 	void EditorLayer::SaveAs()
 	{
-		std::string filepath = Atom::FileDialogs::SaveFile("Atom Scene (*.atsc)\0*.atsc\0");
+		std::string filepath = Atom::FileDialogs::SaveFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled save file dialog!");
