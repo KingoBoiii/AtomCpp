@@ -17,6 +17,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "ImGuizmo.h"
+
 namespace Atom
 {
 
@@ -91,6 +93,7 @@ namespace Atom
 		//ImGui_ImplGlfw_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()
