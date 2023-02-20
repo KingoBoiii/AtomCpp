@@ -14,3 +14,6 @@
 [submodule "Atom/Vendor/yaml-cpp"]
 	path = Atom/Vendor/yaml-cpp
 	url = https://github.com/cpp-engine-forks/yaml-cpp.git
+[submodule "Atom/Vendor/ImGuizmo"]
+	path = Atom/Vendor/ImGuizmo
+	url = https://github.com/cpp-engine-forks/ImGuizmo.git
