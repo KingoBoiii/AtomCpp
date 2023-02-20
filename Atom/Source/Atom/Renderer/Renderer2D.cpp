@@ -2,12 +2,12 @@
 #include "Renderer2D.h"
 #include "Renderer.h"
 
+#include "Camera.h"
 #include "Pipeline.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "UniformBuffer.h"
 #include "Shader.h"
-#include "Camera.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -68,7 +68,7 @@ namespace Atom
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" }
 		};
-		pipelineOptions.Shader = shader;
+		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D");// shader;
 		s_Renderer2DData.QuadPipeline = Pipeline::Create(pipelineOptions);
 
 		s_Renderer2DData.QuadVertexBufferBase = new QuadVertex[s_Renderer2DData.MaxVertices];

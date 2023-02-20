@@ -12,6 +12,25 @@ namespace Atom
 		m_Device = context.m_Device;
 		m_DeviceContext = context.m_DeviceContext;
 
+		Invalidate();
+		GetNameByFilepath(shaderOptions.Filepath.string());
+	}
+
+	DX11Shader::~DX11Shader()
+	{
+		ReleaseCOM(m_VertexSourceBlob);
+		ReleaseCOM(m_VertexShader);
+		ReleaseCOM(m_PixelShader);
+	}
+
+	void DX11Shader::Bind() const
+	{
+		m_DeviceContext->VSSetShader(m_VertexShader, nullptr, 0);
+		m_DeviceContext->PSSetShader(m_PixelShader, nullptr, 0);
+	}
+
+	void DX11Shader::Invalidate()
+	{
 		m_VertexSourceBlob = CompileShader(m_Options.VertexShaderEntryPoint.c_str(), m_Options.VertexShaderTarget.c_str());
 		ID3DBlob* pixelShaderBlob = CompileShader(m_Options.PixelShaderEntryPoint.c_str(), m_Options.PixelShaderTarget.c_str());
 
@@ -36,19 +55,6 @@ namespace Atom
 		ReleaseCOM(pixelShaderBlob);
 	}
 
-	DX11Shader::~DX11Shader()
-	{
-		ReleaseCOM(m_VertexSourceBlob);
-		ReleaseCOM(m_VertexShader);
-		ReleaseCOM(m_PixelShader);
-	}
-
-	void DX11Shader::Bind() const
-	{
-		m_DeviceContext->VSSetShader(m_VertexShader, nullptr, 0);
-		m_DeviceContext->PSSetShader(m_PixelShader, nullptr, 0);
-	}
-
 	ID3DBlob* DX11Shader::CompileShader(const char* entryPoint, const char* target) const
 	{
 		ID3DBlob* shaderBlob = nullptr;
@@ -69,6 +75,14 @@ namespace Atom
 		AT_CORE_ASSERT(SUCCEEDED(hr), (char*)errorBlob->GetBufferPointer());
 
 		return shaderBlob;
+	}
+
+	void DX11Shader::GetNameByFilepath(const std::string& filepath)
+	{
+		size_t found = filepath.find_last_of("/\\");
+		m_Name = found != std::string::npos ? filepath.substr(found + 1) : filepath;
+		found = m_Name.find_first_of(".");
+		m_Name = found != std::string::npos ? m_Name.substr(0, found) : m_Name;
 	}
 
 }

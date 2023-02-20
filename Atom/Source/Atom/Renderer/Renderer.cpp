@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "IRenderer.h"
 #include "Renderer2D.h"
+#include "ShaderLibrary.h"
 
 #include "Atom/Platform/DirectX11/DX11Renderer.h"
 
@@ -22,12 +23,25 @@ namespace Atom
 		return nullptr;
 	}
 
+	struct RendererData
+	{
+		ShaderLibrary* ShaderLibrary = nullptr;
+	};
+
 	static IRenderer* s_Renderer = nullptr;
+	static RendererData* s_RendererData = nullptr;
 
 	void Renderer::Initialize(Window* window)
 	{
 		s_Renderer = CreateRenderer(window);
 		s_Renderer->Initialize();
+
+
+		s_RendererData = new RendererData();
+
+		s_RendererData->ShaderLibrary = ShaderLibrary::Create();
+
+		Renderer::GetShaderLibrary()->Load("Resources/Shaders/Renderer2D.shader");
 
 		Renderer2D::Initialize();
 	}
@@ -72,6 +86,11 @@ namespace Atom
 		}
 
 		s_Renderer->SetViewport(x, y, width, height);
+	}
+
+	ShaderLibrary* Renderer::GetShaderLibrary()
+	{
+		return s_RendererData->ShaderLibrary;
 	}
 
 	void Renderer::SetRendererAPI(RendererAPI rendererAPI)

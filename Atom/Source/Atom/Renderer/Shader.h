@@ -22,6 +22,10 @@ namespace Atom
 		static Shader* Create(const ShaderOptions& shaderOptions);
 	public:
 		virtual void Bind() const = 0;
+
+		virtual const std::string& GetName() const = 0;
 	};
 
 }
+
+#include "ShaderLibrary.h"

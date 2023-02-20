@@ -10,6 +10,7 @@ namespace Atom
 	class VertexBuffer;
 	class IndexBuffer;
 	class UniformBuffer;
+	class ShaderLibrary;
 
 	class Renderer
 	{
@@ -26,6 +27,8 @@ namespace Atom
 		static void RenderGeometry(Pipeline* pipeline, VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer, UniformBuffer* uniformBuffer, uint32_t indexCount = 0);
 
 		static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+
+		static ShaderLibrary* GetShaderLibrary();
 
 		inline static RendererAPI Current() { return s_CurrentRendererAPI; }
 		static void SetRendererAPI(RendererAPI rendererAPI);
