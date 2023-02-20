@@ -1,0 +1,38 @@
+Scene: Untitled
+Entities:
+  - Entity: 17802813744049723721
+    Identifier:
+      Name: Empty Entity
+    Transform:
+      Position: [2, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    BasicRenderer:
+      Color: [1, 1, 1, 1]
+  - Entity: 14973211360988385937
+    Identifier:
+      Name: Camera
+    Transform:
+      Position: [0, 0, 0.100000001]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 11553653040598419143
+    Identifier:
+      Name: Quad
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    BasicRenderer:
+      Color: [1, 0, 1, 1]

@@ -78,9 +78,11 @@ namespace Atom
 
 	void ImGuiLayer::OnEvent(Event& e)
 	{
+#if 0
 		ImGuiIO& io = ImGui::GetIO();
 		e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
 		e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+#endif
 	}
 
 	void ImGuiLayer::Begin()

@@ -20,9 +20,15 @@ namespace Atomic
 		virtual void OnDetach() override;
 		virtual void OnUpdate(float deltaTime) override;
 		virtual void OnGUI() override;
+		virtual void OnEvent(Atom::Event& e) override;
 	private:
-		void DrawDockSpace();
 		void DrawTopMenuBar();
+	private: // Scene commands
+		void NewScene();
+		void OpenScene();
+		void SaveAs();
+	private: // Events
+		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
 		Atom::Scene* m_Scene = nullptr;
 		Atom::Framebuffer* m_Framebuffer = nullptr;

@@ -13,6 +13,11 @@
 #include "Atom/Core/Input/KeyCodes.h"
 #include "Atom/Core/Input/MouseButtons.h"
 
+#include "Atom/Events/Event.h"
+#include "Atom/Events/KeyEvent.h"
+#include "Atom/Events/MouseEvent.h"
+#include "Atom/Events/WindowEvent.h"
+
 #include "Atom/ImGui/ImGuiLayer.h"
 
 #include "Atom/Renderer/Renderer.h"
