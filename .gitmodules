@@ -11,3 +11,6 @@
 	path = Atom/Vendor/imgui
 	url = https://github.com/cpp-engine-forks/imgui.git
 	branch = docking
+[submodule "Atom/Vendor/yaml-cpp"]
+	path = Atom/Vendor/yaml-cpp
+	url = https://github.com/cpp-engine-forks/yaml-cpp.git
