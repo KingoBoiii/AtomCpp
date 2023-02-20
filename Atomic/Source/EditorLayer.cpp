@@ -33,8 +33,7 @@ namespace Atomic
 
 		m_Viewport = new Viewport(m_Framebuffer);
 		m_SceneHierarchyPanel = new Atom::SceneHierarchyPanel(m_Scene);
-
-		//m_Scene->OnViewportResize(window->GetWidth(), window->GetHeight());
+		
 		m_Scene->OnRuntimeStart();
 	}
 
