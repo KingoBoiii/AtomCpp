@@ -6,6 +6,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include "Atom/ImGui/ImGuiUtillities.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -70,65 +71,57 @@ namespace Atom
 			ImGuiIO& io = ImGui::GetIO();
 			auto boldFont = io.Fonts->Fonts[0];
 
-			ImGui::PushID(label.c_str());
+			UI::Column2(label, [&]()
+			{
+				ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-			ImGui::Columns(2, 0, false);
-			ImGui::SetColumnWidth(0, columnWidth);
-			ImGui::Text(label.c_str());
-			ImGui::NextColumn();
+				float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+				ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+				ImGui::PushFont(boldFont);
+				if(ImGui::Button("X", buttonSize))
+					values.x = resetValue;
+				ImGui::PopFont();
+				ImGui::PopStyleColor(3);
 
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+				ImGui::SameLine();
+				ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::PopItemWidth();
+				ImGui::SameLine();
 
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if(ImGui::Button("X", buttonSize))
-				values.x = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+				ImGui::PushFont(boldFont);
+				if(ImGui::Button("Y", buttonSize))
+					values.y = resetValue;
+				ImGui::PopFont();
+				ImGui::PopStyleColor(3);
 
-			ImGui::SameLine();
-			ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
+				ImGui::SameLine();
+				ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::PopItemWidth();
+				ImGui::SameLine();
 
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if(ImGui::Button("Y", buttonSize))
-				values.y = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+				ImGui::PushFont(boldFont);
+				if(ImGui::Button("Z", buttonSize))
+					values.z = resetValue;
+				ImGui::PopFont();
+				ImGui::PopStyleColor(3);
 
-			ImGui::SameLine();
-			ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
+				ImGui::SameLine();
+				ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::PopItemWidth();
 
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if(ImGui::Button("Z", buttonSize))
-				values.z = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
-
-			ImGui::SameLine();
-			ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-
-			ImGui::PopStyleVar();
-
-			ImGui::Columns(1);
-
-			ImGui::PopID();
+				ImGui::PopStyleVar();
+			});
 		}
 
 	}
@@ -261,57 +254,64 @@ namespace Atom
 		Utils::DrawComponent<Component::Transform>("Transform", entity, [](auto& component)
 		{
 			Utils::DrawVec3Control("Translation", component.Position);
-		glm::vec3 rotation = glm::degrees(component.Rotation);
-		Utils::DrawVec3Control("Rotation", rotation);
-		component.Rotation = glm::radians(rotation);
-		Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
+			glm::vec3 rotation = glm::degrees(component.Rotation);
+			Utils::DrawVec3Control("Rotation", rotation);
+			component.Rotation = glm::radians(rotation);
+			Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
 
 		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			UI::Column2("Color", [&]()
+			{
+				float width = ImGui::GetContentRegionAvail().x;
+
+				ImGui::PushItemWidth(width);
+				ImGui::ColorEdit4("##Color", glm::value_ptr(component.Color));
+				ImGui::PopItemWidth();
+			});
 		});
 
 		Utils::DrawComponent<Component::Script>("C# Script", entity, [entity](auto& component) mutable
 		{
 			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
-		static char buffer[64];
-		strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+			static char buffer[64];
+			strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-		if(!scriptClassExists)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
-		}
-
-		if(ImGui::InputText("Class", buffer, sizeof(buffer)))
-		{
-			component.ClassName = buffer;
-		}
-
-		// Fields
-		ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-		if(scriptInstance)
-		{
-			const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-			for(const auto& [name, field] : fields)
+			if(!scriptClassExists)
 			{
-				if(field.Type == ScriptFieldType::Float)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+			}
+
+			if(ImGui::InputText("Class", buffer, sizeof(buffer)))
+			{
+				component.ClassName = buffer;
+			}
+
+			// Fields
+			ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+			if(scriptInstance)
+			{
+				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+				for(const auto& [name, field] : fields)
 				{
-					float data = scriptInstance->GetFieldValue<float>(name);
-					if(ImGui::DragFloat(name.c_str(), &data))
+					if(field.Type == ScriptFieldType::Float)
 					{
-						scriptInstance->SetFieldValue(name, data);
+						float data = scriptInstance->GetFieldValue<float>(name);
+						if(ImGui::DragFloat(name.c_str(), &data))
+						{
+							scriptInstance->SetFieldValue(name, data);
+						}
 					}
 				}
 			}
-		}
 
 
-		if(!scriptClassExists)
-		{
-			ImGui::PopStyleColor();
-		}
+			if(!scriptClassExists)
+			{
+				ImGui::PopStyleColor();
+			}
 		});
 	}
 
