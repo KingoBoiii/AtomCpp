@@ -6,8 +6,8 @@
 
 namespace Atom
 {
-
-#define USE_MODERN_SWAPCHAIN 1
+	
+#define USE_MODERN_SWAPCHAIN 0
 
 	DX11SwapChain::DX11SwapChain(Window* window)
 		: m_Window(window)

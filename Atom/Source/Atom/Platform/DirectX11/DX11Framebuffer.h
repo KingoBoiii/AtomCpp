@@ -12,13 +12,14 @@ namespace Atom
 		DX11Framebuffer(const FramebufferOptions& framebufferOptions);
 		virtual ~DX11Framebuffer();
 
-		virtual void Resize(uint32_t width, uint32_t height) override;
+		virtual void Resize(uint32_t width, uint32_t height, uint32_t x = 0, uint32_t y = 0) override;
 
 		virtual void Clear() const override;
 		virtual void Bind() override;
 		virtual void Unbind() override;
 
 		virtual void* GetImage() const override;
+		virtual FramebufferOptions GetOptions() const override { return m_Options; }
 	private:
 		void Invalidate();
 
@@ -41,6 +42,7 @@ namespace Atom
 
 		ID3D11RenderTargetView* m_OldRenderTargetView = nullptr;
 		ID3D11DepthStencilView* m_OldDepthStencilView = nullptr;
+		D3D11_VIEWPORT m_OldViewport;
 	};
 
 }

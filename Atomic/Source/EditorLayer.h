@@ -1,6 +1,9 @@
 #pragma once
 #include <Atom.h>
 
+#include "Panels/Viewport.h"
+#include <Atom/Editor/SceneHierarchyPanel.h>
+
 namespace Atomic
 {
 	
@@ -18,9 +21,15 @@ namespace Atomic
 		virtual void OnUpdate(float deltaTime) override;
 		virtual void OnGUI() override;
 	private:
+		void DrawDockSpace();
+		void DrawTopMenuBar();
+	private:
 		Atom::Scene* m_Scene = nullptr;
 		Atom::Framebuffer* m_Framebuffer = nullptr;
-		Atom::Texture2D* m_Texture = nullptr;
+
+		// Panels
+		Viewport* m_Viewport = nullptr;
+		Atom::SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
 	};
 
 }

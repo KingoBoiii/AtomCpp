@@ -8,7 +8,7 @@ namespace Atom
 		: m_Options(framebufferOptions), m_Viewport({ 0.0f, 0.0f, (float)framebufferOptions.Width, (float)framebufferOptions.Height, 0.0f, 1.0f })
 	{
 		DX11RendererContext& context = DX11RendererContext::Get();
-		
+
 		m_Device = context.m_Device;
 		m_DeviceContext = context.m_DeviceContext;
 
@@ -32,13 +32,14 @@ namespace Atom
 		m_Options.Width = width;
 		m_Options.Height = height;
 
+		SetD3D11Viewport(0, 0, width, height);
 		Invalidate();
 	}
 
 	void DX11Framebuffer::Clear() const
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView, m_Options.ClearColor);
-		
+
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
@@ -48,6 +49,9 @@ namespace Atom
 
 		m_DeviceContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencilView);
 
+		static uint32_t s_ViewportCount = 1;
+		m_DeviceContext->RSGetViewports(&s_ViewportCount, &m_OldViewport);
+
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
@@ -56,6 +60,8 @@ namespace Atom
 		CreateShaderResourceView();
 
 		m_DeviceContext->OMSetRenderTargets(1, &m_OldRenderTargetView, m_OldDepthStencilView);
+
+		m_DeviceContext->RSSetViewports(1, &m_OldViewport);
 	}
 
 	void* DX11Framebuffer::GetImage() const
@@ -133,7 +139,7 @@ namespace Atom
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		desc.Texture2D.MipLevels = 1;
-		
+
 		ReleaseCOM(m_ShaderResourceView);
 		HRESULT hr = m_Device->CreateShaderResourceView(m_RenderTargetViewTexture, &desc, &m_ShaderResourceView);
 		AT_CORE_ASSERT(!FAILED(hr), "Failed to create Shader Resource View");

@@ -9,6 +9,8 @@
 #include "Atom/Scripting/ScriptEngine.h"
 #include "Input/Input.h"
 
+extern bool g_ApplicationRunning;
+
 namespace Atom
 {
 
@@ -67,6 +69,7 @@ namespace Atom
 		Renderer::Shutdown();
 
 		delete m_Window;
+		s_Instance = nullptr;
 	}
 
 	void Application::Run()
@@ -101,6 +104,17 @@ namespace Atom
 		}
 	}
 
+	void Application::Restart()
+	{
+		m_IsRunning = false;
+	}
+
+	void Application::Close()
+	{
+		g_ApplicationRunning = false;
+		m_IsRunning = false;
+	}
+
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
@@ -128,7 +142,7 @@ namespace Atom
 
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& e)
 	{
-		m_IsRunning = false;
+		Close();
 		return true;
 	}
 

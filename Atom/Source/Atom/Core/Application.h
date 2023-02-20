@@ -24,6 +24,9 @@ namespace Atom
 
 		void Run();
 
+		void Restart();
+		void Close();
+
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
