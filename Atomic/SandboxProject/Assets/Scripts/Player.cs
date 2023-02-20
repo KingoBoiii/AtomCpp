@@ -3,9 +3,19 @@
 namespace Sandbox
 {
 
+    // TODO: Move build files into cache directory?
+
     internal class Player : EntityBase, IEntity
     {
-        public float Speed { get; set; } = 1.0f;
+        public float Test = 1.0f;
+        public EntityBase OtherEntity;
+
+        public Vector3 Position;
+        public char Character;
+        public string PlayerName;
+
+        public float Speed = 2.5f;
+        public float Time;
 
         private BasicRenderer m_Renderer;
 
@@ -20,6 +30,8 @@ namespace Sandbox
 
         public void OnUpdate(float deltaTime)
         {
+            Time += deltaTime;
+
             //Log.Info("Player.OnUpdate({0})", deltaTime);
             Vector3 position = Transform.Position;
             if (Input.IsKeyDown(KeyCode.A))

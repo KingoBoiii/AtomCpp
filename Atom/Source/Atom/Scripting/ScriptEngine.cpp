@@ -10,9 +10,28 @@
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
+#include <mono/metadata/tabledefs.h>
 
 namespace Atom
 {
+
+	// TODO: Add unsigned types (and missing types)
+	using ScriptFieldTypeMap = std::unordered_map<std::string, ScriptFieldType>;
+	static ScriptFieldTypeMap s_ScriptFieldTypeMap = {
+		{ "System.Boolean",		ScriptFieldType::Bool },
+		{ "System.Char",		ScriptFieldType::Char },
+		{ "System.String",		ScriptFieldType::String },
+		{ "System.Single",		ScriptFieldType::Float },
+		{ "System.Double",		ScriptFieldType::Double },
+		{ "System.Byte",		ScriptFieldType::Byte },
+		{ "System.Int16",		ScriptFieldType::Short },
+		{ "System.Int32",		ScriptFieldType::Int },
+		{ "System.Int64",		ScriptFieldType::Long },
+		{ "Atom.Vector2",		ScriptFieldType::Vector2 },
+		{ "Atom.Vector3",		ScriptFieldType::Vector3 },
+		{ "Atom.Vector4",		ScriptFieldType::Vector4 },
+		{ "Atom.EntityBase",	ScriptFieldType::Entity }
+	};
 
 	namespace Utils
 	{
@@ -88,6 +107,41 @@ namespace Atom
 			}
 		}
 
+		ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType)
+		{
+			std::string typeName = mono_type_get_name(monoType);
+
+			auto it = s_ScriptFieldTypeMap.find(typeName);
+			if(it == s_ScriptFieldTypeMap.end())
+			{
+				return ScriptFieldType::None;
+			}
+
+			return it->second;
+		}
+
+		const char* ScriptFieldTypeToString(ScriptFieldType fieldType)
+		{
+			switch(fieldType)
+			{
+				case ScriptFieldType::Bool: return "Bool";
+				case ScriptFieldType::Char: return "Char";
+				case ScriptFieldType::String: return "String";
+				case ScriptFieldType::Float: return "Float";
+				case ScriptFieldType::Double: return "Double";
+				case ScriptFieldType::Byte: return "Byte";
+				case ScriptFieldType::Short: return "Short";
+				case ScriptFieldType::Int: return "Int";
+				case ScriptFieldType::Long: return "Long";
+				case ScriptFieldType::Vector2: return "Vector2";
+				case ScriptFieldType::Vector3: return "Vector3";
+				case ScriptFieldType::Vector4: return "Vector4";
+				case ScriptFieldType::Entity: return "Entity";
+				case ScriptFieldType::None:
+				default: return "Invalid";
+			}
+		}
+
 	}
 
 	struct ScriptEngineData
@@ -141,7 +195,7 @@ namespace Atom
 	void ScriptEngine::OnRuntimeStop()
 	{
 		s_ScriptEngineData->SceneContext = nullptr;
-		
+
 		s_ScriptEngineData->EntityInstances.clear();
 	}
 
@@ -208,6 +262,17 @@ namespace Atom
 		return s_ScriptEngineData->EntityClasses;
 	}
 
+	ScriptInstance* ScriptEngine::GetEntityScriptInstance(UUID entityId)
+	{
+		auto it = s_ScriptEngineData->EntityInstances.find(entityId);
+		if(it == s_ScriptEngineData->EntityInstances.end())
+		{
+			return nullptr;
+		}
+
+		return it->second;
+	}
+
 	void ScriptEngine::InitializeMono()
 	{
 		mono_set_assemblies_path("mono/lib");
@@ -248,18 +313,18 @@ namespace Atom
 			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
 			const char* nameSpace = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* name = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+			const char* className = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
 			std::string fullName;
 			if(strlen(nameSpace) != 0)
 			{
-				fullName = fmt::format("{}.{}", nameSpace, name);
+				fullName = fmt::format("{}.{}", nameSpace, className);
 			}
 			else
 			{
-				fullName = name;
+				fullName = className;
 			}
 
-			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyImage, nameSpace, name);
+			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyImage, nameSpace, className);
 			if(monoClass == nullptr)
 			{
 				continue;
@@ -271,9 +336,37 @@ namespace Atom
 			}
 
 			bool isEntity = mono_class_is_subclass_of(monoClass, entityBaseClass, false);
-			if(isEntity)
+			if(!isEntity)
 			{
-				s_ScriptEngineData->EntityClasses[fullName] = new ScriptClass(nameSpace, name);
+				continue;
+			}
+
+			ScriptClass* scriptClass = new ScriptClass(nameSpace, className);
+
+			s_ScriptEngineData->EntityClasses[fullName] = scriptClass;
+
+			uint32_t fieldCount = mono_class_num_fields(monoClass);
+
+			AT_CORE_WARN("{} fields in {}", fieldCount, fullName);
+			void* iterator = nullptr;
+			while(MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
+			{
+				uint32_t flags = mono_field_get_flags(field);
+				const char* fieldName = mono_field_get_name(field);
+
+				if(!(flags & FIELD_ATTRIBUTE_PUBLIC))
+				{
+					continue;
+				}
+
+				MonoType* type = mono_field_get_type(field);
+				ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
+
+				const char* fieldTypeName = Utils::ScriptFieldTypeToString(fieldType);
+
+				AT_CORE_INFO(" - {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
+
+				scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
 			}
 		}
 	}
@@ -360,6 +453,40 @@ namespace Atom
 
 		void* param = &deltaTime;
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+	}
+
+	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
+	{
+		const auto& fields = m_ScriptClass->GetFields();
+
+		auto it = fields.find(name);
+
+		if(it == fields.end())
+		{
+			return false;
+		}
+
+		const ScriptField& field = it->second;
+
+		mono_field_get_value(m_Instance, field.ClassField, buffer);
+		return true;
+	}
+
+	bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value)
+	{
+		const auto& fields = m_ScriptClass->GetFields();
+
+		auto it = fields.find(name);
+
+		if(it == fields.end())
+		{
+			return false;
+		}
+
+		const ScriptField& field = it->second;
+
+		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
+		return true;
 	}
 
 }

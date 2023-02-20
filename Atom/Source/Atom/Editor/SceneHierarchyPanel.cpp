@@ -261,10 +261,10 @@ namespace Atom
 		Utils::DrawComponent<Component::Transform>("Transform", entity, [](auto& component)
 		{
 			Utils::DrawVec3Control("Translation", component.Position);
-			glm::vec3 rotation = glm::degrees(component.Rotation);
-			Utils::DrawVec3Control("Rotation", rotation);
-			component.Rotation = glm::radians(rotation);
-			Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
+		glm::vec3 rotation = glm::degrees(component.Rotation);
+		Utils::DrawVec3Control("Rotation", rotation);
+		component.Rotation = glm::radians(rotation);
+		Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
 
 		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, [](auto& component)
@@ -272,7 +272,7 @@ namespace Atom
 			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 		});
 
-		Utils::DrawComponent<Component::Script>("C# Script", entity, [](auto& component)
+		Utils::DrawComponent<Component::Script>("C# Script", entity, [entity](auto& component) mutable
 		{
 			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
@@ -289,13 +289,32 @@ namespace Atom
 				component.ClassName = buffer;
 			}
 
+			// Fields
+			ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+			if(scriptInstance)
+			{
+				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+				for(const auto& [name, field] : fields)
+				{
+					if(field.Type == ScriptFieldType::Float)
+					{
+						float data = scriptInstance->GetFieldValue<float>(name);
+						if(ImGui::DragFloat(name.c_str(), &data))
+						{
+							scriptInstance->SetFieldValue(name, data);
+						}
+					}
+				}
+			}
+
+
 			if(!scriptClassExists)
 			{
 				ImGui::PopStyleColor();
 			}
 		});
 	}
-	
+
 	void SceneHierarchyPanel::DrawAddComponentPopup()
 	{
 		if(ImGui::BeginPopup(ADD_COMPONENT_POP_UP_IDENTIFIER))

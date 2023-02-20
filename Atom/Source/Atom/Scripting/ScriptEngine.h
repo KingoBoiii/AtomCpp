@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Atom/Core/UUID.h"
+
+#include <map>
+#include <string>
+
 extern "C" {
 	typedef struct _MonoClass MonoClass;
 	typedef struct _MonoObject MonoObject;
@@ -7,14 +12,27 @@ extern "C" {
 	typedef struct _MonoImage MonoImage;
 	typedef struct _MonoMethod MonoMethod;
 	typedef struct _MonoDomain MonoDomain;
+	typedef struct _MonoClassField MonoClassField;
 }
 
 namespace Atom
 {
 
+	enum class ScriptFieldType
+	{
+		None = 0,
+		Bool,
+		Char, String,
+		Float, Double,
+		Byte, Short, Int, Long,
+		Vector2, Vector3, Vector4,
+		Entity
+	};
+
 	class Scene;
 	class Entity;
 	class ScriptClass;
+	class ScriptInstance;
 
 	class ATOM_API ScriptEngine
 	{
@@ -35,10 +53,11 @@ namespace Atom
 		static bool EntityClassExists(const std::string& fullName);
 
 		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
+		static ScriptInstance* GetEntityScriptInstance(UUID entityId);
 
 		static MonoImage* GetCoreAssemblyImage();
 		static MonoDomain* GetAppDomain();
-		
+
 		static Scene* GetSceneContext();
 	private:
 		static void InitializeMono();
@@ -51,6 +70,13 @@ namespace Atom
 		friend class ScriptGlue;
 	};
 
+	struct ScriptField
+	{
+		ScriptFieldType Type;
+		std::string Name;
+		MonoClassField* ClassField; 
+	};
+
 	class ScriptClass
 	{
 	public:
@@ -60,11 +86,17 @@ namespace Atom
 		MonoObject* Instantiate() const;
 		MonoMethod* GetMethod(const std::string& methodName, int parameterCount = 0) const;
 		MonoObject* InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** parameters = nullptr);
+
+		const std::map<std::string, ScriptField>& GetFields() const { return m_Fields; }
 	private:
 		std::string m_ClassNamespace;
 		std::string m_ClassName;
 
+		std::map<std::string, ScriptField> m_Fields;
+
 		MonoClass* m_MonoClass = nullptr;
+
+		friend class ScriptEngine;
 	};
 
 	class ScriptInstance
@@ -75,6 +107,29 @@ namespace Atom
 		void InvokeOnCreate();
 		void InvokeOnDestroy();
 		void InvokeOnUpdate(float deltaTime);
+
+		ScriptClass* GetScriptClass() { return m_ScriptClass; }
+
+		template<typename T>
+		T GetFieldValue(const std::string& name)
+		{
+			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
+			if(!success)
+			{
+				return T();
+			}
+
+			return *(T*)s_FieldValueBuffer;
+		}
+
+		template<typename T>
+		void SetFieldValue(const std::string& name, const T& value)
+		{
+			SetFieldValueInternal(name, &value);
+		}
+	private:
+		bool GetFieldValueInternal(const std::string& name, void* buffer);
+		bool SetFieldValueInternal(const std::string& name, const void* value);
 	private:
 		ScriptClass* m_ScriptClass = nullptr;
 
@@ -83,6 +138,8 @@ namespace Atom
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnDestroyMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+
+		inline static char s_FieldValueBuffer[8];
 	};
-	
+
 }
