@@ -12,7 +12,7 @@ namespace Atom
 		DX11Framebuffer(const FramebufferOptions& framebufferOptions);
 		virtual ~DX11Framebuffer();
 
-		virtual void Resize(uint32_t width, uint32_t height, uint32_t x = 0, uint32_t y = 0) override;
+		virtual void Resize(uint32_t width, uint32_t height) override;
 
 		virtual void Clear() const override;
 		virtual void Bind() override;

@@ -15,7 +15,7 @@ namespace Atom
 	public:
 		static Framebuffer* Create(const FramebufferOptions& framebufferOptions);
 	public:
-		virtual void Resize(uint32_t width, uint32_t height, uint32_t x = 0, uint32_t y = 0) = 0;
+		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 		virtual void Clear() const = 0;
 		virtual void Bind() = 0;
