@@ -72,7 +72,7 @@ namespace Atom
 
 			ImGui::PushID(label.c_str());
 
-			ImGui::Columns(2);
+			ImGui::Columns(2, 0, false);
 			ImGui::SetColumnWidth(0, columnWidth);
 			ImGui::Text(label.c_str());
 			ImGui::NextColumn();
@@ -276,42 +276,42 @@ namespace Atom
 		{
 			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
-			static char buffer[64];
-			strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+		static char buffer[64];
+		strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-			if(!scriptClassExists)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
-			}
+		if(!scriptClassExists)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+		}
 
-			if(ImGui::InputText("Class", buffer, sizeof(buffer)))
-			{
-				component.ClassName = buffer;
-			}
+		if(ImGui::InputText("Class", buffer, sizeof(buffer)))
+		{
+			component.ClassName = buffer;
+		}
 
-			// Fields
-			ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-			if(scriptInstance)
+		// Fields
+		ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+		if(scriptInstance)
+		{
+			const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+			for(const auto& [name, field] : fields)
 			{
-				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-				for(const auto& [name, field] : fields)
+				if(field.Type == ScriptFieldType::Float)
 				{
-					if(field.Type == ScriptFieldType::Float)
+					float data = scriptInstance->GetFieldValue<float>(name);
+					if(ImGui::DragFloat(name.c_str(), &data))
 					{
-						float data = scriptInstance->GetFieldValue<float>(name);
-						if(ImGui::DragFloat(name.c_str(), &data))
-						{
-							scriptInstance->SetFieldValue(name, data);
-						}
+						scriptInstance->SetFieldValue(name, data);
 					}
 				}
 			}
+		}
 
 
-			if(!scriptClassExists)
-			{
-				ImGui::PopStyleColor();
-			}
+		if(!scriptClassExists)
+		{
+			ImGui::PopStyleColor();
+		}
 		});
 	}
 
