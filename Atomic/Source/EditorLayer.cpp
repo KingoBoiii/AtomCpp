@@ -80,9 +80,6 @@ namespace Atom
 			case Atom::EditorLayer::SceneState::Play: m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
 			default: break;
 		}
-		//m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
-		//m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
-		//m_ActiveScene->OnRuntimeUpdate(deltaTime);
 
 		m_Framebuffer->Unbind();
 	}
