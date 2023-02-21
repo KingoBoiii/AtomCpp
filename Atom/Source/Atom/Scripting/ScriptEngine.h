@@ -189,7 +189,7 @@ namespace Atom
 
 		inline static char s_FieldValueBuffer[8];
 
-		friend class ScriptFieldInstance;
+		friend struct ScriptFieldInstance;
 		friend class ScriptEngine;
 	};
 
