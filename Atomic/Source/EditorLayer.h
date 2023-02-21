@@ -32,10 +32,14 @@ namespace Atom
 
 		void OnScenePlay();
 		void OnSceneStop();
+
+		void OnDuplicateEntity();
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
 		Scene* m_ActiveScene = nullptr;
+		Scene* m_EditorScene = nullptr;
+
 		Framebuffer* m_Framebuffer = nullptr;
 		EditorCamera m_EditorCamera;
 

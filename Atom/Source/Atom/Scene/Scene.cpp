@@ -42,6 +42,63 @@ namespace Atom
 	{
 	}
 
+	template<typename TComponent>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	{
+		auto view = src.view<TComponent>();
+		for(auto e : view)
+		{
+			UUID uuid = src.get<Component::Identifier>(e).ID;
+			AT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
+			entt::entity dstEnttId = enttMap.at(uuid);
+			
+			auto& component = src.get<TComponent>(e);
+			dst.emplace_or_replace<TComponent>(dstEnttId, component);
+		}
+	}
+
+	template<typename TComponent>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		if(src.HasComponent<TComponent>())
+		{
+			dst.AddOrReplaceComponent<TComponent>(src.GetComponent<TComponent>());
+		}
+	}
+
+	Scene* Scene::Copy(Scene* other)
+	{
+		Scene* newScene = new Scene();
+
+		newScene->m_ViewportWidth = other->m_ViewportWidth;
+		newScene->m_ViewportHeight = other->m_ViewportHeight;
+
+		auto& srcSceneRegistry = other->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+
+		std::unordered_map<UUID, entt::entity> enttMap;
+
+		// Creat entities in new scene
+		auto identifierView = srcSceneRegistry.view<Component::Identifier>();
+		for(auto e : identifierView)
+		{
+			UUID uuid = srcSceneRegistry.get<Component::Identifier>(e).ID;
+			const auto& name = srcSceneRegistry.get<Component::Identifier>(e).Name;
+			Entity newEntity = newScene->CreateEntity(uuid, name);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+
+		// Copy components (except for Identifier)
+		CopyComponent<Component::Transform>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::BasicRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::Script>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		return newScene;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		return CreateEntity(UUID(), name);
@@ -65,6 +122,19 @@ namespace Atom
 	{
 		m_EntityMap.erase(entity.GetUUID());
 		m_Registry.destroy(entity);
+	}
+
+	void Scene::DuplicateEntity(Entity entity)
+	{
+		std::string name = entity.GetName();
+		Entity newEntity = CreateEntity(name);
+
+		CopyComponentIfExists<Component::Transform>(newEntity, entity);
+		CopyComponentIfExists<Component::Camera>(newEntity, entity);
+		CopyComponentIfExists<Component::BasicRenderer>(newEntity, entity);
+		CopyComponentIfExists<Component::Script>(newEntity, entity);
+		CopyComponentIfExists<Component::Rigidbody2D>(newEntity, entity);
+		CopyComponentIfExists<Component::BoxCollider2D>(newEntity, entity);
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)

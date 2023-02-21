@@ -17,9 +17,13 @@ namespace Atom
 		Scene();
 		~Scene();
 
+		static Scene* Copy(Scene* other);
+
 		Entity CreateEntity(const std::string& name = std::string());
 		Entity CreateEntity(UUID uuid, const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
+
+		void DuplicateEntity(Entity entity);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 

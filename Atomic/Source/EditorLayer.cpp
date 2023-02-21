@@ -220,10 +220,16 @@ namespace Atom
 
 		NewScene();
 
-		SceneSerializer serializer(m_ActiveScene);
-		auto d = serializer.Deserialize(filepath);
+		Scene* newScene = new Scene();
+		SceneSerializer serializer(newScene);
+		auto success = serializer.Deserialize(filepath);
+		AT_CORE_ASSERT(success, "Failed to deserialize scene");
 
-		m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		m_EditorScene = newScene;
+		m_EditorScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		m_SceneHierarchyPanel->SetSceneContext(m_EditorScene);
+
+		m_ActiveScene = m_EditorScene;
 	}
 
 	void EditorLayer::SaveAs()
@@ -242,15 +248,36 @@ namespace Atom
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+
+		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
 
+		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetGizmoType(-1);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+
 		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
+		
+		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OnDuplicateEntity()
+	{
+		if(m_SceneState != SceneState::Edit)
+		{
+			return;
+		}
+
+		Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
+		if(selectedEntity)
+		{
+			m_EditorScene->DuplicateEntity(selectedEntity);
+		}
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -279,6 +306,15 @@ namespace Atom
 			case Key::R:
 				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::SCALE);
 				break;
+
+			// Entity shortcuts
+			case Key::D:
+			{
+				if(control)
+				{
+					OnDuplicateEntity();
+				}
+			} break;
 
 			// Scene shortcuts
 			case Key::N:
