@@ -47,20 +47,20 @@ namespace Atom
 		}
 
 		template<typename T>
-		T GetValue(const std::string& name)
+		T GetValue()
 		{
-			static_assert(sizeof(T) <= 8, "Type too large");
+			static_assert(sizeof(T) <= 16, "Type too large");
 			return *(T*)m_Buffer;
 		}
 
 		template<typename T>
 		void SetValue(T value)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large");
+			static_assert(sizeof(T) <= 16, "Type too large");
 			memcpy(m_Buffer, &value, sizeof(T));
 		}
 	private:
-		uint8_t m_Buffer[8];
+		uint8_t m_Buffer[16];
 
 		friend class ScriptInstance;
 		friend class ScriptEngine;
@@ -154,7 +154,7 @@ namespace Atom
 		template<typename T>
 		T GetFieldValue(const std::string& name)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large");
+			static_assert(sizeof(T) <= 16, "Type too large");
 			
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 			if(!success)
@@ -168,7 +168,7 @@ namespace Atom
 		template<typename T>
 		void SetFieldValue(const std::string& name, const T& value)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large");
+			static_assert(sizeof(T) <= 16, "Type too large");
 
 			SetFieldValueInternal(name, &value);
 		}
@@ -187,10 +187,60 @@ namespace Atom
 		MonoMethod* m_OnCollision2DEnterMethod = nullptr;
 		MonoMethod* m_OnCollision2DExitMethod = nullptr;
 
-		inline static char s_FieldValueBuffer[8];
+		inline static char s_FieldValueBuffer[16];
 
 		friend struct ScriptFieldInstance;
 		friend class ScriptEngine;
 	};
+
+	namespace Utils
+	{
+
+		inline const char* ScriptFieldTypeToString(ScriptFieldType scriptFieldType)
+		{
+			switch(scriptFieldType)
+			{
+				case Atom::ScriptFieldType::Bool:		return "Bool";
+				case Atom::ScriptFieldType::Char:		return "Char";
+				case Atom::ScriptFieldType::String:		return "String";
+				case Atom::ScriptFieldType::Float:		return "Float";
+				case Atom::ScriptFieldType::Double:		return "Double";
+				case Atom::ScriptFieldType::Byte:		return "Byte";
+				case Atom::ScriptFieldType::Short:		return "Short";
+				case Atom::ScriptFieldType::Int:		return "Int";
+				case Atom::ScriptFieldType::Long:		return "Long";
+				case Atom::ScriptFieldType::Vector2:	return "Vector2";
+				case Atom::ScriptFieldType::Vector3:	return "Vector3";
+				case Atom::ScriptFieldType::Vector4:	return "Vector4";
+				case Atom::ScriptFieldType::Entity:		return "Entity";
+				case Atom::ScriptFieldType::None:		return "None";
+				default: break;
+			}
+			
+			AT_CORE_ASSERT(false, "Unknown Script Field Type!");
+			return "None";
+		}
+
+		inline ScriptFieldType ScriptFieldTypeFromString(std::string_view scriptFieldType)
+		{
+			if(scriptFieldType == "None")		return ScriptFieldType::None;
+			if(scriptFieldType == "Bool")		return ScriptFieldType::Bool;
+			if(scriptFieldType == "Char")		return ScriptFieldType::Char;
+			if(scriptFieldType == "String")		return ScriptFieldType::String;
+			if(scriptFieldType == "Float")		return ScriptFieldType::Float;
+			if(scriptFieldType == "Double")		return ScriptFieldType::Double;
+			if(scriptFieldType == "Byte")		return ScriptFieldType::Byte;
+			if(scriptFieldType == "Short")		return ScriptFieldType::Short;
+			if(scriptFieldType == "Int")		return ScriptFieldType::Int;
+			if(scriptFieldType == "Long")		return ScriptFieldType::Long;
+			if(scriptFieldType == "Vector2")	return ScriptFieldType::Vector2;
+			if(scriptFieldType == "Vector3")	return ScriptFieldType::Vector3;
+			if(scriptFieldType == "Vector4")	return ScriptFieldType::Vector4;
+			if(scriptFieldType == "Entity")		return ScriptFieldType::Entity;
+
+			return ScriptFieldType::None;
+		}
+
+	}
 
 }

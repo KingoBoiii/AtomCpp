@@ -120,28 +120,6 @@ namespace Atom
 			return it->second;
 		}
 
-		const char* ScriptFieldTypeToString(ScriptFieldType fieldType)
-		{
-			switch(fieldType)
-			{
-				case ScriptFieldType::Bool: return "Bool";
-				case ScriptFieldType::Char: return "Char";
-				case ScriptFieldType::String: return "String";
-				case ScriptFieldType::Float: return "Float";
-				case ScriptFieldType::Double: return "Double";
-				case ScriptFieldType::Byte: return "Byte";
-				case ScriptFieldType::Short: return "Short";
-				case ScriptFieldType::Int: return "Int";
-				case ScriptFieldType::Long: return "Long";
-				case ScriptFieldType::Vector2: return "Vector2";
-				case ScriptFieldType::Vector3: return "Vector3";
-				case ScriptFieldType::Vector4: return "Vector4";
-				case ScriptFieldType::Entity: return "Entity";
-				case ScriptFieldType::None:
-				default: return "Invalid";
-			}
-		}
-
 	}
 
 	struct ScriptEngineData

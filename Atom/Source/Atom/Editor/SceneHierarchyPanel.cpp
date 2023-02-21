@@ -401,7 +401,7 @@ namespace Atom
 
 							if(field.Type == ScriptFieldType::Float)
 							{
-								float data = scriptField.GetValue<float>(name);
+								float data = scriptField.GetValue<float>();
 								if(ImGui::DragFloat(name.c_str(), &data))
 								{
 									scriptField.SetValue(data);

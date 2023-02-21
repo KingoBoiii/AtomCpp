@@ -1,5 +1,23 @@
 Scene: Untitled
 Entities:
+  - Entity: 8445150081912805089
+    Identifier:
+      Name: Player
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    BasicRenderer:
+      Color: [1, 0, 1, 1]
+    Script:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 1.5
+        - Name: Test
+          Type: Float
+          Data: 25
   - Entity: 1477010802534493587
     Identifier:
       Name: Camera
@@ -18,14 +36,3 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 8445150081912805089
-    Identifier:
-      Name: Player
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    BasicRenderer:
-      Color: [1, 0, 1, 1]
-    Script:
-      ClassName: Sandbox.Player

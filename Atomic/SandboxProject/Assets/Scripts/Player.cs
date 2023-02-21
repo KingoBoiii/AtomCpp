@@ -7,7 +7,7 @@ namespace Sandbox
 
     internal class Player : Entity
     {
-        public float Test = 1.0f;
+        //public float Test = 1.0f;
         public Entity OtherEntity;
 
         public Vector3 Position;
