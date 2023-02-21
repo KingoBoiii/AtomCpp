@@ -17,3 +17,6 @@
 [submodule "Atom/Vendor/ImGuizmo"]
 	path = Atom/Vendor/ImGuizmo
 	url = https://github.com/cpp-engine-forks/ImGuizmo.git
+[submodule "Atom/Vendor/Box2D"]
+	path = Atom/Vendor/Box2D
+	url = https://github.com/cpp-engine-forks/box2d.git
