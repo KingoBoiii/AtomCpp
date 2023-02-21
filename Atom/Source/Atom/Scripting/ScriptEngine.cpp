@@ -177,7 +177,7 @@ namespace Atom
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
 
-		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "EntityBase", true);
+		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
 	}
 
 	void ScriptEngine::Shutdown()
@@ -235,6 +235,34 @@ namespace Atom
 		scriptInstance->InvokeOnUpdate(deltaTime);
 	}
 
+	void ScriptEngine::InvokeOnCollection2DEnter(Entity entity, Entity other)
+	{
+		if(!entity.HasComponent<Component::Script>())
+		{
+			return;
+		}
+
+		UUID entityUUID = entity.GetUUID();
+		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
+
+		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
+		scriptInstance->InvokeOnCollision2DEnter(other);
+	}
+
+	void ScriptEngine::InvokeOnCollection2DExit(Entity entity, Entity other)
+	{
+		if(!entity.HasComponent<Component::Script>())
+		{
+			return;
+		}
+
+		UUID entityUUID = entity.GetUUID();
+		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
+
+		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
+		scriptInstance->InvokeOnCollision2DExit(other);
+	}
+	
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
@@ -305,7 +333,7 @@ namespace Atom
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_ScriptEngineData->AppAssemblyImage, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-		MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "EntityBase");
+		MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Entity");
 
 		for(int32_t i = 0; i < numTypes; i++)
 		{
@@ -417,6 +445,9 @@ namespace Atom
 		m_OnDestroyMethod = m_ScriptClass->GetMethod("OnDestroy");
 		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
 
+		m_OnCollision2DEnterMethod = s_ScriptEngineData->EntityClass.GetMethod("OnCollision2DEnter_Internal", 1);
+		m_OnCollision2DExitMethod = s_ScriptEngineData->EntityClass.GetMethod("OnCollision2DExit_Internal", 1);
+
 		{
 			void* param = &entity.GetUUID();
 
@@ -453,6 +484,28 @@ namespace Atom
 
 		void* param = &deltaTime;
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+	}
+
+	void ScriptInstance::InvokeOnCollision2DEnter(Entity other)
+	{
+		if(!m_OnCollision2DEnterMethod)
+		{
+			return;
+		}
+
+		void* param = &other.GetUUID();
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollision2DEnterMethod, &param);
+	}
+
+	void ScriptInstance::InvokeOnCollision2DExit(Entity other)
+	{
+		if(!m_OnCollision2DExitMethod)
+		{
+			return;
+		}
+
+		void* param = &other.GetUUID();
+		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollision2DExitMethod, &param);
 	}
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)

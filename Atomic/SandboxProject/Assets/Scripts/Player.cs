@@ -5,10 +5,10 @@ namespace Sandbox
 
     // TODO: Move build files into cache directory?
 
-    internal class Player : EntityBase, IEntity
+    internal class Player : Entity
     {
         public float Test = 1.0f;
-        public EntityBase OtherEntity;
+        public Entity OtherEntity;
 
         public Vector3 Position;
         public char Character;

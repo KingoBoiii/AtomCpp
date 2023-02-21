@@ -2,9 +2,9 @@
 namespace Sandbox
 {
 
-    internal class Camera : EntityBase
+    internal class Camera : Entity
     {
-        public EntityBase OtherBase;
+        public Entity OtherEntity;
         
         private void OnCreate()
         {

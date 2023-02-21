@@ -1,18 +1,17 @@
 ﻿namespace Atom
 {
 
-    public interface IEntity
-    {
-        void OnCreate();
-        void OnDestroy();
-        void OnUpdate(float deltaTime);
-    }
+    public delegate void OnCollision2DEnter(Entity entity);
+    public delegate void OnCollision2DExit(Entity entity);
 
-    public class EntityBase
+    public class Entity
     {
-        protected EntityBase() { Id = 0; }
+        public event OnCollision2DEnter OnCollision2DEnter;
+        public event OnCollision2DExit OnCollision2DExit;
 
-        internal EntityBase(ulong id)
+        protected Entity() { Id = 0; }
+
+        internal Entity(ulong id)
         {
             Id = id;
         }
@@ -32,6 +31,20 @@
                 return GetComponent<Transform>();
             }
         }
+
+        #region Physics Test
+        
+        internal void OnCollision2DEnter_Internal(ulong entityId)
+        {
+            OnCollision2DEnter?.Invoke(new Entity(entityId));
+        }
+
+        internal void OnCollision2DExit_Internal(ulong entityId)
+        {
+            OnCollision2DExit?.Invoke(new Entity(entityId));
+        }
+
+        #endregion
 
         public bool HasComponent<TComponent>() where TComponent : ComponentBase
         {

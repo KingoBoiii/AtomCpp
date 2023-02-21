@@ -47,6 +47,9 @@ namespace Atom
 		static void OnDestroyEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, float deltaTime);
 
+		static void InvokeOnCollection2DEnter(Entity entity, Entity other);
+		static void InvokeOnCollection2DExit(Entity entity, Entity other);
+		
 		static void LoadAssembly(const std::filesystem::path& filepath);
 		static void LoadAppAssembly(const std::filesystem::path& filepath);
 
@@ -108,6 +111,9 @@ namespace Atom
 		void InvokeOnDestroy();
 		void InvokeOnUpdate(float deltaTime);
 
+		void InvokeOnCollision2DEnter(Entity other);
+		void InvokeOnCollision2DExit(Entity other);
+
 		ScriptClass* GetScriptClass() { return m_ScriptClass; }
 
 		template<typename T>
@@ -138,6 +144,9 @@ namespace Atom
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnDestroyMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
+
+		MonoMethod* m_OnCollision2DEnterMethod = nullptr;
+		MonoMethod* m_OnCollision2DExitMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
 	};

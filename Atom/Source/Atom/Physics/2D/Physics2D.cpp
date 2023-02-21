@@ -1,5 +1,6 @@
 #include "ATPCH.h"
 #include "Physics2D.h"
+#include "ContactListener.h"
 
 #include "Atom/Scene/Entity.h"
 
@@ -98,6 +99,7 @@ namespace Atom
 		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
 
 		s_PhysicsData->World = new b2World({ 0.0f, -9.81f });
+		s_PhysicsData->World->SetContactListener(new ContactListener());
 	}
 
 	void Physics2D::OnRuntimeStop()
@@ -131,6 +133,7 @@ namespace Atom
 		bodyDef.fixedRotation = rb2d.FixedRotation;
 		bodyDef.position.Set(transform.Position.x, transform.Position.y);
 		bodyDef.angle = transform.Rotation.z;
+		bodyDef.userData.pointer = (uintptr_t)entity.GetUUID();
 
 		b2Body* body = s_PhysicsData->World->CreateBody(&bodyDef);
 		body->SetFixedRotation(rb2d.FixedRotation);
