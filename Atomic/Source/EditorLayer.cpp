@@ -64,12 +64,13 @@ namespace Atom
 
 	void EditorLayer::OnUpdate(float deltaTime)
 	{
+		const glm::vec2& viewportSize = m_Viewport->GetViewportSize();
+		m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+
 		FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
 		if(m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
 		{
-			const glm::vec2& viewportSize = m_Viewport->GetViewportSize();
 			m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-			m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 			m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
 		}
 
@@ -281,7 +282,7 @@ namespace Atom
 
 		m_ActiveScene->OnRuntimeStop();
 		m_ActiveScene = m_EditorScene;
-		
+
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
 	}
 
