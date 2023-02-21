@@ -35,7 +35,6 @@ namespace Atom
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 
-
 #if 0
 		auto cameraEntity = m_Scene->CreateEntity("Camera");
 		auto& transform = cameraEntity.GetComponent<Atom::Component::Transform>();
@@ -46,15 +45,11 @@ namespace Atom
 		quadEntity.AddComponent<Atom::Component::BasicRenderer>(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 		quadEntity.AddComponent<Atom::Component::Script>("Sandbox.Player");
 #endif
-
-		//m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		EditorResources::Shutdown();
-
-		//m_ActiveScene->OnRuntimeStop();
 		delete m_ActiveScene;
 	}
 
@@ -243,6 +238,8 @@ namespace Atom
 	{
 		m_SceneState = SceneState::Play;
 		m_ActiveScene->OnRuntimeStart();
+
+		m_Viewport->SetGizmoType(-1);
 	}
 
 	void EditorLayer::OnSceneStop()
@@ -300,6 +297,11 @@ namespace Atom
 					SaveAs();
 				}
 			} break;
+		}
+
+		if(m_SceneState == SceneState::Play)
+		{
+			m_Viewport->SetGizmoType(-1);
 		}
 
 		return true;
