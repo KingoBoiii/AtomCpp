@@ -21,7 +21,17 @@ namespace Atom
 
 		Window* window = Application::Get().GetWindow();
 
-		m_ActiveScene = new Atom::Scene();
+		m_EditorScene = new Atom::Scene();
+		m_ActiveScene = m_EditorScene;
+
+		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
+		if(commandLineArgs.Count > 1)
+		{
+			std::string scenePath = commandLineArgs[1];
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(scenePath);
+		}
 
 		Atom::FramebufferOptions framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };

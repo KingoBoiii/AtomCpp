@@ -32,6 +32,8 @@ namespace Atom
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		const ApplicationOptions& GetOptions() const { return m_ApplicationOptions; }
+		const ApplicationOptions& GetOptions() { return m_ApplicationOptions; }
 		inline Window* GetWindow() const { return m_Window; }
 		static Application& Get() { return *s_Instance; }
 	private:
