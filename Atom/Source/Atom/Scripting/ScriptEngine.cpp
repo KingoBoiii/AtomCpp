@@ -30,7 +30,7 @@ namespace Atom
 		{ "Atom.Vector2",		ScriptFieldType::Vector2 },
 		{ "Atom.Vector3",		ScriptFieldType::Vector3 },
 		{ "Atom.Vector4",		ScriptFieldType::Vector4 },
-		{ "Atom.EntityBase",	ScriptFieldType::Entity }
+		{ "Atom.Entity",		ScriptFieldType::Entity }
 	};
 
 	namespace Utils
