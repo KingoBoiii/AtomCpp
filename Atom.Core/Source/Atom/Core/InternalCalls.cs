@@ -11,6 +11,9 @@ namespace Atom
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Entity_HasComponent(ulong entityId, Type componentType);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Entity_FindEntityByName(string name, out ulong entityId);
+
         #endregion
 
         #region Identifier

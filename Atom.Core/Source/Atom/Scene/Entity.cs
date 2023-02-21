@@ -61,6 +61,18 @@
 
             return new TComponent { Entity = this };
         }
+
+        public Entity FindEntityByName(string name)
+        {
+            InternalCalls.Entity_FindEntityByName(name, out var entityId);
+
+            if(entityId == 0)
+            {
+                return default;
+            }
+
+            return new Entity(entityId);
+        }
     }
 
 }

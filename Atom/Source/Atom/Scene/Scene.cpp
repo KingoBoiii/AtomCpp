@@ -286,6 +286,20 @@ namespace Atom
 		}
 	}
 
+	Entity Scene::FindEntityByName(std::string_view name)
+	{
+		auto view = m_Registry.view<Component::Identifier>();
+		for(auto entity : view)
+		{
+			const auto& identifier = view.get<Component::Identifier>(entity);
+			if(identifier.Name == name)
+			{
+				return Entity{ entity, this };
+			}
+		}
+		return {};
+	}
+
 	Entity Scene::GetEntityByUUID(UUID uuid)
 	{
 		if(m_EntityMap.find(uuid) != m_EntityMap.end())

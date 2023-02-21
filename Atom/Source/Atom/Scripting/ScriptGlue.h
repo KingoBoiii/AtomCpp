@@ -24,6 +24,8 @@ namespace Atom
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
 
+		void Entity_FindEntityByName(MonoString* name, UUID* uuid);
+
 #pragma endregion
 
 #pragma region Identifier

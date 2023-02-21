@@ -50,6 +50,7 @@ namespace Atom
 	void ScriptGlue::RegisterInternalCalls()
 	{
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
+		AT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
 		AT_ADD_INTERNAL_CALL(Identifier_GetName);
 		AT_ADD_INTERNAL_CALL(Identifier_SetName);
@@ -85,6 +86,23 @@ namespace Atom
 			AT_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end(), "Entity_HasComponent: No function registered for this type!");
 
 			return s_EntityHasComponentFuncs.at(managedType)(entity);
+		}
+
+		void Entity_FindEntityByName(MonoString* name, UUID* uuid)
+		{
+			char* nameCStr = mono_string_to_utf8(name);
+
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->FindEntityByName(nameCStr);
+			mono_free(nameCStr);
+
+			if(!entity)
+			{
+				*uuid = 0;
+			}
+
+			*uuid = entity.GetUUID();
 		}
 
 #pragma endregion
