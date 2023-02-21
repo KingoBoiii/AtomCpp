@@ -206,6 +206,11 @@ namespace Atom
 
 	void EditorLayer::OpenScene()
 	{
+		if(m_SceneState != SceneState::Edit)
+		{
+			OnSceneStop();
+		}
+
 		std::string filepath = FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
