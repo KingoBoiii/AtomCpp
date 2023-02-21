@@ -2,15 +2,16 @@
 #include <Atom.h>
 
 #include "Panels/Viewport.h"
+#include <Atom/Editor/EditorCamera.h>
 #include <Atom/Editor/SceneHierarchyPanel.h>
 
-namespace Atomic
+namespace Atom
 {
 	
-	class EditorLayer : public Atom::Layer
+	class EditorLayer : public Layer
 	{
 	public:
-		EditorLayer() : Layer("Atomic Editor Layer")
+		EditorLayer() : Layer("Atom Editor Layer")
 		{
 		}
 
@@ -30,12 +31,13 @@ namespace Atomic
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
-		Atom::Scene* m_Scene = nullptr;
-		Atom::Framebuffer* m_Framebuffer = nullptr;
+		Scene* m_ActiveScene = nullptr;
+		Framebuffer* m_Framebuffer = nullptr;
+		EditorCamera m_EditorCamera;
 
 		// Panels
 		Viewport* m_Viewport = nullptr;
-		Atom::SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
+		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
 	};
 
 }

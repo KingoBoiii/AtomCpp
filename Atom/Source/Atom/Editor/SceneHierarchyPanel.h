@@ -14,6 +14,8 @@ namespace Atom
 
 		virtual void OnImGuiRender(bool& isOpen) override;
 		virtual void SetSceneContext(Scene* scene) override;
+
+		Entity GetSelectedEntity() const { return m_SelectedEntity; }
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);

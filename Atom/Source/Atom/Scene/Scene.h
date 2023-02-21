@@ -1,5 +1,6 @@
 #pragma once
 #include "Atom/Core/UUID.h"
+#include "Atom/Editor/EditorCamera.h"
 
 #include "entt.hpp"
 
@@ -19,6 +20,8 @@ namespace Atom
 		void DestroyEntity(Entity entity);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		void OnRuntimeEditor(float deltaTime, EditorCamera& editorCamera);
 
 		void OnRuntimeStart();
 		void OnRuntimeStop();

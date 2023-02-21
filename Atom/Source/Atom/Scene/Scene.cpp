@@ -60,6 +60,23 @@ namespace Atom
 		}
 	}
 
+	void Scene::OnRuntimeEditor(float deltaTime, EditorCamera& editorCamera)
+	{
+		Renderer2D::BeginScene(editorCamera);
+
+		{
+			auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
+			for(auto entity : group)
+			{
+				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
+
+				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
 	void Scene::OnRuntimeStart()
 	{
 		// Script
@@ -147,6 +164,7 @@ namespace Atom
 		{
 			return { m_EntityMap[uuid], this };
 		}
+		return {};
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()

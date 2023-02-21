@@ -185,14 +185,14 @@ namespace Atom
 	{
 		auto& name = entity.GetComponent<Component::Identifier>().Name;
 
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
+		ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, name.c_str());
 		if(ImGui::IsItemClicked())
 		{
 			m_SelectedEntity = entity;
 		}
-
+		
 		bool entityDeleted = false;
 		if(ImGui::BeginPopupContextItem())
 		{

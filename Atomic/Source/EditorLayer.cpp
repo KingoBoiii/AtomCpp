@@ -3,9 +3,12 @@
 #include <Atom/Utils/PlatformUtils.h>
 #include <Atom/ImGui/ImGuiUtillities.h>
 
-#include <imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
-namespace Atomic
+#include <imgui.h>
+#include "ImGuizmo.h"
+
+namespace Atom
 {
 
 #define ATOM_SCENE_FILE_EXTENSIONS "atsc"
@@ -13,18 +16,22 @@ namespace Atomic
 
 	void EditorLayer::OnAttach()
 	{
-		Atom::Window* window = Atom::Application::Get().GetWindow();
+		Window* window = Application::Get().GetWindow();
 
-		m_Scene = new Atom::Scene();
+		m_ActiveScene = new Atom::Scene();
 
 		Atom::FramebufferOptions framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
 		framebufferOptions.Width = window->GetWidth();
 		framebufferOptions.Height = window->GetHeight();
-		m_Framebuffer = Atom::Framebuffer::Create(framebufferOptions);
+		m_Framebuffer = Framebuffer::Create(framebufferOptions);
 
-		m_Viewport = new Viewport(m_Framebuffer);
-		m_SceneHierarchyPanel = new Atom::SceneHierarchyPanel(m_Scene);
+		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
+
+		m_SceneHierarchyPanel = new SceneHierarchyPanel(m_ActiveScene);
+		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
+		m_Viewport->SetSceneContext(m_ActiveScene);
+
 
 #if 0
 		auto cameraEntity = m_Scene->CreateEntity("Camera");
@@ -37,29 +44,33 @@ namespace Atomic
 		quadEntity.AddComponent<Atom::Component::Script>("Sandbox.Player");
 #endif
 
-		m_Scene->OnRuntimeStart();
+		//m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnDetach()
 	{
-		m_Scene->OnRuntimeStop();
-		delete m_Scene;
+		//m_ActiveScene->OnRuntimeStop();
+		delete m_ActiveScene;
 	}
 
 	void EditorLayer::OnUpdate(float deltaTime)
 	{
-		Atom::FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
+		FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
 		if(m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
 		{
 			const glm::vec2& viewportSize = m_Viewport->GetViewportSize();
 			m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-			m_Scene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+			m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+			m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
 		}
+
+		m_EditorCamera.OnUpdate(deltaTime);
 
 		m_Framebuffer->Bind();
 		m_Framebuffer->Clear();
 
-		m_Scene->OnRuntimeUpdate(deltaTime);
+		m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
+		//m_ActiveScene->OnRuntimeUpdate(deltaTime);
 
 		m_Framebuffer->Unbind();
 	}
@@ -81,10 +92,12 @@ namespace Atomic
 		ImGui::End();
 	}
 
-	void EditorLayer::OnEvent(Atom::Event& e)
+	void EditorLayer::OnEvent(Event& e)
 	{
-		Atom::EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<Atom::KeyPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		m_EditorCamera.OnEvent(e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}
 
 	void EditorLayer::DrawTopMenuBar()
@@ -112,26 +125,26 @@ namespace Atomic
 
 				if(ImGui::MenuItem("Save Example Scene"))
 				{
-					Atom::SceneSerializer serializer(m_Scene);
+					SceneSerializer serializer(m_ActiveScene);
 					serializer.Serialize(filepath);
 				}
 				if(ImGui::MenuItem("Load Example Scene"))
 				{
-					Atom::SceneSerializer serializer(m_Scene);
+					SceneSerializer serializer(m_ActiveScene);
 					serializer.Deserialize(filepath);
 
-					m_Scene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+					m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 				}
 
 				ImGui::Separator();
 
 				if(ImGui::MenuItem("Restart (W.I.P.)"))
 				{
-					Atom::Application::Get().Restart();
+					Application::Get().Restart();
 				}
 				if(ImGui::MenuItem("Close"))
 				{
-					Atom::Application::Get().Close();
+					Application::Get().Close();
 				}
 				ImGui::EndMenu();
 			}
@@ -142,43 +155,43 @@ namespace Atomic
 
 	void EditorLayer::NewScene()
 	{
-		m_Scene = new Atom::Scene();
-		m_Scene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
-		m_SceneHierarchyPanel->SetSceneContext(m_Scene);
+		m_ActiveScene = new Scene();
+		m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
+		m_Viewport->SetSceneContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OpenScene()
 	{
-		std::string filepath = Atom::FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
+		std::string filepath = FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled open file dialog!");
 			return;
 		}
 
-		m_Scene = new Atom::Scene();
-		m_SceneHierarchyPanel->SetSceneContext(m_Scene);
+		NewScene();
 
-		Atom::SceneSerializer serializer(m_Scene);
+		SceneSerializer serializer(m_ActiveScene);
 		auto d = serializer.Deserialize(filepath);
 
-		m_Scene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 	}
 
 	void EditorLayer::SaveAs()
 	{
-		std::string filepath = Atom::FileDialogs::SaveFile(ATOM_SCENE_FILE_DIALOG_FILTER);
+		std::string filepath = FileDialogs::SaveFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled save file dialog!");
 			return;
 		}
 
-		Atom::SceneSerializer serializer(m_Scene);
+		SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
 	}
 
-	bool EditorLayer::OnKeyPressed(Atom::KeyPressedEvent& e)
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
 		// Shortcuts
 		if(e.GetRepeatCount() > 0)
@@ -186,32 +199,47 @@ namespace Atomic
 			return false;
 		}
 
-		bool control = Atom::Input::IsKeyDown(Atom::Key::LeftControl) || Atom::Input::IsKeyDown(Atom::Key::RightControl);
-		bool shift = Atom::Input::IsKeyDown(Atom::Key::LeftShift) || Atom::Input::IsKeyDown(Atom::Key::RightShift);
+		bool control = Input::IsKeyDown(Key::LeftControl) || Atom::Input::IsKeyDown(Key::RightControl);
+		bool shift = Input::IsKeyDown(Key::LeftShift) || Input::IsKeyDown(Key::RightShift);
 
 		switch(e.GetKeyCode())
 		{
-			case Atom::Key::N:
+			// Gizmo shortcuts
+			case Key::Q:
+				m_Viewport->SetGizmoType(-1);
+				break;
+			case Key::W:
+				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::TRANSLATE);
+				break;
+			case Key::E:
+				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::ROTATE);
+				break;
+			case Key::R:
+				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::SCALE);
+				break;
+
+			// Scene shortcuts
+			case Key::N:
 			{
 				if(control)
 				{
 					NewScene();
 				}
 			} break;
-			case Atom::Key::O:
+			case Key::O:
 			{
 				if(control)
 				{
 					OpenScene();
 				}
 			} break;
-			case Atom::Key::S:
+			case Key::S:
 			{
 				if(control && shift)
 				{
 					SaveAs();
 				}
-		 	} break;
+			} break;
 		}
 
 		return true;

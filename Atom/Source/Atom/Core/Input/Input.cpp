@@ -41,4 +41,24 @@ namespace Atom
 		return s_Input->IsKeyDown(keycode);
 	}
 
+	bool Input::IsMouseButtonPressed(MouseButtonCode button)
+	{
+		return s_Input->IsMouseButtonPressed(button);
+	}
+
+	glm::vec2 Input::GetMousePosition()
+	{
+		return s_Input->GetMousePosition();
+	}
+
+	float Input::GetMouseX()
+	{
+		return s_Input->GetMousePosition().x;
+	}
+
+	float Input::GetMouseY()
+	{
+		return s_Input->GetMousePosition().y;
+	}
+
 }

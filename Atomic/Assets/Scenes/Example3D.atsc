@@ -13,8 +13,8 @@ Entities:
     Identifier:
       Name: Camera
     Transform:
-      Position: [0, 0, 11.1999998]
-      Rotation: [0, 0, 0]
+      Position: [-3.4000001, 11.6999998, 11.1999998]
+      Rotation: [-0.673697054, -0.315904588, 0]
       Scale: [1, 1, 1]
     Camera:
       SceneCamera:
@@ -31,7 +31,7 @@ Entities:
     Identifier:
       Name: Empty Entity
     Transform:
-      Position: [2, 0, 0]
+      Position: [2, 0, -2.4973917]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     BasicRenderer:
