@@ -28,6 +28,7 @@ namespace Atom
 	private: // Scene commands
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveAs();
 
 		void OnScenePlay();
@@ -37,6 +38,7 @@ namespace Atom
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
+		std::filesystem::path m_EditorScenePath;
 		Scene* m_ActiveScene = nullptr;
 		Scene* m_EditorScene = nullptr;
 

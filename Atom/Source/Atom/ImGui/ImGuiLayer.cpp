@@ -59,7 +59,7 @@ namespace Atom
 		SetDarkThemeColors();
 
 		Application& app = Application::Get();
-		
+
 		GLFWwindow* glfwWindow = static_cast<GlfwWindow*>(app.GetWindow())->m_WindowHandle;
 
 		DX11RendererContext& context = DX11RendererContext::Get();
@@ -80,11 +80,12 @@ namespace Atom
 
 	void ImGuiLayer::OnEvent(Event& e)
 	{
-#if 0
-		ImGuiIO& io = ImGui::GetIO();
-		e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-		e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
-#endif
+		if(m_BlockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
 	}
 
 	void ImGuiLayer::Begin()
@@ -147,5 +148,5 @@ namespace Atom
 		colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 	}
-	
+
 }

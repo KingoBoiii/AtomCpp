@@ -34,6 +34,7 @@ namespace Atom
 
 		const ApplicationOptions& GetOptions() const { return m_ApplicationOptions; }
 		const ApplicationOptions& GetOptions() { return m_ApplicationOptions; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		inline Window* GetWindow() const { return m_Window; }
 		static Application& Get() { return *s_Instance; }
 	private:

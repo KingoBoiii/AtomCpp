@@ -21,18 +21,6 @@ namespace Atom
 
 		Window* window = Application::Get().GetWindow();
 
-		m_EditorScene = new Atom::Scene();
-		m_ActiveScene = m_EditorScene;
-
-		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
-		if(commandLineArgs.Count > 1)
-		{
-			std::string scenePath = commandLineArgs[1];
-
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(scenePath);
-		}
-
 		Atom::FramebufferOptions framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
 		framebufferOptions.Width = window->GetWidth();
@@ -41,9 +29,20 @@ namespace Atom
 
 		m_EditorCamera = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
 
+		m_EditorScene = new Atom::Scene();
+		m_ActiveScene = m_EditorScene;
+
 		m_SceneHierarchyPanel = new SceneHierarchyPanel(m_ActiveScene);
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
+
+		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
+		if(commandLineArgs.Count > 1)
+		{
+			std::string scenePath = commandLineArgs[1];
+			OpenScene(scenePath);
+		}
+
 
 #if 0
 		auto cameraEntity = m_Scene->CreateEntity("Camera");
@@ -209,18 +208,13 @@ namespace Atom
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = new Scene();
-		m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		//m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OpenScene()
 	{
-		if(m_SceneState != SceneState::Edit)
-		{
-			OnSceneStop();
-		}
-
 		std::string filepath = FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
 		{
@@ -228,18 +222,33 @@ namespace Atom
 			return;
 		}
 
-		NewScene();
+		OpenScene(filepath);
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if(m_SceneState != SceneState::Edit)
+		{
+			OnSceneStop();
+		}
+
+		if(path.extension().string() != fmt::format(".{}", ATOM_SCENE_FILE_EXTENSIONS))
+		{
+			AT_CORE_WARN("Could not load {0} - not a scene file", path.filename().string());
+			return;
+		}
 
 		Scene* newScene = new Scene();
 		SceneSerializer serializer(newScene);
-		auto success = serializer.Deserialize(filepath);
+		bool success = serializer.Deserialize(path.string());
 		AT_CORE_ASSERT(success, "Failed to deserialize scene");
 
 		m_EditorScene = newScene;
-		m_EditorScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
+		//m_EditorScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_EditorScene);
 
 		m_ActiveScene = m_EditorScene;
+		m_EditorScenePath = path;
 	}
 
 	void EditorLayer::SaveAs()

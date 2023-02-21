@@ -18,8 +18,11 @@ namespace Atom
 		void Begin();
 		void End();
 
+		void BlockEvents(bool block) { m_BlockEvents = block; }
 	protected:
 		void SetDarkThemeColors();
+	private:
+		bool m_BlockEvents = true;
 	};
 
 }
