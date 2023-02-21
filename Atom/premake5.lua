@@ -30,6 +30,7 @@ project "Atom"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.stb}",
 		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGuizmo}"
     }
 
@@ -38,6 +39,7 @@ project "Atom"
         "GLFW",
         "ImGui",
         "yaml-cpp",
+        "Box2D",
         "%{Library.mono}",
         "opengl32.lib"
     }

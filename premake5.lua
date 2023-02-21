@@ -23,6 +23,7 @@ IncludeDir["ImGui"] = "%{wks.location}/Atom/Vendor/imgui";
 IncludeDir["stb"] = "%{wks.location}/Atom/Vendor/stb/include";
 IncludeDir["yaml_cpp"] = "%{wks.location}/Atom/Vendor/yaml-cpp/include";
 IncludeDir["ImGuizmo"] = "%{wks.location}/Atom/Vendor/ImGuizmo";
+IncludeDir["Box2D"] = "%{wks.location}/Atom/Vendor/Box2D/include";
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/Atom/Vendor/mono/lib/%{cfg.buildcfg}";
@@ -41,6 +42,7 @@ group "Dependencies"
     include "Atom/Vendor/glfw"
     include "Atom/Vendor/imgui"
     include "Atom/Vendor/yaml-cpp"
+    include "Atom/Vendor/Box2D"
 group ""
 
 group "Core" 

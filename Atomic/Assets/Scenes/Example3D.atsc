@@ -1,21 +1,30 @@
 Scene: Untitled
 Entities:
-  - Entity: 11553653040598419143
+  - Entity: 8952760518339916883
     Identifier:
-      Name: Quad
+      Name: Empty Entity
     Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Position: [0, 0.5, 2.98023224e-08]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [1, 0.999995828, 0.999995828]
+    BasicRenderer:
+      Color: [0.884169459, 0, 0.884169877, 1]
+  - Entity: 17802813744049723721
+    Identifier:
+      Name: Empty Entity
+    Transform:
+      Position: [-0.499619246, 0, 0]
+      Rotation: [0, -1.57079637, 0]
       Scale: [1, 1, 1]
     BasicRenderer:
-      Color: [1, 0, 1, 1]
+      Color: [0.795366406, 0, 0.795366764, 1]
   - Entity: 14973211360988385937
     Identifier:
       Name: Camera
     Transform:
-      Position: [-3.4000001, 11.6999998, 11.1999998]
-      Rotation: [-0.673697054, -0.315904588, 0]
-      Scale: [1, 1, 1]
+      Position: [-2.06665635, 1.54023993, 2.03146529]
+      Rotation: [-0.503528059, -0.785401344, -1.89661432e-06]
+      Scale: [0.999999881, 0.999999702, 0.999999762]
     Camera:
       SceneCamera:
         ProjectionType: 0
@@ -27,12 +36,12 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 17802813744049723721
+  - Entity: 11553653040598419143
     Identifier:
-      Name: Empty Entity
+      Name: Quad
     Transform:
-      Position: [2, 0, -2.4973917]
+      Position: [0, 0, 0.5]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     BasicRenderer:
-      Color: [1, 1, 1, 1]
+      Color: [1, 0, 1, 1]
