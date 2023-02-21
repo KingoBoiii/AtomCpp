@@ -48,6 +48,14 @@ namespace Atom
 		m_Window = Utils::CreateWinddow(m_ApplicationOptions);
 		m_Window->SetEventCallback(AT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->Initialize();
+		if(m_ApplicationOptions.StartMaximized)
+		{
+			m_Window->Maximize();
+		}
+		else
+		{
+			m_Window->CenterWindow();
+		}
 
 		Renderer::Initialize(m_Window);
 		ScriptEngine::Initialize();

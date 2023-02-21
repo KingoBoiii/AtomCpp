@@ -25,6 +25,7 @@ Atom::Application* Atom::CreateApplication(Atom::ApplicationCommandLineArgs args
 	applicationOptions.Width = 1920;
 	applicationOptions.Height = 1080;
 	applicationOptions.Fullscreen = false;
+	applicationOptions.StartMaximized = true;
 	applicationOptions.VSync = true;
 	applicationOptions.CommandLineArgs = args;
 

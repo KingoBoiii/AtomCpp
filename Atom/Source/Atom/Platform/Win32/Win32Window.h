@@ -14,6 +14,9 @@ namespace Atom
 		virtual void Update() const override;
 		virtual void Present() const override;
 
+		virtual void Maximize() override;
+		virtual void CenterWindow() override;
+
 		virtual void SetEventCallback(const EventCallbackFn& callback) { m_WindowData.EventCallback = callback; }
 
 		inline virtual uint32_t GetWidth() const { return m_WindowData.Width; }

@@ -166,5 +166,14 @@ namespace Atom
 		m_SwapChain->Present();
 	}
 
+	void Win32Window::Maximize()
+	{
+		PostMessage(m_WindowHandle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	}
+
+	void Win32Window::CenterWindow()
+	{
+	}
+
 }
 

@@ -14,6 +14,7 @@ namespace Atom
 		uint32_t Height;
 		bool Fullscreen;
 		bool VSync;
+		bool StartMaximized;
 
 		ApplicationCommandLineArgs CommandLineArgs;
 	};

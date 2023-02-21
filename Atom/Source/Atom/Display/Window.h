@@ -23,6 +23,9 @@ namespace Atom
 		virtual void Update() const = 0;
 		virtual void Present() const = 0;
 
+		virtual void Maximize() = 0;
+		virtual void CenterWindow() = 0;
+
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 
 		virtual uint32_t GetWidth() const = 0;
