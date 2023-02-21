@@ -14,7 +14,8 @@ namespace Sandbox
         public char Character;
         public string PlayerName;
 
-        public float Speed = 2.5f;
+        //public float Speed = 2.5f;
+        public float Speed;
         public float Time;
 
         private BasicRenderer m_Renderer;

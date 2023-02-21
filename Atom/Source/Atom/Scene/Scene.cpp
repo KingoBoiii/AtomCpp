@@ -173,6 +173,8 @@ namespace Atom
 
 	void Scene::OnRuntimeStart()
 	{
+		m_IsRunning = true;
+
 		// Physics 2D
 		// TODO: move this into it's own module, like ScriptEngine
 		{
@@ -201,6 +203,8 @@ namespace Atom
 
 	void Scene::OnRuntimeStop()
 	{
+		m_IsRunning = false;
+
 		// Physics 2D
 		{
 			Physics2D::OnRuntimeStop();

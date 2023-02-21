@@ -29,6 +29,45 @@ namespace Atom
 		Entity
 	};
 
+	struct ScriptField
+	{
+		ScriptFieldType Type;
+		std::string Name;
+		MonoClassField* ClassField;
+	};
+
+	// ScriptField + Data storage
+	struct ScriptFieldInstance
+	{
+		ScriptField Field;
+
+		ScriptFieldInstance()
+		{
+			memset(m_Buffer, 0, sizeof(m_Buffer));
+		}
+
+		template<typename T>
+		T GetValue(const std::string& name)
+		{
+			static_assert(sizeof(T) <= 8, "Type too large");
+			return *(T*)m_Buffer;
+		}
+
+		template<typename T>
+		void SetValue(T value)
+		{
+			static_assert(sizeof(T) <= 8, "Type too large");
+			memcpy(m_Buffer, &value, sizeof(T));
+		}
+	private:
+		uint8_t m_Buffer[8];
+
+		friend class ScriptInstance;
+		friend class ScriptEngine;
+	};
+
+	using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
+
 	class Scene;
 	class Entity;
 	class ScriptClass;
@@ -49,13 +88,16 @@ namespace Atom
 
 		static void InvokeOnCollection2DEnter(Entity entity, Entity other);
 		static void InvokeOnCollection2DExit(Entity entity, Entity other);
-		
+
 		static void LoadAssembly(const std::filesystem::path& filepath);
 		static void LoadAppAssembly(const std::filesystem::path& filepath);
 
 		static bool EntityClassExists(const std::string& fullName);
 
+		static ScriptClass* GetEntityClass(const std::string& name);
 		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
+		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
+
 		static ScriptInstance* GetEntityScriptInstance(UUID entityId);
 
 		static MonoImage* GetCoreAssemblyImage();
@@ -71,13 +113,6 @@ namespace Atom
 
 		friend class ScriptClass;
 		friend class ScriptGlue;
-	};
-
-	struct ScriptField
-	{
-		ScriptFieldType Type;
-		std::string Name;
-		MonoClassField* ClassField; 
 	};
 
 	class ScriptClass
@@ -119,6 +154,8 @@ namespace Atom
 		template<typename T>
 		T GetFieldValue(const std::string& name)
 		{
+			static_assert(sizeof(T) <= 8, "Type too large");
+			
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 			if(!success)
 			{
@@ -131,6 +168,8 @@ namespace Atom
 		template<typename T>
 		void SetFieldValue(const std::string& name, const T& value)
 		{
+			static_assert(sizeof(T) <= 8, "Type too large");
+
 			SetFieldValueInternal(name, &value);
 		}
 	private:
@@ -149,6 +188,9 @@ namespace Atom
 		MonoMethod* m_OnCollision2DExitMethod = nullptr;
 
 		inline static char s_FieldValueBuffer[8];
+
+		friend class ScriptFieldInstance;
+		friend class ScriptEngine;
 	};
 
 }

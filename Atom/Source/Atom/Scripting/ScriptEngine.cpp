@@ -161,6 +161,8 @@ namespace Atom
 
 		std::unordered_map<std::string, ScriptClass*> EntityClasses;
 		std::unordered_map<UUID, ScriptInstance*> EntityInstances;
+
+		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 	};
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
@@ -204,11 +206,22 @@ namespace Atom
 		const auto& script = entity.GetComponent<Component::Script>();
 		if(EntityClassExists(script.ClassName))
 		{
+			UUID entityId = entity.GetUUID();
+
 			ScriptClass* scriptClass = s_ScriptEngineData->EntityClasses[script.ClassName];
 
 			ScriptInstance* scriptInstance = new ScriptInstance(scriptClass, entity);
+			s_ScriptEngineData->EntityInstances[entityId] = scriptInstance;
 
-			s_ScriptEngineData->EntityInstances[entity.GetUUID()] = scriptInstance;
+			// Copy field values
+			if(s_ScriptEngineData->EntityScriptFields.find(entityId) != s_ScriptEngineData->EntityScriptFields.end())
+			{
+				const ScriptFieldMap& fieldMap = s_ScriptEngineData->EntityScriptFields.at(entityId);
+				for(const auto& [name, fieldInstance] : fieldMap)
+				{
+					scriptInstance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+				}
+			}
 
 			scriptInstance->InvokeOnCreate();
 		}
@@ -262,7 +275,7 @@ namespace Atom
 		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
 		scriptInstance->InvokeOnCollision2DExit(other);
 	}
-	
+
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
@@ -285,9 +298,29 @@ namespace Atom
 		return s_ScriptEngineData->EntityClasses.find(fullName) != s_ScriptEngineData->EntityClasses.end();
 	}
 
+	ScriptClass* ScriptEngine::GetEntityClass(const std::string& name)
+	{
+		if(s_ScriptEngineData->EntityClasses.find(name) == s_ScriptEngineData->EntityClasses.end())
+		{
+			return nullptr;
+		}
+
+		return s_ScriptEngineData->EntityClasses.at(name);
+	}
+
 	std::unordered_map<std::string, ScriptClass*> ScriptEngine::GetEntityClasses()
 	{
 		return s_ScriptEngineData->EntityClasses;
+	}
+
+	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
+	{
+		AT_CORE_ASSERT(entity);
+
+		UUID entityId = entity.GetUUID();
+		//AT_CORE_ASSERT(s_ScriptEngineData->EntityScriptFields.find(entityId) != s_ScriptEngineData->EntityScriptFields.end());
+
+		return s_ScriptEngineData->EntityScriptFields[entityId];
 	}
 
 	ScriptInstance* ScriptEngine::GetEntityScriptInstance(UUID entityId)
