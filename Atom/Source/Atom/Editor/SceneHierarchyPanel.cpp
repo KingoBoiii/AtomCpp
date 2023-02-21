@@ -259,6 +259,79 @@ namespace Atom
 			component.Rotation = glm::radians(rotation);
 			Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
+		
+		Utils::DrawComponent<Component::Camera>("Camera", entity, [](auto& component)
+		{
+			auto& camera = component.SceneCamera;
+
+			ImGui::Checkbox("Primary", &component.Primary);
+
+			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+			if(ImGui::BeginCombo("Projection", currentProjectionTypeString))
+			{
+				for(int i = 0; i < 2; i++)
+				{
+					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+					if(ImGui::Selectable(projectionTypeStrings[i], isSelected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						camera.SetProjectionType((SceneCamera::ProjectionType)i);
+					}
+
+					if(isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if(camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+			{
+				float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
+				if(ImGui::DragFloat("Vertical FOV", &verticalFOV))
+				{
+					camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
+				}
+
+				float perspectiveNear = camera.GetPerspectiveNearClip();
+				if(ImGui::DragFloat("Near", &perspectiveNear))
+				{
+					camera.SetPerspectiveNearClip(perspectiveNear);
+				}
+
+				float perspectiveFar = camera.GetPerspectiveFarClip();
+				if(ImGui::DragFloat("Far", &perspectiveFar))
+				{
+					camera.SetPerspectiveFarClip(perspectiveFar);
+				}
+			}
+
+			if(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+			{
+				float orthographicSize = camera.GetOrthographicSize();
+				if(ImGui::DragFloat("Size", &orthographicSize))
+				{
+					camera.SetOrthographicSize(orthographicSize);
+				}
+
+				float orthographicNear = camera.GetOrthographicNearClip();
+				if(ImGui::DragFloat("Near", &orthographicNear))
+				{
+					camera.SetOrthographicNearClip(orthographicNear);
+				}
+
+				float orthographicFar = camera.GetOrthographicFarClip();
+				if(ImGui::DragFloat("Far", &orthographicFar))
+				{
+					camera.SetOrthographicFarClip(orthographicFar);
+				}
+
+				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+			}
+		});
 
 		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, [](auto& component)
 		{
@@ -313,6 +386,46 @@ namespace Atom
 				ImGui::PopStyleColor();
 			}
 		});
+
+		Utils::DrawComponent<Component::Rigidbody2D>("Rigidbody 2D", entity, [](auto& component)
+		{
+			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+			if(ImGui::BeginCombo("Body Type", currentBodyTypeString))
+			{
+				for(int i = 0; i < 3; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if(ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.Type = (Component::Rigidbody2D::BodyType)i;
+					}
+
+					if(isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+
+		Utils::DrawComponent<Component::BoxCollider2D>("Box Collider 2D", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.1f);
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size), 0.1f);
+			ImGui::Checkbox("Is Trigger", &component.IsTrigger);
+			
+			
+			ImGui::DragFloat("Density", &component.Density, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f, 0.0f);
+		});
 	}
 
 	void SceneHierarchyPanel::DrawAddComponentPopup()
@@ -322,6 +435,8 @@ namespace Atom
 			DrawAddComponentPopupItem<Component::Camera>("Camera");
 			DrawAddComponentPopupItem<Component::Script>("C# Script");
 			DrawAddComponentPopupItem<Component::BasicRenderer>("Basic Renderer");
+			DrawAddComponentPopupItem<Component::Rigidbody2D>("Rigidbody 2D");
+			DrawAddComponentPopupItem<Component::BoxCollider2D>("Box Collider 2D");
 
 			ImGui::EndPopup();
 		}
@@ -330,6 +445,11 @@ namespace Atom
 	template<typename Component>
 	inline void SceneHierarchyPanel::DrawAddComponentPopupItem(const std::string& text)
 	{
+		if(m_SelectedEntity.HasComponent<Component>())
+		{
+			return;
+		}
+		
 		if(ImGui::MenuItem(text.c_str()))
 		{
 			m_SelectedEntity.AddComponent<Component>();

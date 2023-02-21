@@ -4,6 +4,8 @@
 
 #include "entt.hpp"
 
+class b2World;
+
 namespace Atom
 {
 
@@ -40,6 +42,8 @@ namespace Atom
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+		b2World* m_PhysicsWorld = nullptr;
 
 		friend class Entity;
 		friend class SceneSerializer;

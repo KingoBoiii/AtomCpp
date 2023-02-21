@@ -7,6 +7,7 @@
 #include "Atom/Display/WindowFactory.h"
 #include "Atom/Renderer/Renderer.h"
 #include "Atom/Scripting/ScriptEngine.h"
+#include "Atom/Physics/2D/Physics2D.h"
 #include "Input/Input.h"
 
 extern bool g_ApplicationRunning;
@@ -51,6 +52,7 @@ namespace Atom
 		Renderer::Initialize(m_Window);
 		ScriptEngine::Initialize();
 		Input::Initialize();
+		Physics2D::Initialize();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -64,6 +66,7 @@ namespace Atom
 			delete layer;
 		}
 
+		Physics2D::Shutdown();
 		Input::Shutdown();
 		ScriptEngine::Shutdown();
 		Renderer::Shutdown();

@@ -4,11 +4,35 @@
 #include "Components.h"
 
 #include "Atom/Scripting/ScriptEngine.h"
+#include "Atom/Physics/2D/Physics2D.h"
 
 #include "Atom/Renderer/Renderer2D.h"
 
+#include <box2d/b2_world.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_polygon_shape.h>
+
 namespace Atom
 {
+
+	namespace Utils
+	{
+
+		static b2BodyType AtomBodyTypeToBox2D(Component::Rigidbody2D::BodyType bodyType)
+		{
+			switch(bodyType)
+			{
+				case Atom::Component::Rigidbody2D::BodyType::Static:	return b2_staticBody;
+				case Atom::Component::Rigidbody2D::BodyType::Dynamic:	return b2_dynamicBody;
+				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
+			}
+
+			AT_CORE_ASSERT(false, "Unknown body type!");
+			return b2_staticBody;
+		}
+
+	}
 
 	Scene::Scene()
 	{
@@ -79,6 +103,19 @@ namespace Atom
 
 	void Scene::OnRuntimeStart()
 	{
+		// Physics 2D
+		// TODO: move this into it's own module, like ScriptEngine
+		{
+			Physics2D::OnRuntimeStart();
+
+			auto view = m_Registry.view<Component::Rigidbody2D>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+				Physics2D::CreatePhysicsBody(entity);
+			}
+		}
+
 		// Script
 		{
 			ScriptEngine::OnRuntimeStart(this);
@@ -94,6 +131,11 @@ namespace Atom
 
 	void Scene::OnRuntimeStop()
 	{
+		// Physics 2D
+		{
+			Physics2D::OnRuntimeStop();
+		}
+
 		// Script
 		{
 			// TODO: Maybe call OnDestroyEntity?
@@ -117,6 +159,18 @@ namespace Atom
 			{
 				Entity entity{ e, this };
 				ScriptEngine::OnUpdateEntity(entity, deltaTime);
+			}
+		}
+
+		// Physics 2D
+		{
+			Physics2D::Step(deltaTime);
+			auto view = m_Registry.view<Component::Rigidbody2D>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+
+				Physics2D::OnRuntimeUpdate(entity);
 			}
 		}
 

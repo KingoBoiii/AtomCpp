@@ -131,6 +131,29 @@ namespace Atom
 	namespace Utils
 	{
 
+		static std::string Rigidbody2DBodyTypeToString(Component::Rigidbody2D::BodyType bodyType)
+		{
+			switch(bodyType)
+			{
+				case Atom::Component::Rigidbody2D::BodyType::Static: return "Static";
+				case Atom::Component::Rigidbody2D::BodyType::Dynamic: return "Dynamic";
+				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return "Kinematic";
+			}
+
+			AT_CORE_ASSERT(false, "Unknown Rigidbody2D BodyType!");
+			return "Unknown";
+		}
+
+		static Component::Rigidbody2D::BodyType Rigidbody2DBodyTypeFromString(const std::string& bodyTypeString)
+		{
+			if(bodyTypeString == "Static") return Component::Rigidbody2D::BodyType::Static;
+			if(bodyTypeString == "Dynamic") return Component::Rigidbody2D::BodyType::Dynamic;
+			if(bodyTypeString == "Kinematic") return Component::Rigidbody2D::BodyType::Kinematic;
+
+			AT_CORE_ASSERT(false, "Unknown Rigidbody2D BodyType!");
+			return Component::Rigidbody2D::BodyType::Static;
+		}
+
 		static void SerializeEntity(YAML::Emitter& out, Entity entity)
 		{
 			out << YAML::BeginMap;		// Entity
@@ -200,6 +223,50 @@ namespace Atom
 				out << YAML::Key << "Color" << YAML::Value << basicRenderer.Color;
 
 				out << YAML::EndMap;		// BasicRenderer
+			}
+
+			if(entity.HasComponent<Component::Script>())
+			{
+				auto& script = entity.GetComponent<Component::Script>();
+
+				out << YAML::Key << "Script";
+				out << YAML::BeginMap;		// Script
+
+				out << YAML::Key << "ClassName" << YAML::Value << script.ClassName;
+
+				out << YAML::EndMap;		// Script
+			}
+
+			if(entity.HasComponent<Component::Rigidbody2D>())
+			{
+				auto& rigidbody2D = entity.GetComponent<Component::Rigidbody2D>();
+
+				out << YAML::Key << "Rigidbody2D";
+				out << YAML::BeginMap;		// Rigidbody2D
+
+				out << YAML::Key << "BodyType" << YAML::Value << Rigidbody2DBodyTypeToString(rigidbody2D.Type);
+				out << YAML::Key << "FixedRotation" << YAML::Value << rigidbody2D.FixedRotation;
+
+				out << YAML::EndMap;		// Rigidbody2D
+			}
+
+			if(entity.HasComponent<Component::BoxCollider2D>())
+			{
+				auto& boxCollider2D = entity.GetComponent<Component::BoxCollider2D>();
+
+				out << YAML::Key << "BoxCollider2D";
+				out << YAML::BeginMap;		// BoxCollider2D
+
+				out << YAML::Key << "Offset" << YAML::Value << boxCollider2D.Offset;
+				out << YAML::Key << "Size" << YAML::Value << boxCollider2D.Size;
+				out << YAML::Key << "IsTrigger" << YAML::Value << boxCollider2D.IsTrigger;
+				
+				out << YAML::Key << "Density" << YAML::Value << boxCollider2D.Density;
+				out << YAML::Key << "Friction" << YAML::Value << boxCollider2D.Friction;
+				out << YAML::Key << "Restitution" << YAML::Value << boxCollider2D.Restitution;
+				out << YAML::Key << "RestitutionThreshold" << YAML::Value << boxCollider2D.RestitutionThreshold;
+
+				out << YAML::EndMap;		// BoxCollider2D
 			}
 
 			out << YAML::EndMap;		// Entity
@@ -311,6 +378,38 @@ namespace Atom
 			{
 				auto& basicRenderer = deserializedEntity.AddComponent<Component::BasicRenderer>();
 				basicRenderer.Color = basicRendererComponent["Color"].as<glm::vec4>();
+			}
+			
+			auto scriptComponent = entity["Script"];
+			if(scriptComponent)
+			{
+				auto& script = deserializedEntity.AddComponent<Component::Script>();
+				script.ClassName = scriptComponent["ClassName"].as<std::string>();
+			}
+
+			auto rigidbody2DComponent = entity["Rigidbody2D"];
+			if(rigidbody2DComponent)
+			{
+				auto& rigidbody2D = deserializedEntity.AddComponent<Component::Rigidbody2D>();
+
+				rigidbody2D.Type = Utils::Rigidbody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
+				rigidbody2D.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+			}
+
+			auto boxCollider2DComponent = entity["BoxCollider2D"];
+			if(boxCollider2DComponent)
+			{
+				auto& boxCollider2D = deserializedEntity.AddComponent<Component::BoxCollider2D>();
+				
+				boxCollider2D.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+				boxCollider2D.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+				boxCollider2D.IsTrigger = boxCollider2DComponent["IsTrigger"].as<bool>();
+
+				boxCollider2D.Density = boxCollider2DComponent["Density"].as<float>();
+				boxCollider2D.Friction = boxCollider2DComponent["Friction"].as<float>();
+				boxCollider2D.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+				boxCollider2D.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+				
 			}
 		}
 
