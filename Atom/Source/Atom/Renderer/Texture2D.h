@@ -36,7 +36,7 @@ namespace Atom
 		TextureFormat Format = TextureFormat::RGBA;
 		TextureFilter Filter = TextureFilter::LINEAR;
 		TextureFilter MinFilter = TextureFilter::LINEAR;
-		TextureFilter MagFilter = TextureFilter::NEAREST;
+		TextureFilter MagFilter = TextureFilter::LINEAR;
 		TextureWrap WrapMode = TextureWrap::REPEAT;
 		bool FlipVertically = true;
 	};

@@ -24,10 +24,14 @@ namespace Atom
 		virtual void OnEvent(Atom::Event& e) override;
 	private:
 		void DrawTopMenuBar();
+		void UI_Toolbar();
 	private: // Scene commands
 		void NewScene();
 		void OpenScene();
 		void SaveAs();
+
+		void OnScenePlay();
+		void OnSceneStop();
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
@@ -38,6 +42,14 @@ namespace Atom
 		// Panels
 		Viewport* m_Viewport = nullptr;
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
+
+		enum class SceneState
+		{
+			Edit = 0,
+			Play = 1
+		};
+		
+		SceneState m_SceneState = SceneState::Edit;
 	};
 
 }

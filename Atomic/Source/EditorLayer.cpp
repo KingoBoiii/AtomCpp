@@ -2,6 +2,7 @@
 #include <Atom/Scene/SceneSerializer.h>
 #include <Atom/Utils/PlatformUtils.h>
 #include <Atom/ImGui/ImGuiUtillities.h>
+#include <Atom/Editor/EditorResources.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -16,6 +17,8 @@ namespace Atom
 
 	void EditorLayer::OnAttach()
 	{
+		EditorResources::Initialize();
+
 		Window* window = Application::Get().GetWindow();
 
 		m_ActiveScene = new Atom::Scene();
@@ -49,6 +52,8 @@ namespace Atom
 
 	void EditorLayer::OnDetach()
 	{
+		EditorResources::Shutdown();
+
 		//m_ActiveScene->OnRuntimeStop();
 		delete m_ActiveScene;
 	}
@@ -69,7 +74,14 @@ namespace Atom
 		m_Framebuffer->Bind();
 		m_Framebuffer->Clear();
 
-		m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
+		switch(m_SceneState)
+		{
+			case Atom::EditorLayer::SceneState::Edit: m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
+			case Atom::EditorLayer::SceneState::Play: m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
+			default: break;
+		}
+		//m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
+		//m_ActiveScene->OnRuntimeEditor(deltaTime, m_EditorCamera);
 		//m_ActiveScene->OnRuntimeUpdate(deltaTime);
 
 		m_Framebuffer->Unbind();
@@ -83,6 +95,8 @@ namespace Atom
 		static bool isOpen = true;
 		m_Viewport->OnImGuiRender(isOpen);
 		m_SceneHierarchyPanel->OnImGuiRender(isOpen);
+
+		UI_Toolbar();
 
 #if 1
 		static bool opened = true;
@@ -153,6 +167,43 @@ namespace Atom
 		}
 	}
 
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 2.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0.0f, 0.0f));
+
+		auto& colors = ImGui::GetStyle().Colors;
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGuiWindowFlags toolbarFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse;
+		ImGui::Begin("##toolbar", nullptr, toolbarFlags);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+
+		Texture2D* icon = m_SceneState == SceneState::Edit ? EditorResources::PlayIcon : EditorResources::StopIcon;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+		{
+			if(m_SceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if(m_SceneState == SceneState::Play)
+			{
+				OnSceneStop();
+			}
+		}
+
+		ImGui::End();
+
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar(2);
+	}
+
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = new Scene();
@@ -189,6 +240,16 @@ namespace Atom
 
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(filepath);
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)

@@ -21,7 +21,7 @@ namespace Atom
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
-		void OnRuntimeEditor(float deltaTime, EditorCamera& editorCamera);
+		void OnEditorUpdate(float deltaTime, EditorCamera& editorCamera);
 
 		void OnRuntimeStart();
 		void OnRuntimeStop();

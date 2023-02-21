@@ -60,7 +60,7 @@ namespace Atom
 		}
 	}
 
-	void Scene::OnRuntimeEditor(float deltaTime, EditorCamera& editorCamera)
+	void Scene::OnEditorUpdate(float deltaTime, EditorCamera& editorCamera)
 	{
 		Renderer2D::BeginScene(editorCamera);
 
