@@ -312,6 +312,14 @@ namespace Atom
 		return it->second;
 	}
 
+	MonoObject* ScriptEngine::GetManagedInstance(UUID entityId)
+	{
+		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityId) != s_ScriptEngineData->EntityInstances.end());
+
+		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances.at(entityId);
+		return scriptInstance->GetManagedObject();
+	}
+
 	void ScriptEngine::InitializeMono()
 	{
 		mono_set_assemblies_path("mono/lib");

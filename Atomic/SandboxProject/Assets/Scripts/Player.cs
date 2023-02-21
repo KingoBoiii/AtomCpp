@@ -53,6 +53,19 @@ namespace Sandbox
                 position.Y -= Speed * deltaTime;
             }
             Transform.Position = position;
+
+            Camera camera = FindEntityByName("Camera").As<Camera>();
+            if (camera != null) 
+            {
+                if (Input.IsKeyDown(KeyCode.Q))
+                {
+                    camera.DistanceFromPlayer += Speed * 2.0f * deltaTime;
+                }
+                else if (Input.IsKeyDown(KeyCode.E))
+                {
+                    camera.DistanceFromPlayer -= Speed * 2.0f * deltaTime;
+                }
+            }
         }
 
         public void OnDestroy()

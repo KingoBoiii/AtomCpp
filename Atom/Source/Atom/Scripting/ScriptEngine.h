@@ -100,6 +100,8 @@ namespace Atom
 
 		static ScriptInstance* GetEntityScriptInstance(UUID entityId);
 
+		static MonoObject* GetManagedInstance(UUID entityId);
+
 		static MonoImage* GetCoreAssemblyImage();
 		static MonoDomain* GetAppDomain();
 
@@ -150,6 +152,7 @@ namespace Atom
 		void InvokeOnCollision2DExit(Entity other);
 
 		ScriptClass* GetScriptClass() { return m_ScriptClass; }
+		MonoObject* GetManagedObject() { return m_Instance; }
 
 		template<typename T>
 		T GetFieldValue(const std::string& name)

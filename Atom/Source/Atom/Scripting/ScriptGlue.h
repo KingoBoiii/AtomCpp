@@ -4,6 +4,7 @@
 
 extern "C" {
 	typedef struct _MonoString MonoString;
+	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoReflectionType MonoReflectionType;
 }
 
@@ -25,6 +26,8 @@ namespace Atom
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
 
 		void Entity_FindEntityByName(MonoString* name, UUID* uuid);
+
+		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject);
 
 #pragma endregion
 

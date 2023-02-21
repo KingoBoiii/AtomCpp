@@ -51,6 +51,7 @@ namespace Atom
 	{
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
 		AT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		AT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		AT_ADD_INTERNAL_CALL(Identifier_GetName);
 		AT_ADD_INTERNAL_CALL(Identifier_SetName);
@@ -103,6 +104,13 @@ namespace Atom
 			}
 
 			*uuid = entity.GetUUID();
+		}
+
+		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject)
+		{
+			MonoObject* managedObject = ScriptEngine::GetManagedInstance(uuid);
+
+			*monoObject = managedObject;
 		}
 
 #pragma endregion

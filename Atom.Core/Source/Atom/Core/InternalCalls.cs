@@ -14,6 +14,9 @@ namespace Atom
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Entity_FindEntityByName(string name, out ulong entityId);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Entity_GetScriptInstance(ulong entityId, out object instance);
+
         #endregion
 
         #region Identifier

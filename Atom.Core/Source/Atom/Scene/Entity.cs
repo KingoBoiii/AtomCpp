@@ -33,7 +33,7 @@
         }
 
         #region Physics Test
-        
+
         internal void OnCollision2DEnter_Internal(ulong entityId)
         {
             OnCollision2DEnter?.Invoke(new Entity(entityId));
@@ -54,7 +54,7 @@
 
         public TComponent GetComponent<TComponent>() where TComponent : ComponentBase, new()
         {
-            if(!HasComponent<TComponent>())
+            if (!HasComponent<TComponent>())
             {
                 return default;
             }
@@ -66,12 +66,18 @@
         {
             InternalCalls.Entity_FindEntityByName(name, out var entityId);
 
-            if(entityId == 0)
+            if (entityId == 0)
             {
                 return default;
             }
 
             return new Entity(entityId);
+        }
+
+        public T As<T>() where T : Entity, new()
+        {
+            InternalCalls.Entity_GetScriptInstance(Id, out var instance);
+            return instance as T;
         }
     }
 
