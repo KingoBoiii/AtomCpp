@@ -33,10 +33,20 @@ namespace Atom
 		void OnRuntimeStop();
 		void OnRuntimeUpdate(float deltaTime);
 
+		void OnSimulationStart();
+		void OnSimulationStop();
+		void OnSimulationUpdate(float deltaTime, EditorCamera& editorCamera);
+
 		Entity FindEntityByName(std::string_view name);
 		Entity GetEntityByUUID(UUID uuid);
 		Entity GetPrimaryCameraEntity();
+
 		bool IsRunning() const { return m_IsRunning; }
+		bool IsPaused() const { return m_IsPaused; }
+
+		void SetPaused(bool paused) { m_IsPaused = paused; }
+
+		void Step(int frames = 1);
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()
@@ -50,7 +60,10 @@ namespace Atom
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 		b2World* m_PhysicsWorld = nullptr;
+
 		bool m_IsRunning = false;
+		bool m_IsPaused = false;
+		int m_StepFrames = 0;
 
 		friend class Entity;
 		friend class SceneSerializer;

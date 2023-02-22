@@ -99,7 +99,7 @@ namespace Atom
 		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
 
 		s_PhysicsData->World = new b2World({ 0.0f, -9.81f });
-		s_PhysicsData->World->SetContactListener(new ContactListener());
+		//s_PhysicsData->World->SetContactListener(new ContactListener());
 	}
 
 	void Physics2D::OnRuntimeStop()

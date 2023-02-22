@@ -51,7 +51,7 @@ namespace Atom
 			UUID uuid = src.get<Component::Identifier>(e).ID;
 			AT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
 			entt::entity dstEnttId = enttMap.at(uuid);
-			
+
 			auto& component = src.get<TComponent>(e);
 			dst.emplace_or_replace<TComponent>(dstEnttId, component);
 		}
@@ -181,7 +181,6 @@ namespace Atom
 		m_IsRunning = true;
 
 		// Physics 2D
-		// TODO: move this into it's own module, like ScriptEngine
 		{
 			Physics2D::OnRuntimeStart();
 
@@ -231,25 +230,28 @@ namespace Atom
 
 	void Scene::OnRuntimeUpdate(float deltaTime)
 	{
-		// Script 
+		if(!m_IsPaused || m_StepFrames-- > 0)
 		{
-			auto view = m_Registry.view<Component::Script>();
-			for(auto e : view)
+			// Script 
 			{
-				Entity entity{ e, this };
-				ScriptEngine::OnUpdateEntity(entity, deltaTime);
+				auto view = m_Registry.view<Component::Script>();
+				for(auto e : view)
+				{
+					Entity entity{ e, this };
+					ScriptEngine::OnUpdateEntity(entity, deltaTime);
+				}
 			}
-		}
 
-		// Physics 2D
-		{
-			Physics2D::Step(deltaTime);
-			auto view = m_Registry.view<Component::Rigidbody2D>();
-			for(auto e : view)
+			// Physics 2D
 			{
-				Entity entity{ e, this };
+				Physics2D::Step(deltaTime);
+				auto view = m_Registry.view<Component::Rigidbody2D>();
+				for(auto e : view)
+				{
+					Entity entity{ e, this };
 
-				Physics2D::OnRuntimeUpdate(entity);
+					Physics2D::OnRuntimeUpdate(entity);
+				}
 			}
 		}
 
@@ -291,6 +293,62 @@ namespace Atom
 		}
 	}
 
+	void Scene::OnSimulationStart()
+	{
+		// Physics 2D
+		{
+			Physics2D::OnRuntimeStart();
+
+			auto view = m_Registry.view<Component::Rigidbody2D>();
+			for(auto e : view)
+			{
+				Entity entity{ e, this };
+				Physics2D::CreatePhysicsBody(entity);
+			}
+		}
+	}
+
+	void Scene::OnSimulationStop()
+	{
+		// Physics 2D
+		{
+			Physics2D::OnRuntimeStop();
+		}
+	}
+
+	void Scene::OnSimulationUpdate(float deltaTime, EditorCamera& editorCamera)
+	{
+		if(!m_IsPaused || m_StepFrames-- > 0)
+		{
+			// Physics 2D
+			{
+				Physics2D::Step(deltaTime);
+				auto view = m_Registry.view<Component::Rigidbody2D>();
+				for(auto e : view)
+				{
+					Entity entity{ e, this };
+
+					Physics2D::OnRuntimeUpdate(entity);
+				}
+			}
+		}
+
+		// Renderer 2D
+		Renderer2D::BeginScene(editorCamera);
+
+		{
+			auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
+			for(auto entity : group)
+			{
+				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
+
+				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
+			}
+		}
+
+		Renderer2D::EndScene();
+	}
+
 	Entity Scene::FindEntityByName(std::string_view name)
 	{
 		auto view = m_Registry.view<Component::Identifier>();
@@ -326,6 +384,11 @@ namespace Atom
 			}
 		}
 		return {};
+	}
+
+	void Scene::Step(int frames)
+	{
+		m_StepFrames = frames;
 	}
 
 }

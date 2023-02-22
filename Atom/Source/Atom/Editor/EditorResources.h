@@ -12,17 +12,26 @@ namespace Atom
 	public:
 		inline static Texture2D* PlayIcon = nullptr;
 		inline static Texture2D* StopIcon = nullptr;
+		inline static Texture2D* SimulateIcon = nullptr;
+		inline static Texture2D* PauseIcon = nullptr;
+		inline static Texture2D* StepIcon = nullptr;
 	public:
 		static void Initialize()
 		{
 			PlayIcon = LoadTexture("Viewport/Play.png");
 			StopIcon = LoadTexture("Viewport/Stop.png");
+			SimulateIcon = LoadTexture("Viewport/Simulate.png");
+			PauseIcon = LoadTexture("Viewport/Pause.png");
+			StepIcon = LoadTexture("Viewport/Step.png");
 		}
 
 		static void Shutdown()
 		{
 			ReleasePtr(PlayIcon);
 			ReleasePtr(StopIcon);
+			ReleasePtr(SimulateIcon);
+			ReleasePtr(PauseIcon);
+			ReleasePtr(StepIcon);
 		}
 	private:
 		static Texture2D* LoadTexture(const std::filesystem::path& relativePath, const Texture2DOptions& textureOptions = Texture2DOptions())

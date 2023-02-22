@@ -33,6 +33,8 @@ namespace Atom
 
 		void OnScenePlay();
 		void OnSceneStop();
+		void OnSceneSimulate();
+		void OnScenePause();
 
 		void OnDuplicateEntity();
 	private: // Events
@@ -52,7 +54,8 @@ namespace Atom
 		enum class SceneState
 		{
 			Edit = 0,
-			Play = 1
+			Play = 1,
+			Simulate = 2
 		};
 		
 		SceneState m_SceneState = SceneState::Edit;

@@ -82,8 +82,9 @@ namespace Atom
 
 		switch(m_SceneState)
 		{
-			case Atom::EditorLayer::SceneState::Edit: m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
-			case Atom::EditorLayer::SceneState::Play: m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
+			case Atom::EditorLayer::SceneState::Edit:		m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
+			case Atom::EditorLayer::SceneState::Simulate:	m_ActiveScene->OnSimulationUpdate(deltaTime, m_EditorCamera); break;
+			case Atom::EditorLayer::SceneState::Play:		m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
 			default: break;
 		}
 
@@ -196,18 +197,69 @@ namespace Atom
 		ImGui::Begin("##toolbar", nullptr, toolbarFlags);
 
 		float size = ImGui::GetWindowHeight() - 4.0f;
-
-		Texture2D* icon = m_SceneState == SceneState::Edit ? EditorResources::PlayIcon : EditorResources::StopIcon;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+		
+		bool hasPlayButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
+		bool hasSimulateButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+		bool hasPauseButton = m_SceneState != SceneState::Edit;
+
+		if(hasPlayButton)
 		{
-			if(m_SceneState == SceneState::Edit)
+			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? EditorResources::PlayIcon : EditorResources::StopIcon;
+			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
-				OnScenePlay();
+				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+				{
+					OnScenePlay();
+				}
+				else if(m_SceneState == SceneState::Play)
+				{
+					OnSceneStop();
+				}
 			}
-			else if(m_SceneState == SceneState::Play)
+		}
+		if(hasSimulateButton)
+		{
+			if(hasPlayButton)
 			{
-				OnSceneStop();
+				ImGui::SameLine();
+			}
+			
+			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorResources::SimulateIcon : EditorResources::StopIcon;
+			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			{
+				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+				{
+					OnSceneSimulate();
+				}
+				else if(m_SceneState == SceneState::Simulate)
+				{
+					OnSceneStop();
+				}
+			}
+		}
+		if(hasPauseButton)
+		{
+			bool isPaused = m_ActiveScene->IsPaused();
+			ImGui::SameLine();
+			{
+				Texture2D* icon = EditorResources::PauseIcon;
+				if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+				{
+					m_ActiveScene->SetPaused(!isPaused);
+				}
+			}
+			
+			if(isPaused)
+			{
+				ImGui::SameLine();
+				{
+					Texture2D* icon = EditorResources::StepIcon;
+					if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+					{
+						m_ActiveScene->Step(1);
+					}
+				}
 			}
 		}
 
@@ -289,12 +341,47 @@ namespace Atom
 
 	void EditorLayer::OnSceneStop()
 	{
+		AT_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+
+		if(m_SceneState == SceneState::Play)
+		{
+			m_ActiveScene->OnRuntimeStop();
+		}
+		else if(m_SceneState == SceneState::Simulate)
+		{
+			m_ActiveScene->OnSimulationStop();
+		}
+
 		m_SceneState = SceneState::Edit;
 
-		m_ActiveScene->OnRuntimeStop();
 		m_ActiveScene = m_EditorScene;
 
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OnSceneSimulate()
+	{
+		if(m_SceneState == SceneState::Play)
+		{
+			OnSceneStop();
+		}
+
+		m_SceneState = SceneState::Simulate;
+
+		m_ActiveScene = Scene::Copy(m_EditorScene);
+		m_ActiveScene->OnSimulationStart();
+
+		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OnScenePause()
+	{
+		if(m_SceneState == SceneState::Edit)
+		{
+			return;
+		}
+
+		m_ActiveScene->SetPaused(true);
 	}
 
 	void EditorLayer::OnDuplicateEntity()
