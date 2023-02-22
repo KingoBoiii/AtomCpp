@@ -37,6 +37,10 @@ namespace Atom
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		inline Window* GetWindow() const { return m_Window; }
 		static Application& Get() { return *s_Instance; }
+
+		void SubmitToMainThread(const std::function<void()>& function);
+	private:
+		void ExecuteMainThreadQueue();
 	private:
 		bool OnWindowCloseEvent(WindowCloseEvent& e);
 		bool OnWindowResizeEvent(WindowResizeEvent& e);
@@ -49,6 +53,9 @@ namespace Atom
 		bool m_IsRunning = true;
 		float m_DeltaTime = 0.0f;
 		float m_LastFrameTime = 0.0f;
+
+		std::mutex m_MainThreadQueueMutex;
+		std::vector<std::function<void()>> m_MainThreadQueue;
 	private:
 		static Application* s_Instance;
 	};

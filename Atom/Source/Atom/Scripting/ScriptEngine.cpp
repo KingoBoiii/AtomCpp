@@ -2,8 +2,11 @@
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
 
+#include "Atom/Core/Application.h"
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
+
+#include "FileWatch.h"
 
 #include <glm/glm.hpp>
 
@@ -138,12 +141,15 @@ namespace Atom
 
 		ScriptClass EntityClass;
 
-		Scene* SceneContext;
-
 		std::unordered_map<std::string, ScriptClass*> EntityClasses;
 		std::unordered_map<UUID, ScriptInstance*> EntityInstances;
 
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
+
+		filewatch::FileWatch<std::string>* AppAssemblyWatcher;
+		bool AppAssemblyReloadPending = false;
+
+		Scene* SceneContext;
 	};
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
@@ -178,7 +184,7 @@ namespace Atom
 
 		LoadAssembly(s_ScriptEngineData->CoreAssemblyFilepath);
 		LoadAppAssembly(s_ScriptEngineData->AppAssemblyFilepath);
-		
+
 		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
@@ -284,12 +290,38 @@ namespace Atom
 		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
 	}
 
+	static void OnAppAssemblyFileSystemEvent(const std::string& filepath, filewatch::Event changeType)
+	{
+		if(!s_ScriptEngineData->AppAssemblyReloadPending && changeType == filewatch::Event::modified)
+		{
+			s_ScriptEngineData->AppAssemblyReloadPending = true;
+
+			//using namespace std::chrono_literals;
+			//std::this_thread::sleep_for(500ms);
+
+			// Reload assembly
+			// Add reload to main thread queue
+			Application::Get().SubmitToMainThread([]()
+			{
+				delete s_ScriptEngineData->AppAssemblyWatcher;
+				s_ScriptEngineData->AppAssemblyWatcher = nullptr;
+				
+				AT_CORE_INFO("Reloading Assembly!");
+
+				ScriptEngine::ReloadAssembly();
+			});
+		}
+	}
+
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_ScriptEngineData->AppAssemblyFilepath = filepath;
 		s_ScriptEngineData->AppAssembly = Utils::LoadCSharpAssembly(filepath.string());
 		s_ScriptEngineData->AppAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssembly);
 		//Utils::PrintAssemblyTypes(s_ScriptEngineData->AppAssembly);
+
+		s_ScriptEngineData->AppAssemblyWatcher = new filewatch::FileWatch<std::string>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_ScriptEngineData->AppAssemblyReloadPending = false;
 	}
 
 	bool ScriptEngine::EntityClassExists(const std::string& fullName)

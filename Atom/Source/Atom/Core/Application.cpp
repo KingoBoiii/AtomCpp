@@ -95,6 +95,8 @@ namespace Atom
 			m_DeltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
+			ExecuteMainThreadQueue();
+
 			Renderer::BeginFrame();
 			for(Layer* layer : m_LayerStack)
 			{
@@ -149,6 +151,23 @@ namespace Atom
 			if(e.Handled)
 				break;
 		}
+	}
+
+	void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		m_MainThreadQueue.emplace_back(function);
+	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		for(auto& func : m_MainThreadQueue)
+		{
+			func();
+		}
+
+		m_MainThreadQueue.clear();
 	}
 
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& e)
