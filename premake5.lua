@@ -24,6 +24,7 @@ IncludeDir["stb"] = "%{wks.location}/Atom/Vendor/stb/include";
 IncludeDir["yaml_cpp"] = "%{wks.location}/Atom/Vendor/yaml-cpp/include";
 IncludeDir["ImGuizmo"] = "%{wks.location}/Atom/Vendor/ImGuizmo";
 IncludeDir["Box2D"] = "%{wks.location}/Atom/Vendor/Box2D/include";
+IncludeDir["FileWatch"] = "%{wks.location}/Atom/Vendor/filewatch";
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/Atom/Vendor/mono/lib/%{cfg.buildcfg}";

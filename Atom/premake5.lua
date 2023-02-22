@@ -31,7 +31,8 @@ project "Atom"
 		"%{IncludeDir.stb}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.FileWatch}"
     }
 
     links {

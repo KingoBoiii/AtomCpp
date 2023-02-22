@@ -19,7 +19,8 @@ project "Atomic"
         "%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.FileWatch}"
     }
 
 	links {
