@@ -25,6 +25,8 @@ IncludeDir["yaml_cpp"] = "%{wks.location}/Atom/Vendor/yaml-cpp/include";
 IncludeDir["ImGuizmo"] = "%{wks.location}/Atom/Vendor/ImGuizmo";
 IncludeDir["Box2D"] = "%{wks.location}/Atom/Vendor/Box2D/include";
 IncludeDir["FileWatch"] = "%{wks.location}/Atom/Vendor/filewatch";
+IncludeDir["msdfgen"] = "%{wks.location}/Atom/Vendor/msdf-atlas-gen/msdfgen";
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Atom/Vendor/msdf-atlas-gen/msdf-atlas-gen";
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/Atom/Vendor/mono/lib/%{cfg.buildcfg}";
@@ -44,6 +46,7 @@ group "Dependencies"
     include "Atom/Vendor/imgui"
     include "Atom/Vendor/yaml-cpp"
     include "Atom/Vendor/Box2D"
+    include "Atom/Vendor/msdf-atlas-gen"
 group ""
 
 group "Core" 

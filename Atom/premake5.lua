@@ -32,7 +32,9 @@ project "Atom"
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.FileWatch}"
+		"%{IncludeDir.FileWatch}",
+		"%{IncludeDir.msdfgen}",
+		"%{IncludeDir.msdf_atlas_gen}"
     }
 
     links {
@@ -41,6 +43,7 @@ project "Atom"
         "ImGui",
         "yaml-cpp",
         "Box2D",
+        "msdf-atlas-gen",
         "%{Library.mono}",
         "opengl32.lib"
     }

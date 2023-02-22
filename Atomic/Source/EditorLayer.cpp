@@ -1,9 +1,10 @@
 #include "EditorLayer.h"
 #include <Atom/Scene/SceneSerializer.h>
-#include <Atom/Scripting/ScriptEngine.h>
 #include <Atom/Utils/PlatformUtils.h>
 #include <Atom/ImGui/ImGuiUtillities.h>
 #include <Atom/Editor/EditorResources.h>
+#include <Atom/Scripting/ScriptEngine.h>
+#include <Atom/Renderer/Font.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -21,6 +22,9 @@ namespace Atom
 
 	void EditorLayer::OnAttach()
 	{
+		//Font font("C:\\Windows\\Fonts\\Arial.ttf");
+		Font font("Resources/Fonts/OpenSans/OpenSans-Regular.ttf");
+
 		EditorResources::Initialize();
 
 		Window* window = Application::Get().GetWindow();
