@@ -9,6 +9,8 @@
 #include "UniformBuffer.h"
 #include "Shader.h"
 
+#include "MSDFData.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -22,14 +24,21 @@ namespace Atom
 		glm::vec4 Color;
 	};
 
+	struct TextVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
+	};
+
 	struct Renderer2DData
 	{
 		// TODO: RenderCaps
 
-		static constexpr uint32_t MaxQuads = 20000;
+		static constexpr uint32_t MaxQuads = 200000;
 		static constexpr uint32_t MaxVertices = MaxQuads * 4;
 		static constexpr uint32_t MaxIndices = MaxQuads * 6;
-		static constexpr uint32_t MaxTextureSlots = 32;
+		static constexpr uint32_t MaxTextureSlots = 16; // 32 is the max for OpenGL, 16 for DirectX
 
 		Pipeline* QuadPipeline;
 		VertexBuffer* QuadVertexBuffer;
@@ -38,6 +47,15 @@ namespace Atom
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
+
+		Pipeline* TextPipeline;
+		VertexBuffer* TextVertexBuffer;
+
+		uint32_t TextIndexCount = 0;
+		TextVertex* TextVertexBufferBase = nullptr;
+		TextVertex* TextVertexBufferPtr = nullptr;
+
+		Texture2D* FontAtlasTexture;
 
 		glm::vec4 QuadVertexPositions[4];
 
@@ -54,29 +72,6 @@ namespace Atom
 	void Renderer2D::Initialize()
 	{
 		s_Renderer2DData = {};
-
-		Atom::ShaderOptions shaderOptions{ };
-		shaderOptions.Filepath = "Resources/Shaders/Renderer2D.shader";
-		shaderOptions.VertexShaderEntryPoint = "VSMain";
-		shaderOptions.VertexShaderTarget = "vs_5_0";
-		shaderOptions.PixelShaderEntryPoint = "PSMain";
-		shaderOptions.PixelShaderTarget = "ps_5_0";
-		Shader* shader = Shader::Create(shaderOptions);
-
-		PipelineOptions pipelineOptions{ };
-		pipelineOptions.InputLayout = {
-			{ ShaderDataType::Float3, "POSITION" },
-			{ ShaderDataType::Float4, "COLOR" }
-		};
-		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D");// shader;
-		s_Renderer2DData.QuadPipeline = Pipeline::Create(pipelineOptions);
-
-		s_Renderer2DData.QuadVertexBufferBase = new QuadVertex[s_Renderer2DData.MaxVertices];
-
-		VertexBufferOptions vertexBufferOptions{ };
-		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
-		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
-		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 
 		uint32_t* quadIndices = new uint32_t[s_Renderer2DData.MaxIndices];
 
@@ -96,6 +91,9 @@ namespace Atom
 
 		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(quadIndices, s_Renderer2DData.MaxIndices);
 
+		CreateQuadPipeline();
+		CreateTextPipeline();
+
 		s_Renderer2DData.CameraUniformBuffer = UniformBuffer::Create(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
 
 		s_Renderer2DData.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
@@ -107,6 +105,7 @@ namespace Atom
 	void Renderer2D::Shutdown()
 	{
 		delete[] s_Renderer2DData.QuadVertexBufferBase;
+		delete[] s_Renderer2DData.TextVertexBufferBase;
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera)
@@ -114,8 +113,7 @@ namespace Atom
 		s_Renderer2DData.CameraData.ProjectionViewMatrix = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
 
-		s_Renderer2DData.QuadIndexCount = 0;
-		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& cameraTransform)
@@ -123,8 +121,7 @@ namespace Atom
 		s_Renderer2DData.CameraData.ProjectionViewMatrix = camera.GetProjectionMatrix() * glm::inverse(cameraTransform);
 		s_Renderer2DData.CameraUniformBuffer->SetData(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
 
-		s_Renderer2DData.QuadIndexCount = 0;
-		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
@@ -150,7 +147,7 @@ namespace Atom
 
 		if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
 		{
-			//NextBatch();
+			NextBatch();
 		}
 
 		for(size_t i = 0; i < quadVertexCount; i++)
@@ -163,14 +160,173 @@ namespace Atom
 		s_Renderer2DData.QuadIndexCount += 6;
 	}
 
+	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4& color)
+	{
+		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
+		const auto& metrics = fontGeometry.getMetrics();
+		auto fontAtlas = font->GetAtlasTexture();
+
+		s_Renderer2DData.FontAtlasTexture = fontAtlas;
+
+		double x = 0.0;
+		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+		double y = 0.0f; // -fsScale * metrics.ascenderY;
+		float lineHeightOffset = 0.0f;
+
+		//if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
+		//{
+		//	NextBatch();
+		//}
+
+		for(size_t i = 0; i < string.size(); i++)
+		{
+			char character = string[i];
+
+			if(character == '\n')
+			{
+				x = 0.0;
+				y -= fsScale * metrics.lineHeight + lineHeightOffset;
+				continue;
+			}
+
+			if(character == '\t')
+			{
+				character = ' ';
+			}
+
+			auto glyph = fontGeometry.getGlyph(character);
+			if(!glyph)
+			{
+				glyph = fontGeometry.getGlyph('?');
+			}
+			if(!glyph)
+			{
+				return;
+			}
+
+			double al, ab, ar, at;
+			glyph->getQuadAtlasBounds(al, ab, ar, at);
+			glm::vec2 texCoordMin((float)al, (float)ab);
+			glm::vec2 texCoordMax((float)ar, (float)at);
+
+			double pl, pb, pr, pt;
+			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+			glm::vec2 quadMin((float)pl, (float)pb);
+			glm::vec2 quadMax((float)pr, (float)pt);
+
+			quadMin *= fsScale, quadMax *= fsScale;
+			quadMin += glm::vec2(x, y);
+			quadMax += glm::vec2(x, y);
+
+			float texelWidth = 1.0f / fontAtlas->GetWidth();
+			float texelHeight = 1.0f / fontAtlas->GetHeight();
+			texCoordMin *= glm::vec2(texelWidth, texelHeight);
+			texCoordMax *= glm::vec2(texelWidth, texelHeight);
+
+			// Render here!
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMin;
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMax;
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextIndexCount += 6;
+
+			if(i < string.size() - 1)
+			{
+				double advance = glyph->getAdvance();
+				char nextCharacter = string[i + 1];
+				fontGeometry.getAdvance(advance, character, nextCharacter);
+
+				float kerningOffset = 0.0f;
+				x += fsScale * advance + kerningOffset;
+			}
+		}
+	}
+
+	void Renderer2D::CreateQuadPipeline()
+	{
+		PipelineOptions pipelineOptions{ };
+		pipelineOptions.InputLayout = {
+			{ ShaderDataType::Float3, "POSITION" },
+			{ ShaderDataType::Float4, "COLOR" }
+		};
+		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D");
+		s_Renderer2DData.QuadPipeline = Pipeline::Create(pipelineOptions);
+
+		s_Renderer2DData.QuadVertexBufferBase = new QuadVertex[s_Renderer2DData.MaxVertices];
+
+		VertexBufferOptions vertexBufferOptions{ };
+		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
+		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
+	}
+
+	void Renderer2D::CreateTextPipeline()
+	{
+		PipelineOptions pipelineOptions{ };
+		pipelineOptions.InputLayout = {
+			{ ShaderDataType::Float3, "POSITION" },
+			{ ShaderDataType::Float4, "COLOR" },
+			{ ShaderDataType::Float2, "TEXCOORD" }
+		};
+		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D_Text");
+		s_Renderer2DData.TextPipeline = Pipeline::Create(pipelineOptions);
+
+		s_Renderer2DData.TextVertexBufferBase = new TextVertex[s_Renderer2DData.MaxVertices];
+
+		VertexBufferOptions vertexBufferOptions{ };
+		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
+		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		s_Renderer2DData.TextVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
+	}
+
+	void Renderer2D::StartBatch()
+	{
+		s_Renderer2DData.QuadIndexCount = 0;
+		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
+
+		s_Renderer2DData.TextIndexCount = 0;
+		s_Renderer2DData.TextVertexBufferPtr = s_Renderer2DData.TextVertexBufferBase;
+	}
+
 	void Renderer2D::Flush()
 	{
 		if(s_Renderer2DData.QuadIndexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Renderer2DData.QuadVertexBufferPtr - (uint8_t*)s_Renderer2DData.QuadVertexBufferBase);
 			s_Renderer2DData.QuadVertexBuffer->SetData(s_Renderer2DData.QuadVertexBufferBase, dataSize);
-			
+
 			Renderer::RenderGeometry(s_Renderer2DData.QuadPipeline, s_Renderer2DData.QuadVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.QuadIndexCount);
+		}
+
+		if(s_Renderer2DData.TextIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Renderer2DData.TextVertexBufferPtr - (uint8_t*)s_Renderer2DData.TextVertexBufferBase);
+			s_Renderer2DData.TextVertexBuffer->SetData(s_Renderer2DData.TextVertexBufferBase, dataSize);
+
+			s_Renderer2DData.FontAtlasTexture->Bind();
+			Renderer::RenderGeometry(s_Renderer2DData.TextPipeline, s_Renderer2DData.TextVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.TextIndexCount);
 		}
 	}
 

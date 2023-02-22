@@ -20,10 +20,13 @@ namespace Atom
 #define ATOM_PROJECT_FILE_EXTENSIONS "atpr"
 #define ATOM_PROJECT_FILE_DIALOG_FILTER "Atom Project (*.atpr)\0*.atpr\0"
 
+	static Font* s_Font;
+
 	void EditorLayer::OnAttach()
 	{
 		//Font font("C:\\Windows\\Fonts\\Arial.ttf");
-		Font font("Resources/Fonts/OpenSans/OpenSans-Regular.ttf");
+		//s_Font = new Font("Resources/Fonts/OpenSans/OpenSans-Regular.ttf");
+		s_Font = Font::GetDefaultFont(); // new Font("C:\\Windows\\Fonts\\Arial.ttf");
 
 		EditorResources::Initialize();
 
@@ -105,6 +108,12 @@ namespace Atom
 		m_SceneHierarchyPanel->OnImGuiRender(isOpen);
 
 		UI_Toolbar();
+
+		ImGui::Begin("Settings");
+
+		ImGui::Image(s_Font->GetAtlasTexture()->GetTexture(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+
+		ImGui::End();
 
 #if 1
 		static bool opened = true;

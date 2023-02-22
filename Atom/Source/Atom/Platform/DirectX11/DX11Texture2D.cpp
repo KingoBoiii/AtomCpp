@@ -31,7 +31,7 @@ namespace Atom
 			switch(format)
 			{
 				case TextureFormat::RGBA:				return DXGI_FORMAT_R8G8B8A8_UNORM;
-				case TextureFormat::RGB:				return DXGI_FORMAT_R8G8B8A8_UNORM;
+				case TextureFormat::RGB:				return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 				case TextureFormat::RED:				return DXGI_FORMAT_R8G8B8A8_UNORM;
 				case TextureFormat::RED_INTEGER:		return DXGI_FORMAT_R8G8B8A8_UNORM;
 				case TextureFormat::LUMINANCE_ALPHA:	return DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -96,6 +96,16 @@ namespace Atom
 		stbi_image_free(data);
 	}
 
+	DX11Texture2D::DX11Texture2D(uint32_t width, uint32_t height, const Texture2DOptions& texture2DOptions)
+		: m_Width(width), m_Height(height), m_Options(texture2DOptions)
+	{
+		DX11RendererContext& context = DX11RendererContext::Get();
+		m_Device = context.m_Device;
+		m_DeviceContext = context.m_DeviceContext;
+
+		Invalidate();
+	}
+
 	DX11Texture2D::~DX11Texture2D()
 	{
 		ReleaseCOM(m_Texture);
@@ -136,7 +146,7 @@ namespace Atom
 			AT_CORE_ASSERT(m_Texture);
 			AT_CORE_ASSERT(m_ShaderResourceView);
 
-			int rowPitch = m_Width * m_Channels; // *sizeof(uint8_t);
+			int rowPitch = m_Width * Utils::AtomTextureChannelsByFormat(m_Options.Format);// m_Channels; // *sizeof(uint8_t);
 			m_DeviceContext->UpdateSubresource(m_Texture, 0, nullptr, data, rowPitch, 0);
 			m_DeviceContext->GenerateMips(m_ShaderResourceView);
 		}
