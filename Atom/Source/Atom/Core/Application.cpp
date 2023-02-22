@@ -58,7 +58,6 @@ namespace Atom
 		}
 
 		Renderer::Initialize(m_Window);
-		ScriptEngine::Initialize();
 		Input::Initialize();
 		Physics2D::Initialize();
 

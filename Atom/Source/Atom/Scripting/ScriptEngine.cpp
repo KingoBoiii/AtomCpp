@@ -5,6 +5,7 @@
 #include "Atom/Core/Application.h"
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
+#include "Atom/Project/Project.h"
 
 #include "FileWatch.h"
 
@@ -160,7 +161,9 @@ namespace Atom
 
 		InitializeMono();
 		LoadAssembly("Resources/Scripts/Atom.Core.dll");
-		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+
+		auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActiveProject()->GetConfig().ScriptModulePath;
+		LoadAppAssembly(scriptModulePath);
 		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();

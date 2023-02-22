@@ -38,3 +38,5 @@
 #include "Atom/Scene/Components.h"
 
 #include "Atom/Scripting/ScriptEngine.h"
+
+#include "Atom/Project/Project.h"

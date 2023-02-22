@@ -25,6 +25,12 @@ namespace Atom
 	private:
 		void DrawTopMenuBar();
 		void UI_Toolbar();
+	private: // Project commands
+		void NewProject();
+		void OpenProject();
+		void OpenProject(const std::filesystem::path& filepath);
+		void SaveProject();
+		void SaveProjectAs();
 	private: // Scene commands
 		void NewScene();
 		void OpenScene();

@@ -16,6 +16,9 @@ namespace Atom
 #define ATOM_SCENE_FILE_EXTENSIONS "atsc"
 #define ATOM_SCENE_FILE_DIALOG_FILTER "Atom Scene (*.atsc)\0*.atsc\0"
 
+#define ATOM_PROJECT_FILE_EXTENSIONS "atpr"
+#define ATOM_PROJECT_FILE_DIALOG_FILTER "Atom Project (*.atpr)\0*.atpr\0"
+
 	void EditorLayer::OnAttach()
 	{
 		EditorResources::Initialize();
@@ -40,21 +43,18 @@ namespace Atom
 		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
 		if(commandLineArgs.Count > 1)
 		{
-			std::string scenePath = commandLineArgs[1];
-			OpenScene(scenePath);
+			auto projectFilepath = commandLineArgs[1];
+			OpenProject(projectFilepath);
 		}
+		else
+		{
+			// TODO: prompt the user to select a directory
+			// NewProject();
 
-
-#if 0
-		auto cameraEntity = m_Scene->CreateEntity("Camera");
-		auto& transform = cameraEntity.GetComponent<Atom::Component::Transform>();
-		transform.Position = { 0.0f, 0.0f, 0.1f };
-		auto& camera = cameraEntity.AddComponent<Atom::Component::Camera>();
-
-		auto quadEntity = m_Scene->CreateEntity("Quad");
-		quadEntity.AddComponent<Atom::Component::BasicRenderer>(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
-		quadEntity.AddComponent<Atom::Component::Script>("Sandbox.Player");
-#endif
+			// If no project is opened, close Atomic
+			// NOTE: this is while we don't have a new project path
+			Application::Get().Close();
+		}
 	}
 
 	void EditorLayer::OnDetach()
@@ -124,6 +124,25 @@ namespace Atom
 		{
 			if(ImGui::BeginMenu("File"))
 			{
+				if(ImGui::MenuItem("New Project", "Ctrl+N"))
+				{
+					NewProject();
+				}
+				if(ImGui::MenuItem("Open Project...", "Ctrl+O"))
+				{
+					OpenProject();
+				}
+				if(ImGui::MenuItem("Save Project", "Ctrl+S"))
+				{
+					SaveProject();
+				}
+				if(ImGui::MenuItem("Save Project As...", "Ctrl+Shift+S"))
+				{
+					SaveProjectAs();
+				}
+
+				ImGui::Separator();
+
 				if(ImGui::MenuItem("New", "Ctrl+N"))
 				{
 					NewScene();
@@ -198,7 +217,7 @@ namespace Atom
 
 		float size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		
+
 		bool hasPlayButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
 		bool hasSimulateButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
 		bool hasPauseButton = m_SceneState != SceneState::Edit;
@@ -224,7 +243,7 @@ namespace Atom
 			{
 				ImGui::SameLine();
 			}
-			
+
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorResources::SimulateIcon : EditorResources::StopIcon;
 			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
@@ -249,7 +268,7 @@ namespace Atom
 					m_ActiveScene->SetPaused(!isPaused);
 				}
 			}
-			
+
 			if(isPaused)
 			{
 				ImGui::SameLine();
@@ -267,6 +286,49 @@ namespace Atom
 
 		ImGui::PopStyleColor(3);
 		ImGui::PopStyleVar(2);
+	}
+
+	void EditorLayer::NewProject()
+	{
+	}
+
+	void EditorLayer::OpenProject()
+	{
+		std::string filepath = FileDialogs::OpenFile(ATOM_PROJECT_FILE_DIALOG_FILTER);
+		if(filepath.empty())
+		{
+			return;
+		}
+
+		OpenProject(filepath);
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
+	{
+		bool projectLoaded = Project::Load(filepath);
+
+		if(projectLoaded)
+		{
+			ScriptEngine::Initialize();
+
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
+			OpenScene(startScenePath);
+		}
+	}
+
+	void EditorLayer::SaveProject()
+	{
+	}
+
+	void EditorLayer::SaveProjectAs()
+	{
+		std::string filepath = FileDialogs::SaveFile(ATOM_PROJECT_FILE_DIALOG_FILTER);
+		if(filepath.empty())
+		{
+			return;
+		}
+
+		Project::SaveActiveProject(filepath);
 	}
 
 	void EditorLayer::NewScene()
