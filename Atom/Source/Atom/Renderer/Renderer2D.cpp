@@ -59,6 +59,8 @@ namespace Atom
 
 		glm::vec4 QuadVertexPositions[4];
 
+		Renderer2D::Statistics Stats;
+
 		struct CameraDataCS
 		{
 			glm::mat4 ProjectionViewMatrix;
@@ -158,6 +160,8 @@ namespace Atom
 		}
 
 		s_Renderer2DData.QuadIndexCount += 6;
+
+		s_Renderer2DData.Stats.QuadCount++;
 	}
 
 	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4& color)
@@ -246,6 +250,8 @@ namespace Atom
 
 			s_Renderer2DData.TextIndexCount += 6;
 
+			s_Renderer2DData.Stats.QuadCount++;
+
 			if(i < string.size() - 1)
 			{
 				double advance = glyph->getAdvance();
@@ -256,6 +262,16 @@ namespace Atom
 				x += fsScale * advance + kerningOffset;
 			}
 		}
+	}
+
+	void Renderer2D::ResetStats()
+	{
+		memset(&s_Renderer2DData.Stats, 0, sizeof(Statistics));
+	}
+
+	const Renderer2D::Statistics& Renderer2D::GetStats()
+	{
+		return s_Renderer2DData.Stats;
 	}
 
 	void Renderer2D::CreateQuadPipeline()
@@ -308,6 +324,8 @@ namespace Atom
 
 		s_Renderer2DData.TextIndexCount = 0;
 		s_Renderer2DData.TextVertexBufferPtr = s_Renderer2DData.TextVertexBufferBase;
+
+		ResetStats();
 	}
 
 	void Renderer2D::Flush()
@@ -318,6 +336,7 @@ namespace Atom
 			s_Renderer2DData.QuadVertexBuffer->SetData(s_Renderer2DData.QuadVertexBufferBase, dataSize);
 
 			Renderer::RenderGeometry(s_Renderer2DData.QuadPipeline, s_Renderer2DData.QuadVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.QuadIndexCount);
+			s_Renderer2DData.Stats.DrawCalls++;
 		}
 
 		if(s_Renderer2DData.TextIndexCount)
@@ -327,6 +346,7 @@ namespace Atom
 
 			s_Renderer2DData.FontAtlasTexture->Bind();
 			Renderer::RenderGeometry(s_Renderer2DData.TextPipeline, s_Renderer2DData.TextVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.TextIndexCount);
+			s_Renderer2DData.Stats.DrawCalls++;
 		}
 	}
 

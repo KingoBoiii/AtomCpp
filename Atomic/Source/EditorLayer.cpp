@@ -44,6 +44,7 @@ namespace Atom
 		m_ActiveScene = m_EditorScene;
 
 		m_SceneHierarchyPanel = new SceneHierarchyPanel(m_ActiveScene);
+		m_StatisticsPanel = new StatisticsPanel();
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 
@@ -106,6 +107,7 @@ namespace Atom
 		static bool isOpen = true;
 		m_Viewport->OnImGuiRender(isOpen);
 		m_SceneHierarchyPanel->OnImGuiRender(isOpen);
+		m_StatisticsPanel->OnImGuiRender(isOpen);
 
 		UI_Toolbar();
 

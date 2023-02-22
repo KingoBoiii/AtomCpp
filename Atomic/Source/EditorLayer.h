@@ -1,9 +1,9 @@
 #pragma once
 #include <Atom.h>
+#include <Atom/Editor/EditorCamera.h>
 
 #include "Panels/Viewport.h"
-#include <Atom/Editor/EditorCamera.h>
-#include <Atom/Editor/SceneHierarchyPanel.h>
+#include <Atom/Editor/EditorPanels.h>
 
 namespace Atom
 {
@@ -56,6 +56,7 @@ namespace Atom
 		// Panels
 		Viewport* m_Viewport = nullptr;
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
+		StatisticsPanel* m_StatisticsPanel = nullptr;
 
 		enum class SceneState
 		{
