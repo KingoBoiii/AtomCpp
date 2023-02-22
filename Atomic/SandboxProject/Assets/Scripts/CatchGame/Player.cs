@@ -6,12 +6,15 @@ namespace Sandbox.CatchGame
     internal class Player : Entity
     {
         public float Speed;
+        public int Lives;
 
         private Score _score;
+        private Rigidbody2D _rb;
 
         private void OnCreate()
         {
             _score = FindEntityByName("Score").As<Score>();
+            _rb = GetComponent<Rigidbody2D>();
 
             Log.Info("CatchGame.Player.OnCreate({0})", Name);
             OnCollision2DEnter += OnCollision2DEnterFunc;
@@ -26,7 +29,7 @@ namespace Sandbox.CatchGame
         private void OnUpdate(float deltaTime)
         {
             // TODO: Since Rigidbody takes ownership of Transform, we need a API for Rigidbody to move!
-            var position = Transform.Position;
+            var position = _rb.Position;
 
             if(Input.IsKeyDown(KeyCode.A))
             {
@@ -37,7 +40,7 @@ namespace Sandbox.CatchGame
                 position.X += Speed * deltaTime;
             }
 
-            Transform.Position = position;
+            _rb.Position = position;
         }
 
         private void OnCollision2DEnterFunc(Entity entity)

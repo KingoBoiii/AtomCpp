@@ -16,13 +16,13 @@ namespace Sandbox.CatchGame
             _rb = GetComponent<Rigidbody2D>();
 
             Log.Info("CatchGame.Catch.OnCreate({0})", Name);
-            OnCollision2DEnter += OnCollision2DEnterFunc;
+            //OnCollision2DEnter += OnCollision2DEnterFunc;
         }
 
         private void OnDestroy()
         {
             Log.Info("CatchGame.Catch.OnCreate({0})", Name);
-            OnCollision2DEnter -= OnCollision2DEnterFunc;
+            //OnCollision2DEnter -= OnCollision2DEnterFunc;
         }
 
         private void OnUpdate(float deltaTime)
@@ -36,17 +36,17 @@ namespace Sandbox.CatchGame
             Log.Info("Rigidbody Position: ({0}, {1})", _rb.Position.X, _rb.Position.Y);
         }
 
-        private void OnCollision2DEnterFunc(Entity entity)
-        {
-            var player = entity.As<Player>();
-            if (player == default)
-            {
-                return;
-            }
+        //private void OnCollision2DEnterFunc(Entity entity)
+        //{
+        //    var player = entity.As<Player>();
+        //    if (player == default)
+        //    {
+        //        return;
+        //    }
             
-            _hitPlayer = true;
-            Log.Info("Collide with Player!");
-        }
+        //    _hitPlayer = true;
+        //    Log.Info("Collide with Player!");
+        //}
     }
 
 }

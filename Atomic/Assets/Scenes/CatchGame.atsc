@@ -1,43 +1,27 @@
 Scene: Untitled
 Entities:
-  - Entity: 12221253100997875787
+  - Entity: 16099744065964783997
     Identifier:
-      Name: Score
+      Name: Catch
     Transform:
-      Position: [0, 0, 0]
+      Position: [0, 6.0999999, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    Script:
-      ClassName: Sandbox.CatchGame.Score
-      ScriptFields:
-        []
-  - Entity: 18362893959025394425
-    Identifier:
-      Name: Camera
-    Transform:
-      Position: [0, 0, 10]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Camera:
-      SceneCamera:
-        ProjectionType: 0
-        PerspectiveFOV: 1.04719758
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 10457896839208547369
-    Identifier:
-      Name: Ground
-    Transform:
-      Position: [0, -5.31998873, 0]
-      Rotation: [0, 0, 0]
-      Scale: [24.1000004, 1, 1]
     BasicRenderer:
-      Color: [0.189189196, 0.189189196, 0.189189196, 1]
+      Color: [0.907335877, 0, 0, 1]
+    Script:
+      ClassName: Sandbox.CatchGame.Catch
+    Rigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 16319858811739101369
     Identifier:
       Name: Player
@@ -64,20 +48,18 @@ Entities:
       Friction: 0.200000003
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 16099744065964783997
+  - Entity: 10457896839208547369
     Identifier:
-      Name: Catch
+      Name: Ground
     Transform:
-      Position: [0, 6.0999999, 0]
+      Position: [0, -5.31998873, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [24.1000004, 1, 1]
     BasicRenderer:
-      Color: [0.907335877, 0, 0, 1]
-    Script:
-      ClassName: Sandbox.CatchGame.Catch
+      Color: [0.189189196, 0.189189196, 0.189189196, 1]
     Rigidbody2D:
-      BodyType: Dynamic
-      FixedRotation: false
+      BodyType: Static
+      FixedRotation: true
     BoxCollider2D:
       Offset: [0, 0]
       Size: [1, 1]
@@ -86,3 +68,32 @@ Entities:
       Friction: 0.200000003
       Restitution: 0
       RestitutionThreshold: 0.5
+  - Entity: 18362893959025394425
+    Identifier:
+      Name: Camera
+    Transform:
+      Position: [0, 0, 10]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.04719758
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 12221253100997875787
+    Identifier:
+      Name: Score
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Script:
+      ClassName: Sandbox.CatchGame.Score
+      ScriptFields:
+        []
