@@ -26,6 +26,9 @@ namespace Atom
 		static void OnRuntimeUpdate(Entity entity);
 
 		static void CreatePhysicsBody(Entity entity);
+		
+		static void SetTransform(const glm::vec2& position, Entity entity);
+		static glm::vec2 GetTransform(Entity entity);
 
 		static b2Body* GetBox2DBody(Entity entity);
 	};

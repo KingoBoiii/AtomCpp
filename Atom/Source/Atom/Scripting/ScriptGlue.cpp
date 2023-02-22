@@ -2,6 +2,8 @@
 #include "ScriptGlue.h"
 #include "ScriptEngine.h"
 
+#include "Atom/Physics/2D/Physics2D.h"
+
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
 
@@ -61,6 +63,9 @@ namespace Atom
 
 		AT_ADD_INTERNAL_CALL(BasicRenderer_GetColor);
 		AT_ADD_INTERNAL_CALL(BasicRenderer_SetColor);
+
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
 		
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
@@ -187,6 +192,31 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 			
 			entity.GetComponent<Component::BasicRenderer>().Color = *color;
+		}
+
+#pragma endregion
+
+#pragma region Rigidbody 2D
+
+		void Rigidbody2D_GetPosition(UUID uuid, glm::vec2* outPosition)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			glm::vec2 position = Physics2D::GetTransform(entity);
+			*outPosition = position;
+		}
+
+		void Rigidbody2D_SetPosition(UUID uuid, glm::vec2* position)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			Physics2D::SetTransform(*position, entity);
 		}
 
 #pragma endregion

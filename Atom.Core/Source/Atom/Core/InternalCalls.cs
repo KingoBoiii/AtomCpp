@@ -49,6 +49,16 @@ namespace Atom
 
         #endregion
 
+        #region Rigidbody 2D
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_GetPosition(ulong entityId, out Vector2 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_SetPosition(ulong entityId, ref Vector2 position);
+
+        #endregion
+
         #region Input
 
         [MethodImpl(MethodImplOptions.InternalCall)]

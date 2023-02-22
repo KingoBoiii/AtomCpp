@@ -144,6 +144,19 @@ namespace Atom
 		Utils::CreatePhysicsFixtures<Component::BoxCollider2D>(entity, transform);
 	}
 
+	void Physics2D::SetTransform(const glm::vec2& position, Entity entity)
+	{
+		b2Body* body = GetBox2DBody(entity);
+		body->SetTransform({ position.x, position.y }, body->GetAngle());
+	}
+
+	glm::vec2 Physics2D::GetTransform(Entity entity)
+	{
+		b2Body* body = GetBox2DBody(entity);
+		const auto& position = body->GetPosition();
+		return { position.x, position.y };
+	}
+
 	b2Body* Physics2D::GetBox2DBody(Entity entity)
 	{
 		AT_CORE_ASSERT(s_PhysicsData->EntityPhysicsBodies.find(entity.GetUUID()) != s_PhysicsData->EntityPhysicsBodies.end());

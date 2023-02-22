@@ -133,6 +133,9 @@ namespace Atom
 		MonoAssembly* AppAssembly = nullptr;
 		MonoImage* AppAssemblyImage = nullptr;
 
+		std::filesystem::path CoreAssemblyFilepath;
+		std::filesystem::path AppAssemblyFilepath;
+
 		ScriptClass EntityClass;
 
 		Scene* SceneContext;
@@ -165,6 +168,22 @@ namespace Atom
 		ShutdownMono();
 
 		delete s_ScriptEngineData;
+	}
+
+	void ScriptEngine::ReloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_ScriptEngineData->AppDomain);
+
+		LoadAssembly(s_ScriptEngineData->CoreAssemblyFilepath);
+		LoadAppAssembly(s_ScriptEngineData->AppAssemblyFilepath);
+		
+		LoadAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
+
+		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
@@ -259,6 +278,7 @@ namespace Atom
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
 
+		s_ScriptEngineData->CoreAssemblyFilepath = filepath;
 		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly(filepath.string());
 		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
 		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
@@ -266,6 +286,7 @@ namespace Atom
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
+		s_ScriptEngineData->AppAssemblyFilepath = filepath;
 		s_ScriptEngineData->AppAssembly = Utils::LoadCSharpAssembly(filepath.string());
 		s_ScriptEngineData->AppAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssembly);
 		//Utils::PrintAssemblyTypes(s_ScriptEngineData->AppAssembly);
@@ -332,6 +353,9 @@ namespace Atom
 
 	void ScriptEngine::ShutdownMono()
 	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_ScriptEngineData->AppDomain);
 		s_ScriptEngineData->AppDomain = nullptr;
 
 		mono_jit_cleanup(s_ScriptEngineData->RootDomain);

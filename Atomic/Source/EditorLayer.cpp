@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 #include <Atom/Scene/SceneSerializer.h>
+#include <Atom/Scripting/ScriptEngine.h>
 #include <Atom/Utils/PlatformUtils.h>
 #include <Atom/ImGui/ImGuiUtillities.h>
 #include <Atom/Editor/EditorResources.h>
@@ -162,6 +163,16 @@ namespace Atom
 				{
 					Application::Get().Close();
 				}
+				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Script"))
+			{
+				if(ImGui::MenuItem("Reload Assembly"))
+				{
+					ScriptEngine::ReloadAssembly();
+				}
+
 				ImGui::EndMenu();
 			}
 

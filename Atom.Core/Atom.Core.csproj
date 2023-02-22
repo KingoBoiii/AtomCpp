@@ -50,9 +50,11 @@
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
     <Compile Include="Source\Atom\Graphics\Color.cs" />
+    <Compile Include="Source\Atom\Math\Vector2.cs" />
     <Compile Include="Source\Atom\Scene\ComponentBase.cs" />
     <Compile Include="Source\Atom\Scene\Components\BasicRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Identifier.cs" />
+    <Compile Include="Source\Atom\Scene\Components\Rigidbody2D.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\Entity.cs" />
     <Compile Include="Source\Main.cs" />
