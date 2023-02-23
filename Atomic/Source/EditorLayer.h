@@ -3,6 +3,7 @@
 #include <Atom/Editor/EditorCamera.h>
 
 #include "Panels/Viewport.h"
+#include "Panels/ProjectExplorer.h"
 #include <Atom/Editor/EditorPanels.h>
 
 namespace Atom
@@ -58,6 +59,7 @@ namespace Atom
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
 		StatisticsPanel* m_StatisticsPanel = nullptr;
 		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
+		ProjectExplorer* m_ProjectExplorer = nullptr;
 
 		enum class SceneState
 		{
