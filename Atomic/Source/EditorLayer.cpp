@@ -45,6 +45,8 @@ namespace Atom
 
 		m_SceneHierarchyPanel = new SceneHierarchyPanel(m_ActiveScene);
 		m_StatisticsPanel = new StatisticsPanel();
+		m_ScriptEngineInspectorPanel = new ScriptEngineInspectorPanel();
+
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 
@@ -108,6 +110,7 @@ namespace Atom
 		m_Viewport->OnImGuiRender(isOpen);
 		m_SceneHierarchyPanel->OnImGuiRender(isOpen);
 		m_StatisticsPanel->OnImGuiRender(isOpen);
+		m_ScriptEngineInspectorPanel->OnImGuiRender(isOpen);
 
 		UI_Toolbar();
 
@@ -324,7 +327,9 @@ namespace Atom
 
 		if(projectLoaded)
 		{
-			ScriptEngine::Initialize();
+			ScriptEngine::Initialize(Application::Get().GetOptions().ScriptConfig);
+
+			m_ScriptEngineInspectorPanel->OnProjectChanged(Project::GetActiveProject());
 
 			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
 			OpenScene(startScenePath);

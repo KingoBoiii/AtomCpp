@@ -2,6 +2,8 @@
 #include "Base.h"
 #include "ApplicationCommandLineArgs.h"
 
+#include "Atom/Scripting/ScriptEngine.h"
+
 namespace Atom
 {
 	
@@ -15,6 +17,8 @@ namespace Atom
 		bool Fullscreen;
 		bool VSync;
 		bool StartMaximized;
+
+		ScriptEngineConfig ScriptConfig;
 
 		ApplicationCommandLineArgs CommandLineArgs;
 	};

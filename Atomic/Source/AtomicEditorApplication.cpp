@@ -28,6 +28,8 @@ Atom::Application* Atom::CreateApplication(Atom::ApplicationCommandLineArgs args
 	applicationOptions.StartMaximized = true;
 	applicationOptions.VSync = true;
 	applicationOptions.CommandLineArgs = args;
+	
+	applicationOptions.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Atom.Core.dll";
 
 	return new Atom::AtomEditorApplication(applicationOptions);
 }

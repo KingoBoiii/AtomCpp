@@ -27,7 +27,8 @@ namespace Atom
 		std::string_view structName = typeName.substr(pos + 1);
 		std::string managedTypeName = fmt::format("Atom.{}", structName);
 
-		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
+		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage);
+		//MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
 		if(!managedType)
 		{
 			AT_CORE_ERROR("Could not find managed component type: {}", managedTypeName);

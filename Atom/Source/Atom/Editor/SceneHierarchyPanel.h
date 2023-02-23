@@ -41,8 +41,8 @@ namespace Atom
 		}
 #endif
 	private:
-		Scene* m_Scene;
-		Entity m_SelectedEntity;
+		Scene* m_Scene = nullptr;
+		Entity m_SelectedEntity = {};
 	};
 
 }

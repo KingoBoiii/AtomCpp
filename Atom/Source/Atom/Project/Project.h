@@ -20,6 +20,12 @@ namespace Atom
 		static Project* Load(const std::filesystem::path& filepath);
 		static bool SaveActiveProject(const std::filesystem::path& filepath);
 
+		static const std::string& GetProjectName()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->GetConfig().Name;
+		}
+
 		static const std::filesystem::path& GetProjectDirectory()
 		{
 			AT_CORE_ASSERT(s_ActiveProject);
@@ -36,6 +42,18 @@ namespace Atom
 		{
 			AT_CORE_ASSERT(s_ActiveProject);
 			return GetAssetDirectory() / path;
+		}
+
+		static std::filesystem::path GetScriptModulePath()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return GetAssetDirectory() / s_ActiveProject->GetConfig().ScriptModulePath;
+		}
+
+		static std::filesystem::path GetScriptModuleFilepath()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return GetScriptModulePath() / fmt::format("{0}.dll", GetProjectName());
 		}
 
 		static Project* GetActiveProject() { return s_ActiveProject; }

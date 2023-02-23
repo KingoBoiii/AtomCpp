@@ -57,6 +57,7 @@ namespace Atom
 		Viewport* m_Viewport = nullptr;
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
 		StatisticsPanel* m_StatisticsPanel = nullptr;
+		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
 
 		enum class SceneState
 		{

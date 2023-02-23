@@ -1,6 +1,7 @@
 #include "ATPCH.h"
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
+#include "ScriptCache.h"
 
 #include "Atom/Core/Application.h"
 #include "Atom/Scene/Scene.h"
@@ -131,14 +132,10 @@ namespace Atom
 		MonoDomain* RootDomain = nullptr;
 		MonoDomain* AppDomain = nullptr;
 
-		MonoAssembly* CoreAssembly = nullptr;
-		MonoImage* CoreAssemblyImage = nullptr;
-
-		MonoAssembly* AppAssembly = nullptr;
-		MonoImage* AppAssemblyImage = nullptr;
-
-		std::filesystem::path CoreAssemblyFilepath;
-		std::filesystem::path AppAssemblyFilepath;
+		ScriptEngineConfig Config;
+		
+		AssemblyInfo* CoreAssemblyInfo = nullptr;
+		AssemblyInfo* AppAssemblyInfo = nullptr;
 
 		ScriptClass EntityClass;
 
@@ -155,16 +152,18 @@ namespace Atom
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
 
-	void ScriptEngine::Initialize()
+	void ScriptEngine::Initialize(const ScriptEngineConfig& config)
 	{
 		s_ScriptEngineData = new ScriptEngineData();
+		s_ScriptEngineData->Config = config;
 
 		InitializeMono();
-		LoadAssembly("Resources/Scripts/Atom.Core.dll");
-
-		auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActiveProject()->GetConfig().ScriptModulePath;
-		LoadAppAssembly(scriptModulePath);
-		LoadAssemblyClasses();
+		
+		LoadCoreAssembly();
+		ScriptCache::Initialize();
+		
+		LoadAppAssembly();
+		LoadAssemblyClasses(); // TODO: Move to ScriptCache
 
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
@@ -174,6 +173,7 @@ namespace Atom
 
 	void ScriptEngine::Shutdown()
 	{
+		ScriptCache::Shutdown();
 		ShutdownMono();
 
 		delete s_ScriptEngineData;
@@ -185,8 +185,8 @@ namespace Atom
 
 		mono_domain_unload(s_ScriptEngineData->AppDomain);
 
-		LoadAssembly(s_ScriptEngineData->CoreAssemblyFilepath);
-		LoadAppAssembly(s_ScriptEngineData->AppAssemblyFilepath);
+		LoadCoreAssembly();
+		LoadAppAssembly();
 
 		LoadAssemblyClasses();
 
@@ -282,17 +282,6 @@ namespace Atom
 		scriptInstance->InvokeOnCollision2DExit(other);
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
-	{
-		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
-		mono_domain_set(s_ScriptEngineData->AppDomain, true);
-
-		s_ScriptEngineData->CoreAssemblyFilepath = filepath;
-		s_ScriptEngineData->CoreAssembly = Utils::LoadCSharpAssembly(filepath.string());
-		s_ScriptEngineData->CoreAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssembly);
-		//Utils::PrintAssemblyTypes(s_ScriptEngineData->CoreAssembly);
-	}
-
 	static void OnAppAssemblyFileSystemEvent(const std::string& filepath, filewatch::Event changeType)
 	{
 		if(!s_ScriptEngineData->AppAssemblyReloadPending && changeType == filewatch::Event::modified)
@@ -314,17 +303,6 @@ namespace Atom
 				ScriptEngine::ReloadAssembly();
 			});
 		}
-	}
-
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
-	{
-		s_ScriptEngineData->AppAssemblyFilepath = filepath;
-		s_ScriptEngineData->AppAssembly = Utils::LoadCSharpAssembly(filepath.string());
-		s_ScriptEngineData->AppAssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssembly);
-		//Utils::PrintAssemblyTypes(s_ScriptEngineData->AppAssembly);
-
-		s_ScriptEngineData->AppAssemblyWatcher = new filewatch::FileWatch<std::string>(filepath.string(), OnAppAssemblyFileSystemEvent);
-		s_ScriptEngineData->AppAssemblyReloadPending = false;
 	}
 
 	bool ScriptEngine::EntityClassExists(const std::string& fullName)
@@ -376,6 +354,16 @@ namespace Atom
 		return scriptInstance->GetManagedObject();
 	}
 
+	AssemblyInfo* ScriptEngine::GetCoreAssemblyInfo()
+	{
+		return s_ScriptEngineData->CoreAssemblyInfo;
+	}
+
+	AssemblyInfo* ScriptEngine::GetAppAssemblyInfo()
+	{
+		return s_ScriptEngineData->AppAssemblyInfo;
+	}
+
 	void ScriptEngine::InitializeMono()
 	{
 		mono_set_assemblies_path("mono/lib");
@@ -397,6 +385,106 @@ namespace Atom
 		s_ScriptEngineData->RootDomain = nullptr;
 	}
 
+	bool ScriptEngine::LoadCoreAssembly()
+	{
+		if(!std::filesystem::exists(s_ScriptEngineData->Config.CoreAssemblyPath))
+		{
+			return false;
+		}
+
+		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
+		mono_domain_set(s_ScriptEngineData->AppDomain, true);
+		
+		MonoAssembly* assembly = LoadMonoAssembly(s_ScriptEngineData->Config.CoreAssemblyPath);
+		if(assembly == nullptr)
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load core assembly!");
+			return false;
+		}
+
+		s_ScriptEngineData->CoreAssemblyInfo = new AssemblyInfo();
+		s_ScriptEngineData->CoreAssemblyInfo->Filepath = s_ScriptEngineData->Config.CoreAssemblyPath;
+		s_ScriptEngineData->CoreAssemblyInfo->Assembly = assembly;
+		s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssemblyInfo->Assembly);
+		s_ScriptEngineData->CoreAssemblyInfo->IsCoreAssembly = true;
+		s_ScriptEngineData->CoreAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
+
+		AT_CORE_INFO("[ScriptEngine] Successfully loaded core assembly from: {0}", s_ScriptEngineData->Config.CoreAssemblyPath);
+
+		return true;
+	}
+
+	bool ScriptEngine::LoadAppAssembly()
+	{
+		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
+			AT_CORE_ERROR("[ScriptEngine] Filepath = {}", Project::GetScriptModuleFilepath());
+			return false;
+		}
+
+		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
+		if(assembly == nullptr)
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
+			return false;
+		}
+
+		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
+		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
+		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
+		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
+		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
+		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
+
+		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
+
+		return true;
+	}
+
+	AssemblyMetadata ScriptEngine::LoadAssemblyMetadata(MonoImage* image)
+	{
+		AssemblyMetadata metadata;
+
+		const MonoTableInfo* t = mono_image_get_table_info(image, MONO_TABLE_ASSEMBLY);
+		uint32_t cols[MONO_ASSEMBLY_SIZE];
+		mono_metadata_decode_row(t, 0, cols, MONO_ASSEMBLY_SIZE);
+
+		metadata.Name = mono_metadata_string_heap(image, cols[MONO_ASSEMBLY_NAME]);
+		metadata.MajorVersion = cols[MONO_ASSEMBLY_MAJOR_VERSION] > 0 ? cols[MONO_ASSEMBLY_MAJOR_VERSION] : 1;
+		metadata.MinorVersion = cols[MONO_ASSEMBLY_MINOR_VERSION];
+		metadata.BuildVersion = cols[MONO_ASSEMBLY_BUILD_NUMBER];
+		metadata.RevisionVersion = cols[MONO_ASSEMBLY_REV_NUMBER];
+
+		return metadata;
+	}
+
+	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& filepath)
+	{
+		if(!std::filesystem::exists(filepath))
+		{
+			return false;
+		}
+
+		uint32_t size;
+		char* data = Utils::ReadBytes(filepath.string(), &size);
+		
+				// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
+		MonoImageOpenStatus status;
+		MonoImage* image = mono_image_open_from_data_full(data, size, 1, &status, 0);
+
+		if(status != MONO_IMAGE_OK)
+		{
+			const char* errorMessage = mono_image_strerror(status);
+			AT_CORE_ERROR("[ScriptEngine] Failed to open C# assembly '{0}'\n\t\tMessage: {1}", filepath, errorMessage);
+			return nullptr;
+		}
+
+		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
+		mono_image_close(image);
+		return assembly;
+	}
+
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
 	{
 		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
@@ -408,18 +496,19 @@ namespace Atom
 	{
 		s_ScriptEngineData->EntityClasses.clear();
 
-		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_ScriptEngineData->AppAssemblyImage, MONO_TABLE_TYPEDEF);
+		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-		MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Entity");
+		MonoClass* entityBaseClass = AT_CACHED_CLASS_RAW("Atom.Entity");
+		//MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Entity");
 
 		for(int32_t i = 0; i < numTypes; i++)
 		{
 			uint32_t cols[MONO_TYPEDEF_SIZE];
 			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
 
-			const char* nameSpace = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* className = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+			const char* nameSpace = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* className = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, cols[MONO_TYPEDEF_NAME]);
 			std::string fullName;
 			if(strlen(nameSpace) != 0)
 			{
@@ -430,7 +519,7 @@ namespace Atom
 				fullName = className;
 			}
 
-			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyImage, nameSpace, className);
+			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, nameSpace, className);
 			if(monoClass == nullptr)
 			{
 				continue;
@@ -477,10 +566,12 @@ namespace Atom
 		}
 	}
 
+#if 0
 	MonoImage* ScriptEngine::GetCoreAssemblyImage()
 	{
 		return s_ScriptEngineData->CoreAssemblyImage;
 	}
+#endif
 
 	MonoDomain* ScriptEngine::GetAppDomain()
 	{
@@ -495,7 +586,9 @@ namespace Atom
 	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className, bool isCore)
 		: m_ClassNamespace(classNameSpace), m_ClassName(className)
 	{
-		m_MonoClass = mono_class_from_name(isCore ? s_ScriptEngineData->CoreAssemblyImage : s_ScriptEngineData->AppAssemblyImage, classNameSpace.c_str(), className.c_str());
+		MonoImage* image = isCore ? s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage : s_ScriptEngineData->AppAssemblyInfo->AssemblyImage;
+		m_MonoClass = mono_class_from_name(image, classNameSpace.c_str(), className.c_str());
+		//m_MonoClass = mono_class_from_name(isCore ? s_ScriptEngineData->CoreAssemblyImage : s_ScriptEngineData->AppAssemblyImage, classNameSpace.c_str(), className.c_str());
 	}
 
 	MonoObject* ScriptClass::Instantiate() const
