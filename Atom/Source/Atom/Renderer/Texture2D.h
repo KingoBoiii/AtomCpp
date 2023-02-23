@@ -45,6 +45,7 @@ namespace Atom
 	{
 	public:
 		static Texture2D* Create(const std::filesystem::path& filepath, const Texture2DOptions& texture2DOptions = Texture2DOptions());
+		static Texture2D* Create(uint32_t width, uint32_t height, const Texture2DOptions& texture2DOptions = Texture2DOptions());
 	public:
 		virtual void Bind(uint32_t slot = 0) const = 0;
 		

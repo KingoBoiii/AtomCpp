@@ -1,4 +1,6 @@
 #pragma once
+#include "Assembly/AssemblyInfo.h"
+#include "Assembly/AssemblyMetadata.h"
 
 #include "Atom/Core/UUID.h"
 
@@ -15,8 +17,17 @@ extern "C" {
 	typedef struct _MonoClassField MonoClassField;
 }
 
+#define ATOM_CORE_ASSEMBLY_INDEX 0
+#define ATOM_APP_ASSEMBLY_INDEX ATOM_CORE_ASSEMBLY_INDEX + 1
+#define ATOM_MAX_ASSEMBLIES (size_t)2
+
 namespace Atom
 {
+
+	struct ScriptEngineConfig
+	{
+		std::filesystem::path CoreAssemblyPath;
+	};
 
 	enum class ScriptFieldType
 	{
@@ -76,7 +87,7 @@ namespace Atom
 	class ATOM_API ScriptEngine
 	{
 	public:
-		static void Initialize();
+		static void Initialize(const ScriptEngineConfig& config);
 		static void Shutdown();
 		static void ReloadAssembly();
 
@@ -103,13 +114,21 @@ namespace Atom
 
 		static MonoObject* GetManagedInstance(UUID entityId);
 
-		static MonoImage* GetCoreAssemblyImage();
+		//static MonoImage* GetCoreAssemblyImage();
 		static MonoDomain* GetAppDomain();
 
 		static Scene* GetSceneContext();
+
+		static AssemblyInfo* GetCoreAssemblyInfo();
+		static AssemblyInfo* GetAppAssemblyInfo();
 	private:
 		static void InitializeMono();
 		static void ShutdownMono();
+
+		static bool LoadCoreAssembly();
+		static bool LoadAppAssembly();
+		static AssemblyMetadata LoadAssemblyMetadata(MonoImage* image);
+		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& filepath);
 
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();

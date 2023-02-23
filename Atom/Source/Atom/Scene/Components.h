@@ -7,6 +7,7 @@
 #include "components/ScriptComponent.h"
 #include "components/Rigidbody2DComponent.h"
 #include "components/BoxCollider2DComponent.h"
+#include "Components/TextComponent.h"
 
 namespace Atom
 {
@@ -18,6 +19,7 @@ namespace Atom
 
 	using AllComponents = ComponentGroup<Component::Identifier, Component::Transform, Component::Camera, 
 										 Component::BasicRenderer, Component::Script, 
-										 Component::Rigidbody2D, Component::BoxCollider2D>;
+										 Component::Rigidbody2D, Component::BoxCollider2D, 
+										 Component::Text>;
 
 }

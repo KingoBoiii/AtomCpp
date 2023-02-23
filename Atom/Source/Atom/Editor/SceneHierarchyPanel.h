@@ -20,6 +20,14 @@ namespace Atom
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);
 
+		void DrawTransformComponent(Component::Transform& component);
+		void DrawCameraComponent(Component::Camera& component);
+		void DrawBasicRendererComponent(Component::BasicRenderer& component);
+		void DrawScriptComponent(Component::Script& component);
+		void DrawRigidbody2DComponent(Component::Rigidbody2D& component);
+		void DrawBoxCollider2DComponent(Component::BoxCollider2D& component);
+		void DrawTextComponent(Component::Text& component);
+
 		void DrawAddComponentPopup();
 		template<typename Component>
 		void DrawAddComponentPopupItem(const std::string& text);
@@ -33,8 +41,8 @@ namespace Atom
 		}
 #endif
 	private:
-		Scene* m_Scene;
-		Entity m_SelectedEntity;
+		Scene* m_Scene = nullptr;
+		Entity m_SelectedEntity = {};
 	};
 
 }

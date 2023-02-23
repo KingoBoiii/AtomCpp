@@ -25,7 +25,7 @@ namespace Atom
         internal static extern void Identifier_GetName(ulong entityId, out string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Identifier_SetName(ulong entityId, ref string name);
+        internal static extern void Identifier_SetName(ulong entityId, string name);
 
         #endregion
 
@@ -56,6 +56,21 @@ namespace Atom
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Rigidbody2D_SetPosition(ulong entityId, ref Vector2 position);
+
+        #endregion
+
+        #region Text 
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_GetTextString(ulong entityId, out string text);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_SetTextString(ulong entityId, string text);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_GetColor(ulong entityId, out Color color);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_SetColor(ulong entityId, ref Color color);
 
         #endregion
 

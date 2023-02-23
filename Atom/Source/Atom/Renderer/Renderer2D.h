@@ -1,12 +1,23 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "Camera.h"
+#include "Font.h"
 
 namespace Atom
 {
+
 	
 	class Renderer2D
 	{
+	public:
+		struct Renderer2D::Statistics
+		{
+			uint32_t DrawCalls = 0;
+			uint32_t QuadCount = 0;
+
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4; }
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6; }
+		};
 	public:
 		static void Initialize();
 		static void Shutdown();
@@ -21,7 +32,17 @@ namespace Atom
 		static void RenderQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f));
 
 		static void RenderQuad(const glm::mat4& transform, const glm::vec4& color);
+
+		static void DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.0f));
+
+		static void ResetStats();
+		static const Statistics& GetStats();
 	private:
+		static void CreateQuadPipeline();
+		static void CreateTextPipeline();
+
+		static void NextBatch();
+		static void StartBatch();
 		static void Flush();
 	};
 

@@ -38,7 +38,6 @@ namespace Atom
 
 #pragma endregion
 
-
 #pragma region Transform
 
 		void Transform_GetPosition(UUID uuid, glm::vec3* outPosition);
@@ -57,6 +56,16 @@ namespace Atom
 
 		void Rigidbody2D_GetPosition(UUID uuid, glm::vec2* outPosition);
 		void Rigidbody2D_SetPosition(UUID uuid, glm::vec2* position);
+
+#pragma endregion
+
+#pragma region Text
+
+		void Text_GetTextString(UUID uuid, MonoString** outText);
+		void Text_SetTextString(UUID uuid, MonoString* text);
+
+		void Text_GetColor(UUID uuid, glm::vec4* outColor);
+		void Text_SetColor(UUID uuid, glm::vec4* color);
 
 #pragma endregion
 
@@ -86,7 +95,6 @@ namespace Atom
 		void Log_Error(MonoString* string);
 
 #pragma endregion
-
 
 	}
 

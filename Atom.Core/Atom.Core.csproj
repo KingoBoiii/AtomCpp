@@ -53,6 +53,7 @@
     <Compile Include="Source\Atom\Scene\Components\BasicRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Identifier.cs" />
     <Compile Include="Source\Atom\Scene\Components\Rigidbody2D.cs" />
+    <Compile Include="Source\Atom\Scene\Components\Text.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\Entity.cs" />
     <Compile Include="Source\Main.cs" />

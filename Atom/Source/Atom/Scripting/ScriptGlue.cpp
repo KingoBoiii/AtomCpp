@@ -1,6 +1,7 @@
 #include "ATPCH.h"
 #include "ScriptGlue.h"
 #include "ScriptEngine.h"
+#include "ScriptUtils.h"
 
 #include "Atom/Physics/2D/Physics2D.h"
 
@@ -26,7 +27,8 @@ namespace Atom
 		std::string_view structName = typeName.substr(pos + 1);
 		std::string managedTypeName = fmt::format("Atom.{}", structName);
 
-		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
+		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage);
+		//MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
 		if(!managedType)
 		{
 			AT_CORE_ERROR("Could not find managed component type: {}", managedTypeName);
@@ -67,6 +69,11 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
 		
+		AT_ADD_INTERNAL_CALL(Text_GetTextString);
+		AT_ADD_INTERNAL_CALL(Text_SetTextString);
+		AT_ADD_INTERNAL_CALL(Text_GetColor);
+		AT_ADD_INTERNAL_CALL(Text_SetColor);
+
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
 		AT_ADD_INTERNAL_CALL(Log_LogMessage);
@@ -131,7 +138,7 @@ namespace Atom
 
 			std::string entityName = entity.GetComponent<Component::Identifier>().Name;
 			
-			*outName = mono_string_new(ScriptEngine::GetAppDomain(), entityName.c_str());
+			*outName = ScriptUtils::UTF8ToMonoString(entityName);
 		}
 
 		void Identifier_SetName(UUID uuid, MonoString* name)
@@ -141,9 +148,10 @@ namespace Atom
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			std::string entityName = mono_string_to_utf8(name);
-			mono_free(name);
-			entity.GetComponent<Component::Identifier>().Name = entityName;
+			std::string entityName = ScriptUtils::MonoStringToUTF8(name);
+
+			auto& idenitifer = entity.GetComponent<Component::Identifier>();
+			idenitifer.Name = entityName;
 		}
 
 #pragma endregion
@@ -221,6 +229,52 @@ namespace Atom
 
 #pragma endregion
 
+#pragma region Text
+
+		void Text_GetTextString(UUID uuid, MonoString** outText)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+			
+			std::string text = entity.GetComponent<Component::Text>().TextString;
+			*outText = ScriptUtils::UTF8ToMonoString(text);
+		}
+
+		void Text_SetTextString(UUID uuid, MonoString* text)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			std::string newTextString = ScriptUtils::MonoStringToUTF8(text);
+			entity.GetComponent<Component::Text>().TextString = newTextString;
+		}
+
+		void Text_GetColor(UUID uuid, glm::vec4* outColor)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*outColor = entity.GetComponent<Component::Text>().Color;
+		}
+
+		void Text_SetColor(UUID uuid, glm::vec4* color)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::Text>().Color = *color;
+		}
+
+#pragma endregion
+
 #pragma region Input
 
 		bool Input_IsKeyDown(KeyCode keycode)
@@ -229,7 +283,6 @@ namespace Atom
 		}
 
 #pragma endregion
-
 
 #pragma region Log
 

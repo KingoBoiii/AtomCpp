@@ -331,6 +331,19 @@ namespace Atom
 				out << YAML::EndMap;		// BoxCollider2D
 			}
 
+			if(entity.HasComponent<Component::Text>())
+			{
+				auto& text = entity.GetComponent<Component::Text>();
+
+				out << YAML::Key << "Text";
+				out << YAML::BeginMap;		// Text
+
+				out << YAML::Key << "TextString" << YAML::Value << text.TextString;
+				out << YAML::Key << "Color" << YAML::Value << text.Color;
+
+				out << YAML::EndMap;		// Text
+			}
+
 			out << YAML::EndMap;		// Entity
 		}
 
@@ -353,10 +366,10 @@ namespace Atom
 		m_Scene->m_Registry.each([&](auto entityID)
 		{
 			Entity entity = { entityID, m_Scene };
-		if(!entity)
-			return;
+			if(!entity)
+				return;
 
-		Utils::SerializeEntity(out, entity);
+			Utils::SerializeEntity(out, entity);
 		});
 		out << YAML::EndSeq;
 
@@ -517,6 +530,15 @@ namespace Atom
 				boxCollider2D.Restitution = boxCollider2DComponent["Restitution"].as<float>();
 				boxCollider2D.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
 
+			}
+
+			auto textComponent = entity["Text"];
+			if(textComponent)
+			{
+				auto& text = deserializedEntity.AddComponent<Component::Text>();
+
+				text.TextString = textComponent["TextString"].as<std::string>();
+				text.Color = textComponent["Color"].as<glm::vec4>();
 			}
 		}
 

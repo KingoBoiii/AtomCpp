@@ -1,5 +1,73 @@
 Scene: Untitled
 Entities:
+  - Entity: 14030535345792414100
+    Identifier:
+      Name: Text
+    Transform:
+      Position: [-6.98253679, 3.65432572, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Text:
+      TextString: "Hello world! \nThis is written from a Text Component!"
+      Color: [0, 0.922779918, 0.634188533, 1]
+  - Entity: 2745269828739346672
+    Identifier:
+      Name: MSDF Shader Text
+    Transform:
+      Position: [-10.958684, -0.721471786, -1.32791424]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Text:
+      TextString: "struct VSInput\n{\n    float3 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\nstruct VSOutput\n{\n    float4 PositionCS : SV_POSITION;\n    float4 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\ncbuffer VS_CONSTANT_BUFFER : register(b0)\n{\n    float4x4 ProjectionViewMatrix;\n}\n\nVSOutput VSMain(VSInput input)\n{\n    float4 pos = float4(input.Position, 1.0);\n\n    VSOutput output = (VSOutput)0; // zero the memory first\n    output.PositionCS = mul(ProjectionViewMatrix, pos);\n    output.Position = pos;\n    output.Color = input.Color;\n    output.TexCoord = input.TexCoord;\n    return output;\n}\n\nTexture2D FontAtlasTexture : register(t0);\nSamplerState FontAtlasSampler : register(s0);\n\nstruct PSOutput\n{\n    float4 Color : SV_TARGET;\n};\n\nfloat median(float r, float g, float b)\n{\n    return max(min(r, g), min(max(r, g), b));\n}\n\nfloat screenPxRange(float2 texCoord)\n{\n    float pxRange = 2.0f;\n\n    float width, height, levels;\n    FontAtlasTexture.GetDimensions(0, width, height, levels);\n\n    float2 unitRange = float2(pxRange, pxRange) / float2(width, height);\n    float2 screenTexSize = float2(1.0f, 1.0f) / fwidth(texCoord);\n    return max(0.5 * dot(unitRange, screenTexSize), 1.0);\n}\n\nPSOutput PSMain(VSOutput input)\n{\n    float4 msdf = FontAtlasTexture.Sample(FontAtlasSampler, input.TexCoord);\n    float3 msd = msdf.rgb;\n\n    float sd = median(msd.r, msd.g, msd.b);\n\n    float screenPxDistance = screenPxRange(input.TexCoord) * (sd - 0.5f);\n\n    float opacity = clamp(screenPxDistance + 0.5f, 0.0f, 1.0f);\n    if(opacity == 0.0f)\n    {\n        discard;\n    }\n\n    float4 bgColor = float4(0.0f, 0.0f, 0.0f, 0.0f);\n\n    float4 color = lerp(bgColor, input.Color, opacity);\n    if(color.a == 0.0f)\n    {\n        discard;\n    }\n\n    PSOutput output = (PSOutput)0;\n    output.Color = color;\n    return output;\n}"
+      Color: [0, 0.808932602, 0.880308867, 1]
+  - Entity: 3084587223367777080
+    Identifier:
+      Name: Dynamic Text
+    Transform:
+      Position: [-2.08987904, 0.187793016, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Text:
+      TextString: Change from C# Script!
+      Color: [0.841698647, 0, 1, 1]
+  - Entity: 18190875840027868098
+    Identifier:
+      Name: Camera
+    Transform:
+      Position: [0, 0, 11.1374054]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.04719758
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 8448523379261213958
+    Identifier:
+      Name: Ground
+    Transform:
+      Position: [0, -6.15504646, 0]
+      Rotation: [0, 0, 0]
+      Scale: [20.7199993, 1, 1]
+    BasicRenderer:
+      Color: [0.277992249, 0.277992249, 0.277992249, 1]
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 13531942428709045881
     Identifier:
       Name: Box
@@ -22,41 +90,3 @@ Entities:
       Friction: 0.200000003
       Restitution: 0.200000003
       RestitutionThreshold: 0.5
-  - Entity: 8448523379261213958
-    Identifier:
-      Name: Ground
-    Transform:
-      Position: [0, -6.15504646, 0]
-      Rotation: [0, 0, 0]
-      Scale: [20.7199993, 1, 1]
-    BasicRenderer:
-      Color: [0.277992249, 0.277992249, 0.277992249, 1]
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 18190875840027868098
-    Identifier:
-      Name: Camera
-    Transform:
-      Position: [0, 0, 11.1374054]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Camera:
-      SceneCamera:
-        ProjectionType: 0
-        PerspectiveFOV: 1.04719758
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
