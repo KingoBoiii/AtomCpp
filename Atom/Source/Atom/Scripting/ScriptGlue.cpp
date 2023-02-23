@@ -1,6 +1,7 @@
 #include "ATPCH.h"
 #include "ScriptGlue.h"
 #include "ScriptEngine.h"
+#include "ScriptUtils.h"
 
 #include "Atom/Physics/2D/Physics2D.h"
 
@@ -136,7 +137,7 @@ namespace Atom
 
 			std::string entityName = entity.GetComponent<Component::Identifier>().Name;
 			
-			*outName = mono_string_new(ScriptEngine::GetAppDomain(), entityName.c_str());
+			*outName = ScriptUtils::UTF8ToMonoString(entityName);
 		}
 
 		void Identifier_SetName(UUID uuid, MonoString* name)
@@ -146,9 +147,7 @@ namespace Atom
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			char* nameCStr = mono_string_to_utf8(name);
-			std::string entityName(nameCStr);
-			mono_free(nameCStr);
+			std::string entityName = ScriptUtils::MonoStringToUTF8(name);
 
 			auto& idenitifer = entity.GetComponent<Component::Identifier>();
 			idenitifer.Name = entityName;
@@ -237,9 +236,9 @@ namespace Atom
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
-
-			auto& text = entity.GetComponent<Component::Text>();
-			*outText = mono_string_new(ScriptEngine::GetAppDomain(), text.TextString.c_str());
+			
+			std::string text = entity.GetComponent<Component::Text>().TextString;
+			*outText = ScriptUtils::UTF8ToMonoString(text);
 		}
 
 		void Text_SetTextString(UUID uuid, MonoString* text)
@@ -249,9 +248,7 @@ namespace Atom
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			char* newTextStringCStr = mono_string_to_utf8(text);
-			std::string newTextString(newTextStringCStr);
-			mono_free(newTextStringCStr);
+			std::string newTextString = ScriptUtils::MonoStringToUTF8(text);
 			entity.GetComponent<Component::Text>().TextString = newTextString;
 		}
 
