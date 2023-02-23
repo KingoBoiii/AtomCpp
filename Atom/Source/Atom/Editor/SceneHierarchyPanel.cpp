@@ -13,6 +13,8 @@
 namespace Atom
 {
 
+#define DRAW_COMPONENT_WITH_FUNCS
+
 #define ADD_COMPONENT_POP_UP_IDENTIFIER "AddComponent"
 #define COMPONENT_SETTINGS_POP_UP_IDENTIFIER "ComponentSettings"
 
@@ -251,100 +253,115 @@ namespace Atom
 
 		ImGui::PopItemWidth();
 
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::Transform>("Transform", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawTransformComponent));
+#else
 		Utils::DrawComponent<Component::Transform>("Transform", entity, [](auto& component)
 		{
 			Utils::DrawVec3Control("Translation", component.Position);
-		glm::vec3 rotation = glm::degrees(component.Rotation);
-		Utils::DrawVec3Control("Rotation", rotation);
-		component.Rotation = glm::radians(rotation);
-		Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
+			glm::vec3 rotation = glm::degrees(component.Rotation);
+			Utils::DrawVec3Control("Rotation", rotation);
+			component.Rotation = glm::radians(rotation);
+			Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
 		});
+#endif
 
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::Camera>("Camera", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawCameraComponent));
+#else
 		Utils::DrawComponent<Component::Camera>("Camera", entity, [](auto& component)
 		{
-			auto& camera = component.SceneCamera;
+				auto& camera = component.SceneCamera;
 
-		ImGui::Checkbox("Primary", &component.Primary);
+			ImGui::Checkbox("Primary", &component.Primary);
 
-		const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-		const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
-		if(ImGui::BeginCombo("Projection", currentProjectionTypeString))
-		{
-			for(int i = 0; i < 2; i++)
+			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+			if(ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
-				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-				if(ImGui::Selectable(projectionTypeStrings[i], isSelected))
+				for(int i = 0; i < 2; i++)
 				{
-					currentProjectionTypeString = projectionTypeStrings[i];
-					camera.SetProjectionType((SceneCamera::ProjectionType)i);
+					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+					if(ImGui::Selectable(projectionTypeStrings[i], isSelected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						camera.SetProjectionType((SceneCamera::ProjectionType)i);
+					}
+
+					if(isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
 				}
 
-				if(isSelected)
+				ImGui::EndCombo();
+			}
+
+			if(camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+			{
+				float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
+				if(ImGui::DragFloat("Vertical FOV", &verticalFOV))
 				{
-					ImGui::SetItemDefaultFocus();
+					camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
+				}
+
+				float perspectiveNear = camera.GetPerspectiveNearClip();
+				if(ImGui::DragFloat("Near", &perspectiveNear))
+				{
+					camera.SetPerspectiveNearClip(perspectiveNear);
+				}
+
+				float perspectiveFar = camera.GetPerspectiveFarClip();
+				if(ImGui::DragFloat("Far", &perspectiveFar))
+				{
+					camera.SetPerspectiveFarClip(perspectiveFar);
 				}
 			}
 
-			ImGui::EndCombo();
-		}
-
-		if(camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
-		{
-			float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
-			if(ImGui::DragFloat("Vertical FOV", &verticalFOV))
+			if(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
-				camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
-			}
+				float orthographicSize = camera.GetOrthographicSize();
+				if(ImGui::DragFloat("Size", &orthographicSize))
+				{
+					camera.SetOrthographicSize(orthographicSize);
+				}
 
-			float perspectiveNear = camera.GetPerspectiveNearClip();
-			if(ImGui::DragFloat("Near", &perspectiveNear))
-			{
-				camera.SetPerspectiveNearClip(perspectiveNear);
-			}
+				float orthographicNear = camera.GetOrthographicNearClip();
+				if(ImGui::DragFloat("Near", &orthographicNear))
+				{
+					camera.SetOrthographicNearClip(orthographicNear);
+				}
 
-			float perspectiveFar = camera.GetPerspectiveFarClip();
-			if(ImGui::DragFloat("Far", &perspectiveFar))
-			{
-				camera.SetPerspectiveFarClip(perspectiveFar);
-			}
-		}
+				float orthographicFar = camera.GetOrthographicFarClip();
+				if(ImGui::DragFloat("Far", &orthographicFar))
+				{
+					camera.SetOrthographicFarClip(orthographicFar);
+				}
 
-		if(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
-		{
-			float orthographicSize = camera.GetOrthographicSize();
-			if(ImGui::DragFloat("Size", &orthographicSize))
-			{
-				camera.SetOrthographicSize(orthographicSize);
+				ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 			}
-
-			float orthographicNear = camera.GetOrthographicNearClip();
-			if(ImGui::DragFloat("Near", &orthographicNear))
-			{
-				camera.SetOrthographicNearClip(orthographicNear);
-			}
-
-			float orthographicFar = camera.GetOrthographicFarClip();
-			if(ImGui::DragFloat("Far", &orthographicFar))
-			{
-				camera.SetOrthographicFarClip(orthographicFar);
-			}
-
-			ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
-		}
 		});
+#endif
 
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawBasicRendererComponent));
+#else
 		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, [](auto& component)
 		{
 			UI::Column2("Color", [&]()
-		{
-			float width = ImGui::GetContentRegionAvail().x;
+			{
+				float width = ImGui::GetContentRegionAvail().x;
 
-		ImGui::PushItemWidth(width);
-		ImGui::ColorEdit4("##Color", glm::value_ptr(component.Color));
-		ImGui::PopItemWidth();
+				ImGui::PushItemWidth(width);
+				ImGui::ColorEdit4("##Color", glm::value_ptr(component.Color));
+				ImGui::PopItemWidth();
+			});
 		});
-		});
+#endif
 
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::Script>("C# Script", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawScriptComponent));
+#else
 		Utils::DrawComponent<Component::Script>("C# Script", entity, [entity, this](auto& component) mutable
 		{
 			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
@@ -458,10 +475,270 @@ namespace Atom
 				ImGui::PopStyleColor();
 			}
 		});
+#endif
 
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::Rigidbody2D>("Rigidbody 2D", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawRigidbody2DComponent));
+#else
 		Utils::DrawComponent<Component::Rigidbody2D>("Rigidbody 2D", entity, [](auto& component)
 		{
 			const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+			const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+			if(ImGui::BeginCombo("Body Type", currentBodyTypeString))
+			{
+				for(int i = 0; i < 3; i++)
+				{
+					bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+					if(ImGui::Selectable(bodyTypeStrings[i], isSelected))
+					{
+						currentBodyTypeString = bodyTypeStrings[i];
+						component.Type = (Component::Rigidbody2D::BodyType)i;
+					}
+
+					if(isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+#endif
+
+#ifdef DRAW_COMPONENT_WITH_FUNCS
+		Utils::DrawComponent<Component::BoxCollider2D>("Box Collider 2D", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawBoxCollider2DComponent));
+#else
+		Utils::DrawComponent<Component::BoxCollider2D>("Box Collider 2D", entity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.1f);
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size), 0.1f);
+			ImGui::Checkbox("Is Trigger", &component.IsTrigger);
+
+
+			ImGui::DragFloat("Density", &component.Density, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f, 0.0f);
+		});
+#endif
+
+		Utils::DrawComponent<Component::Text>("Text", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawTextComponent));
+	}
+
+	void SceneHierarchyPanel::DrawTransformComponent(Component::Transform& component)
+	{
+		Utils::DrawVec3Control("Translation", component.Position);
+		glm::vec3 rotation = glm::degrees(component.Rotation);
+		Utils::DrawVec3Control("Rotation", rotation);
+		component.Rotation = glm::radians(rotation);
+		Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
+	}
+
+	void SceneHierarchyPanel::DrawCameraComponent(Component::Camera& component)
+	{
+		auto& camera = component.SceneCamera;
+
+		ImGui::Checkbox("Primary", &component.Primary);
+
+		const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+		const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+		if(ImGui::BeginCombo("Projection", currentProjectionTypeString))
+		{
+			for(int i = 0; i < 2; i++)
+			{
+				bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+				if(ImGui::Selectable(projectionTypeStrings[i], isSelected))
+				{
+					currentProjectionTypeString = projectionTypeStrings[i];
+					camera.SetProjectionType((SceneCamera::ProjectionType)i);
+				}
+
+				if(isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if(camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+		{
+			float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
+			if(ImGui::DragFloat("Vertical FOV", &verticalFOV))
+			{
+				camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
+			}
+
+			float perspectiveNear = camera.GetPerspectiveNearClip();
+			if(ImGui::DragFloat("Near", &perspectiveNear))
+			{
+				camera.SetPerspectiveNearClip(perspectiveNear);
+			}
+
+			float perspectiveFar = camera.GetPerspectiveFarClip();
+			if(ImGui::DragFloat("Far", &perspectiveFar))
+			{
+				camera.SetPerspectiveFarClip(perspectiveFar);
+			}
+		}
+
+		if(camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+		{
+			float orthographicSize = camera.GetOrthographicSize();
+			if(ImGui::DragFloat("Size", &orthographicSize))
+			{
+				camera.SetOrthographicSize(orthographicSize);
+			}
+
+			float orthographicNear = camera.GetOrthographicNearClip();
+			if(ImGui::DragFloat("Near", &orthographicNear))
+			{
+				camera.SetOrthographicNearClip(orthographicNear);
+			}
+
+			float orthographicFar = camera.GetOrthographicFarClip();
+			if(ImGui::DragFloat("Far", &orthographicFar))
+			{
+				camera.SetOrthographicFarClip(orthographicFar);
+			}
+
+			ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+		}
+	}
+
+	void SceneHierarchyPanel::DrawBasicRendererComponent(Component::BasicRenderer& component)
+	{
+		UI::Column2("Color", [&]()
+		{
+			float width = ImGui::GetContentRegionAvail().x;
+
+			ImGui::PushItemWidth(width);
+			ImGui::ColorEdit4("##Color", glm::value_ptr(component.Color));
+			ImGui::PopItemWidth();
+		});
+	}
+
+	void SceneHierarchyPanel::DrawScriptComponent(Component::Script& component)
+	{
+		bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+		static char buffer[64];
+		strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+
+		if(!scriptClassExists)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+		}
+
+		if(ImGui::InputText("Class", buffer, sizeof(buffer)))
+		{
+			component.ClassName = buffer;
+		}
+
+		// Fields
+		bool sceneRunning = m_Scene->IsRunning();
+		if(sceneRunning)
+		{
+			ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(m_SelectedEntity.GetUUID());
+			if(scriptInstance)
+			{
+				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+				for(const auto& [name, field] : fields)
+				{
+					if(field.Type == ScriptFieldType::Float)
+					{
+						float data = scriptInstance->GetFieldValue<float>(name);
+						if(ImGui::DragFloat(name.c_str(), &data))
+						{
+							scriptInstance->SetFieldValue(name, data);
+						}
+					}
+					if(field.Type == ScriptFieldType::Int)
+					{
+						int32_t data = scriptInstance->GetFieldValue<int32_t>(name);
+						if(ImGui::DragInt(name.c_str(), &data))
+						{
+							scriptInstance->SetFieldValue(name, data);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if(scriptClassExists)
+			{
+				ScriptClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+				const auto& fields = entityClass->GetFields();
+
+				auto& entityFields = ScriptEngine::GetScriptFieldMap(m_SelectedEntity);
+
+				for(const auto& [name, field] : fields)
+				{
+					// Field has been set in editor
+					if(entityFields.find(name) != entityFields.end())
+					{
+						ScriptFieldInstance& scriptField = entityFields.at(name);
+
+						if(field.Type == ScriptFieldType::Float)
+						{
+							float data = scriptField.GetValue<float>();
+							if(ImGui::DragFloat(name.c_str(), &data))
+							{
+								scriptField.SetValue(data);
+							}
+						}
+						if(field.Type == ScriptFieldType::Int)
+						{
+							int32_t data = scriptField.GetValue<int32_t>();
+							if(ImGui::DragInt(name.c_str(), &data))
+							{
+								scriptField.SetValue(data);
+							}
+						}
+					}
+					else
+					{
+						// Field has not been set in editor - display control to set it maybe
+						if(field.Type == ScriptFieldType::Float)
+						{
+							float data = 0.0f;
+							if(ImGui::DragFloat(name.c_str(), &data))
+							{
+								ScriptFieldInstance fieldInstance = entityFields[name];
+								fieldInstance.Field = field;
+								fieldInstance.SetValue(data);
+							}
+						}
+						if(field.Type == ScriptFieldType::Int)
+						{
+							int32_t data = 0.0f;
+							if(ImGui::DragInt(name.c_str(), &data))
+							{
+								ScriptFieldInstance fieldInstance = entityFields[name];
+								fieldInstance.Field = field;
+								fieldInstance.SetValue(data);
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		if(!scriptClassExists)
+		{
+			ImGui::PopStyleColor();
+		}
+	}
+
+	void SceneHierarchyPanel::DrawRigidbody2DComponent(Component::Rigidbody2D& component)
+	{
+		const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
 		const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
 		if(ImGui::BeginCombo("Body Type", currentBodyTypeString))
 		{
@@ -484,20 +761,31 @@ namespace Atom
 		}
 
 		ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
-		});
+	}
 
-		Utils::DrawComponent<Component::BoxCollider2D>("Box Collider 2D", entity, [](auto& component)
-		{
-			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.1f);
+	void SceneHierarchyPanel::DrawBoxCollider2DComponent(Component::BoxCollider2D& component)
+	{
+		ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset), 0.1f);
 		ImGui::DragFloat2("Size", glm::value_ptr(component.Size), 0.1f);
 		ImGui::Checkbox("Is Trigger", &component.IsTrigger);
 
-
+		ImGui::Text("Physics Material:");
 		ImGui::DragFloat("Density", &component.Density, 0.1f, 0.0f, 1.0f);
 		ImGui::DragFloat("Friction", &component.Friction, 0.1f, 0.0f, 1.0f);
 		ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);
 		ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f, 0.0f);
-		});
+	}
+
+	void SceneHierarchyPanel::DrawTextComponent(Component::Text& component)
+	{
+		static char buffer[1024 * 10];
+		strcpy_s(buffer, sizeof(buffer), component.TextString.c_str());
+
+		if(ImGui::InputTextMultiline("Text", buffer, sizeof(buffer)))
+		{
+			component.TextString = buffer;
+		}
+		ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 	}
 
 	void SceneHierarchyPanel::DrawAddComponentPopup()
@@ -509,6 +797,7 @@ namespace Atom
 			DrawAddComponentPopupItem<Component::BasicRenderer>("Basic Renderer");
 			DrawAddComponentPopupItem<Component::Rigidbody2D>("Rigidbody 2D");
 			DrawAddComponentPopupItem<Component::BoxCollider2D>("Box Collider 2D");
+			DrawAddComponentPopupItem<Component::Text>("Text");
 
 			ImGui::EndPopup();
 		}

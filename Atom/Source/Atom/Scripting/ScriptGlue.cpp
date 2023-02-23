@@ -67,6 +67,11 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
 		
+		AT_ADD_INTERNAL_CALL(Text_GetTextString);
+		AT_ADD_INTERNAL_CALL(Text_SetTextString);
+		AT_ADD_INTERNAL_CALL(Text_GetColor);
+		AT_ADD_INTERNAL_CALL(Text_SetColor);
+
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
 		AT_ADD_INTERNAL_CALL(Log_LogMessage);
@@ -141,9 +146,12 @@ namespace Atom
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			std::string entityName = mono_string_to_utf8(name);
-			mono_free(name);
-			entity.GetComponent<Component::Identifier>().Name = entityName;
+			char* nameCStr = mono_string_to_utf8(name);
+			std::string entityName(nameCStr);
+			mono_free(nameCStr);
+
+			auto& idenitifer = entity.GetComponent<Component::Identifier>();
+			idenitifer.Name = entityName;
 		}
 
 #pragma endregion
@@ -221,6 +229,54 @@ namespace Atom
 
 #pragma endregion
 
+#pragma region Text
+
+		void Text_GetTextString(UUID uuid, MonoString** outText)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			auto& text = entity.GetComponent<Component::Text>();
+			*outText = mono_string_new(ScriptEngine::GetAppDomain(), text.TextString.c_str());
+		}
+
+		void Text_SetTextString(UUID uuid, MonoString* text)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			char* newTextStringCStr = mono_string_to_utf8(text);
+			std::string newTextString(newTextStringCStr);
+			mono_free(newTextStringCStr);
+			entity.GetComponent<Component::Text>().TextString = newTextString;
+		}
+
+		void Text_GetColor(UUID uuid, glm::vec4* outColor)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*outColor = entity.GetComponent<Component::Text>().Color;
+		}
+
+		void Text_SetColor(UUID uuid, glm::vec4* color)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::Text>().Color = *color;
+		}
+
+#pragma endregion
+
 #pragma region Input
 
 		bool Input_IsKeyDown(KeyCode keycode)
@@ -229,7 +285,6 @@ namespace Atom
 		}
 
 #pragma endregion
-
 
 #pragma region Log
 

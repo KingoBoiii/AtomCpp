@@ -12,7 +12,7 @@
             }
             set
             {
-                InternalCalls.Identifier_SetName(Entity.Id, ref value);
+                InternalCalls.Identifier_SetName(Entity.Id, value);
             }
         }
     }

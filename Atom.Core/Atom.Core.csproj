@@ -21,7 +21,8 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,7 +34,8 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -53,6 +55,7 @@
     <Compile Include="Source\Atom\Scene\Components\BasicRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Identifier.cs" />
     <Compile Include="Source\Atom\Scene\Components\Rigidbody2D.cs" />
+    <Compile Include="Source\Atom\Scene\Components\Text.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\Entity.cs" />
     <Compile Include="Source\Main.cs" />
