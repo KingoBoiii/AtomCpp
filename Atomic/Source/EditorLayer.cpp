@@ -396,6 +396,9 @@ namespace Atom
 		//m_EditorScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_EditorScene);
 
+		delete m_ActiveScene;
+		m_ActiveScene = nullptr;
+
 		m_ActiveScene = m_EditorScene;
 		m_EditorScenePath = path;
 	}
