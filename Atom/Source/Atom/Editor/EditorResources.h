@@ -10,6 +10,9 @@ namespace Atom
 	class EditorResources
 	{
 	public:
+		inline static Texture2D* DirectoryIcon = nullptr;
+		inline static Texture2D* FileIcon = nullptr;
+
 		inline static Texture2D* PlayIcon = nullptr;
 		inline static Texture2D* StopIcon = nullptr;
 		inline static Texture2D* SimulateIcon = nullptr;
@@ -18,6 +21,9 @@ namespace Atom
 	public:
 		static void Initialize()
 		{
+			DirectoryIcon = LoadTexture("ProjectExplorer/Directory.png");
+			FileIcon = LoadTexture("ProjectExplorer/File.png");
+
 			PlayIcon = LoadTexture("Viewport/Play.png");
 			StopIcon = LoadTexture("Viewport/Stop.png");
 			SimulateIcon = LoadTexture("Viewport/Simulate.png");
@@ -27,6 +33,9 @@ namespace Atom
 
 		static void Shutdown()
 		{
+			ReleasePtr(DirectoryIcon);
+			ReleasePtr(FileIcon);
+			
 			ReleasePtr(PlayIcon);
 			ReleasePtr(StopIcon);
 			ReleasePtr(SimulateIcon);

@@ -50,6 +50,7 @@ namespace Atom
 
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
+		m_Viewport->SetDragDropCallback(AT_BIND_EVENT_FN(EditorLayer::OnViewportDragDropTarget));
 
 		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
 		if(commandLineArgs.Count > 1)
@@ -171,9 +172,13 @@ namespace Atom
 				{
 					OpenScene();
 				}
+				if(ImGui::MenuItem("Save", "Ctrl+S"))
+				{
+					SaveScene();
+				}
 				if(ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 				{
-					SaveAs();
+					SaveSceneAs();
 				}
 
 				ImGui::Separator();
@@ -308,6 +313,17 @@ namespace Atom
 		ImGui::PopStyleVar(2);
 	}
 
+	void EditorLayer::OnViewportDragDropTarget(const ImGuiPayload* payload)
+	{
+		if(!payload)
+		{
+			return;
+		}
+		
+		const wchar_t* path = (const wchar_t*)payload->Data;
+		OpenScene(path);
+	}
+
 	void EditorLayer::NewProject()
 	{
 	}
@@ -403,7 +419,13 @@ namespace Atom
 		m_EditorScenePath = path;
 	}
 
-	void EditorLayer::SaveAs()
+	void EditorLayer::SaveScene()
+	{
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(m_EditorScenePath.string());
+	}
+
+	void EditorLayer::SaveSceneAs()
 	{
 		std::string filepath = FileDialogs::SaveFile(ATOM_SCENE_FILE_DIALOG_FILTER);
 		if(filepath.empty())
@@ -542,9 +564,16 @@ namespace Atom
 			} break;
 			case Key::S:
 			{
+				if(control)
+				{
+					SaveScene();
+					break;
+
+				}
+
 				if(control && shift)
 				{
-					SaveAs();
+					SaveSceneAs();
 				}
 			} break;
 		}

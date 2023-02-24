@@ -4,6 +4,8 @@
 
 #include <Atom/Renderer/Framebuffer.h>
 
+struct ImGuiPayload;
+
 namespace Atom
 {
 
@@ -16,6 +18,8 @@ namespace Atom
 		virtual void OnImGuiRender(bool& isOpen) override;
 		virtual void SetSceneContext(Atom::Scene* scene) override;
 
+		void SetDragDropCallback(std::function<void(const ImGuiPayload*)> callback) { m_DragDropCallback = callback; }
+
 		void SetGizmoType(int type) { m_GizmoType = type; }
 		const glm::vec2& GetViewportSize() const { return m_ViewportSize; }
 	private:
@@ -27,6 +31,8 @@ namespace Atom
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		glm::vec2 m_ViewportBounds[2];
+
+		std::function<void(const ImGuiPayload*)> m_DragDropCallback;
 
 		bool m_ViewportHovered = false;
 		bool m_ViewportFocused = false;

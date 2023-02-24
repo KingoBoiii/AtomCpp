@@ -6,6 +6,8 @@
 #include "Panels/ProjectExplorer.h"
 #include <Atom/Editor/EditorPanels.h>
 
+struct ImGuiPayload;
+
 namespace Atom
 {
 	
@@ -26,6 +28,8 @@ namespace Atom
 	private:
 		void DrawTopMenuBar();
 		void UI_Toolbar();
+
+		void OnViewportDragDropTarget(const ImGuiPayload* payload);
 	private: // Project commands
 		void NewProject();
 		void OpenProject();
@@ -36,7 +40,8 @@ namespace Atom
 		void NewScene();
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
-		void SaveAs();
+		void SaveScene();
+		void SaveSceneAs();
 
 		void OnScenePlay();
 		void OnSceneStop();
