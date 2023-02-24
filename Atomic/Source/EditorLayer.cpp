@@ -437,6 +437,9 @@ namespace Atom
 			m_ActiveScene->OnSimulationStop();
 		}
 
+		delete m_ActiveScene;
+		m_ActiveScene = nullptr;
+
 		m_SceneState = SceneState::Edit;
 
 		m_ActiveScene = m_EditorScene;
