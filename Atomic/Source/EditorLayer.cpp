@@ -47,11 +47,15 @@ namespace Atom
 		m_StatisticsPanel = new StatisticsPanel();
 		m_ScriptEngineInspectorPanel = new ScriptEngineInspectorPanel();
 		m_ProjectExplorer = new ProjectExplorer();
+		m_ProjectSettingsPanel = new ProjectSettingsPanel();
 
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetDragDropCallback(AT_BIND_EVENT_FN(EditorLayer::OnViewportDragDropTarget));
 
+#if 1
+		OpenProject(m_ProjectPath);
+#else
 		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
 		if(commandLineArgs.Count > 1)
 		{
@@ -67,6 +71,7 @@ namespace Atom
 			// NOTE: this is while we don't have a new project path
 			Application::Get().Close();
 		}
+#endif
 	}
 
 	void EditorLayer::OnDetach()
@@ -114,6 +119,7 @@ namespace Atom
 		m_StatisticsPanel->OnImGuiRender(isOpen);
 		m_ScriptEngineInspectorPanel->OnImGuiRender(isOpen);
 		m_ProjectExplorer->OnImGuiRender(isOpen);
+		m_ProjectSettingsPanel->OnImGuiRender(isOpen);
 
 		UI_Toolbar();
 
@@ -357,8 +363,9 @@ namespace Atom
 
 	void EditorLayer::SaveProject()
 	{
+		Project::SaveActiveProject(Project::GetProjectDirectory() / fmt::format("{}.{}", Project::GetActiveProject()->GetConfig().Name, "atpr"));
 	}
-
+	
 	void EditorLayer::SaveProjectAs()
 	{
 		std::string filepath = FileDialogs::SaveFile(ATOM_PROJECT_FILE_DIALOG_FILTER);

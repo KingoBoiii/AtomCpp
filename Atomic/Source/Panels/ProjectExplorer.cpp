@@ -8,6 +8,15 @@
 namespace Atom
 {
 
+#define ATOM_SCENE_FILE_EXTENSION ".atsc"
+#define ATOM_SCENE_DRAG_DROP_TARGET_TYPE "PROJECT_EXPLORER_ITEM_SCENE"
+
+	using AtomFileExtension = std::string;
+	using AtomFileExtensionMap = std::unordered_map<AtomFileExtension, std::string>;
+	static AtomFileExtensionMap s_FileExtensionDragDropTargetMap = {
+		{ ATOM_SCENE_FILE_EXTENSION, ATOM_SCENE_DRAG_DROP_TARGET_TYPE }
+	};
+
 	ProjectExplorer::ProjectExplorer()
 		: m_BaseDirectory(""), m_CurrentDirectory(m_BaseDirectory)
 	{
@@ -71,8 +80,16 @@ namespace Atom
 				if(ImGui::BeginDragDropSource())
 				{
 					std::filesystem::path relativePath(path);
-					const wchar_t* itemPath = relativePath.c_str();
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+					const std::string& itemPath = relativePath.string();
+
+					size_t pos = itemPath.find("\\Scenes");
+					const std::string& relativePathString = itemPath.substr(pos + 1);
+
+					const std::string& extension = relativePath.extension().string();
+					const std::string& dragDropTargetType = s_FileExtensionDragDropTargetMap.at(relativePath.extension().string());
+					static_assert(sizeof(dragDropTargetType) > 32 + 1);
+
+					ImGui::SetDragDropPayload(dragDropTargetType.c_str(), relativePathString.c_str(), (strlen(relativePathString.c_str()) + 1) * sizeof(wchar_t));
 					ImGui::EndDragDropSource();
 				}
 

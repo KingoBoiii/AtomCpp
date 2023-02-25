@@ -1,4 +1,4 @@
-local AtomRootDir = '../../../..'
+local AtomRootDir = '../..'
 include (AtomRootDir .. "/Vendor/premake/premake_customization/solution_items.lua")
 
 workspace "Sandbox"
@@ -21,8 +21,8 @@ project "Sandbox"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("Binaries")
-	objdir ("Intermediates")
+	targetdir ("Cache/Scripts/Binaries")
+	objdir ("Cache/Scripts/Intermediates")
 
 	files {
 		"**.cs"

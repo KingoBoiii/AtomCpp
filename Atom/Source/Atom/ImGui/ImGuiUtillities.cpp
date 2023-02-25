@@ -6,6 +6,32 @@
 
 namespace Atom::UI
 {
+	
+	const char* DragDropTarget(const std::string& text, const std::string& type)
+	{
+		return DragDropTarget(text.c_str(), type.c_str());
+	}
+
+	const char* DragDropTarget(const char* text, const char* type)
+	{
+		float availableWidth = ImGui::GetContentRegionAvail().x;
+		float height = ImGui::GetFrameHeightWithSpacing();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.0f, 0.5f });
+		ImGui::Button(text, { availableWidth, 0.0f });
+		ImGui::PopStyleVar();
+		if(ImGui::BeginDragDropTarget())
+		{
+			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type))
+			{
+				const char* path = (const char*)payload->Data;
+				return path;
+				//AT_CORE_ASSERT(false);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return nullptr;
+	}
 
 	void Column2(const std::string& label, std::function<void()> content, float columnWidth, bool border)
 	{

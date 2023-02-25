@@ -47,7 +47,7 @@ namespace Atom
 		static std::filesystem::path GetScriptModulePath()
 		{
 			AT_CORE_ASSERT(s_ActiveProject);
-			return GetAssetDirectory() / s_ActiveProject->GetConfig().ScriptModulePath;
+			return GetProjectDirectory() / s_ActiveProject->GetConfig().ScriptModulePath;
 		}
 
 		static std::filesystem::path GetScriptModuleFilepath()

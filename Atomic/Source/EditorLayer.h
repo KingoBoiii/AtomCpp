@@ -14,7 +14,7 @@ namespace Atom
 	class EditorLayer : public Layer
 	{
 	public:
-		EditorLayer() : Layer("Atom Editor Layer")
+		EditorLayer(std::string_view projectPath) : Layer("Atom Editor Layer"), m_ProjectPath(projectPath)
 		{
 		}
 
@@ -52,6 +52,7 @@ namespace Atom
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
+		std::string m_ProjectPath;
 		std::filesystem::path m_EditorScenePath;
 		Scene* m_ActiveScene = nullptr;
 		Scene* m_EditorScene = nullptr;
@@ -65,6 +66,7 @@ namespace Atom
 		StatisticsPanel* m_StatisticsPanel = nullptr;
 		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
 		ProjectExplorer* m_ProjectExplorer = nullptr;
+		ProjectSettingsPanel* m_ProjectSettingsPanel = nullptr;
 
 		enum class SceneState
 		{
