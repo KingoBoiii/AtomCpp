@@ -3,6 +3,10 @@
 namespace Atom
 {
 
+#define ATOM_USE_LEGACY_PROJECT_SERIALIZATION 0
+
+#define ATOM_PROJECT_CACHE_DIRECTORY "Cache"
+
 	struct ProjectConfig
 	{
 		std::string Name = "Untitled";
@@ -11,14 +15,20 @@ namespace Atom
 
 		std::filesystem::path AssetDirectory;
 		std::filesystem::path ScriptModulePath;
+
+		// Not serialized
+		std::filesystem::path ProjectFilename;
+		std::filesystem::path ProjectDirectory;
 	};
 
 	class Project
 	{
 	public:
+#if ATOM_USE_LEGACY_PROJECT_SERIALIZATION
 		static Project* Create();
 		static Project* Load(const std::filesystem::path& filepath);
 		static bool SaveActiveProject(const std::filesystem::path& filepath);
+#endif
 
 		static const std::string& GetProjectName()
 		{
@@ -29,7 +39,13 @@ namespace Atom
 		static const std::filesystem::path& GetProjectDirectory()
 		{
 			AT_CORE_ASSERT(s_ActiveProject);
-			return s_ActiveProject->m_ProjectDirectory;
+			return s_ActiveProject->m_Config.ProjectDirectory;
+		}
+
+		static const std::filesystem::path& GetProjectFileName()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->m_Config.ProjectFilename;
 		}
 
 		static std::filesystem::path GetAssetDirectory()
@@ -56,13 +72,19 @@ namespace Atom
 			return GetScriptModulePath() / fmt::format("{0}.dll", GetProjectName());
 		}
 
+		static const std::filesystem::path& GetProjectCacheDirectory()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->m_Config.ProjectDirectory / ATOM_PROJECT_CACHE_DIRECTORY;
+		}
+
+		static void SetActiveProject(Project* project) { s_ActiveProject = project; }
 		static Project* GetActiveProject() { return s_ActiveProject; }
 
 		ProjectConfig& GetConfig() { return m_Config; }
 		const ProjectConfig& GetConfig() const { return m_Config; }
 	private:
 		ProjectConfig  m_Config;
-		std::filesystem::path m_ProjectDirectory;
 
 		inline static Project* s_ActiveProject;
 	};

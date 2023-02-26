@@ -46,6 +46,7 @@ namespace Atom
 
 	void ScriptEngineInspectorPanel::OnProjectChanged(Project* project)
 	{
+#if 0
 		s_LoadedAssembliesMetadata.clear();
 
 		AssemblyInfo* coreAssembly = ScriptEngine::GetCoreAssemblyInfo();
@@ -53,6 +54,7 @@ namespace Atom
 
 		AssemblyInfo* appAssembly = ScriptEngine::GetAppAssemblyInfo();
 		s_LoadedAssembliesMetadata.push_back(appAssembly->Metadata);
+#endif
 	}
 
 }

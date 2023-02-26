@@ -55,22 +55,6 @@ namespace Atom
 		s_Cache = nullptr;
 	}
 
-	ManagedClass* ScriptCache::GetManagedClassByName(const std::string& className)
-	{
-		if(s_Cache == nullptr)
-		{
-			return nullptr;
-		}
-
-		uint32_t classId = Hash::GenerateFNVHash(className);
-		if(s_Cache->Classes.find(classId) == s_Cache->Classes.end())
-		{
-			return nullptr;
-		}
-
-		return &s_Cache->Classes[classId];
-	}
-
 	void ScriptCache::ClearCache()
 	{
 		if(s_Cache == nullptr)
@@ -91,6 +75,22 @@ namespace Atom
 #define CACHE_ATOM_CORE_CLASS(name) CacheClass("Atom." ##name, mono_class_from_name(ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage, "Atom", name))
 
 		CACHE_ATOM_CORE_CLASS("Entity");
+	}
+
+	ManagedClass* ScriptCache::GetManagedClassByName(const std::string& className)
+	{
+		if(s_Cache == nullptr)
+		{
+			return nullptr;
+		}
+
+		uint32_t classId = Hash::GenerateFNVHash(className);
+		if(s_Cache->Classes.find(classId) == s_Cache->Classes.end())
+		{
+			return nullptr;
+		}
+
+		return &s_Cache->Classes[classId];
 	}
 
 	void ScriptCache::CacheClass(std::string_view className, MonoClass* monoClass)

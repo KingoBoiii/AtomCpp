@@ -162,8 +162,7 @@ namespace Atom
 		LoadCoreAssembly();
 		ScriptCache::Initialize();
 		
-		LoadAppAssembly();
-		LoadAssemblyClasses(); // TODO: Move to ScriptCache
+		//LoadAppAssembly();
 
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
@@ -193,6 +192,44 @@ namespace Atom
 		ScriptGlue::RegisterComponents();
 
 		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
+	}
+
+	bool ScriptEngine::LoadAppAssembly()
+	{
+		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
+			AT_CORE_ERROR("[ScriptEngine] Filepath = {}", Project::GetScriptModuleFilepath());
+			return false;
+		}
+
+		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
+		if(assembly == nullptr)
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
+			return false;
+		}
+
+		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
+		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
+		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
+		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
+		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
+		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
+
+		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
+
+		LoadAssemblyClasses(); // TODO: Move to ScriptCache
+
+		return true;
+	}
+
+	void ScriptEngine::UnloadAppAssembly()
+	{
+		// Call OnDestroy method from here!
+
+		ScriptCache::ClearCache();
+		ScriptCache::CacheCoreClasses();
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
@@ -414,34 +451,6 @@ namespace Atom
 		return true;
 	}
 
-	bool ScriptEngine::LoadAppAssembly()
-	{
-		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
-		{
-			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
-			AT_CORE_ERROR("[ScriptEngine] Filepath = {}", Project::GetScriptModuleFilepath());
-			return false;
-		}
-
-		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
-		if(assembly == nullptr)
-		{
-			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
-			return false;
-		}
-
-		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
-		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
-		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
-		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
-		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
-		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
-
-		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
-
-		return true;
-	}
-
 	AssemblyMetadata ScriptEngine::LoadAssemblyMetadata(MonoImage* image)
 	{
 		AssemblyMetadata metadata;
@@ -566,16 +575,14 @@ namespace Atom
 		}
 	}
 
-#if 0
-	MonoImage* ScriptEngine::GetCoreAssemblyImage()
-	{
-		return s_ScriptEngineData->CoreAssemblyImage;
-	}
-#endif
-
 	MonoDomain* ScriptEngine::GetAppDomain()
 	{
 		return s_ScriptEngineData->AppDomain;
+	}
+
+	void ScriptEngine::SetSceneContext(Scene* scene)
+	{
+		s_ScriptEngineData->SceneContext = scene;
 	}
 
 	Scene* ScriptEngine::GetSceneContext()

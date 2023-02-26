@@ -36,6 +36,8 @@ namespace Atom
 		void OpenProject(const std::filesystem::path& filepath);
 		void SaveProject();
 		void SaveProjectAs();
+		void SaveProject(const std::filesystem::path& filepath);
+		void CloseProject(bool unloadProject = true);
 	private: // Scene commands
 		void NewScene();
 		void OpenScene();

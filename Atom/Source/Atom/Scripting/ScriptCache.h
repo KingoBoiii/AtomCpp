@@ -15,11 +15,11 @@ namespace Atom
 		static void Initialize();
 		static void Shutdown();
 
-		static ManagedClass* GetManagedClassByName(const std::string& className);
-	private:
 		static void ClearCache();
 		static void CacheCoreClasses();
 
+		static ManagedClass* GetManagedClassByName(const std::string& className);
+	private:
 		static void CacheClass(std::string_view className, MonoClass* monoClass);
 	};
 

@@ -5,6 +5,7 @@
 namespace Atom
 {
 
+#if ATOM_USE_LEGACY_PROJECT_SERIALIZATION
 	Project* Project::Create()
 	{
 		s_ActiveProject = new Project();
@@ -37,5 +38,6 @@ namespace Atom
 
 		return false;
 	}
+#endif 
 
 }

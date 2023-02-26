@@ -10,6 +10,7 @@
 
 #include <imgui.h>
 #include "ImGuizmo.h"
+#include <Atom/Project/ProjectSerializer.h>
 
 namespace Atom
 {
@@ -189,25 +190,11 @@ namespace Atom
 
 				ImGui::Separator();
 
-				std::string filepath = fmt::format("Assets/Scenes/Example.{}", ATOM_SCENE_FILE_EXTENSIONS);
-
-				if(ImGui::MenuItem("Save Example Scene"))
-				{
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Serialize(filepath);
-				}
-				if(ImGui::MenuItem("Load Example Scene"))
-				{
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Deserialize(filepath);
-
-					m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
-				}
-
-				ImGui::Separator();
-
 				if(ImGui::MenuItem("Restart (W.I.P.)"))
 				{
+					// TODO: Fix Swap Chain!
+
+					AT_CORE_ASSERT("SwapChain failing! - TODO: FIX!!");
 					Application::Get().Restart();
 				}
 				if(ImGui::MenuItem("Close"))
@@ -325,7 +312,7 @@ namespace Atom
 		{
 			return;
 		}
-		
+
 		const wchar_t* path = (const wchar_t*)payload->Data;
 		OpenScene(path);
 	}
@@ -347,25 +334,45 @@ namespace Atom
 
 	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
 	{
-		bool projectLoaded = Project::Load(filepath);
-
-		if(projectLoaded)
+		if(Project::GetActiveProject())
 		{
-			ScriptEngine::Initialize(Application::Get().GetOptions().ScriptConfig);
-
-			m_ScriptEngineInspectorPanel->OnProjectChanged(Project::GetActiveProject());
-			m_ProjectExplorer->OnProjectChanged(Project::GetActiveProject());
-
-			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
-			OpenScene(startScenePath);
+			CloseProject();
 		}
+
+		Project* newProject = new Project();
+
+		ProjectSerializer serializer(newProject);
+		if(!serializer.Deserialize(filepath))
+		{
+			AT_CORE_ERROR("Failed to load project at filepath: {0}", filepath.string());
+			return;
+		}
+
+		Project::SetActiveProject(newProject);
+
+		ScriptEngine::LoadAppAssembly();
+
+		m_ScriptEngineInspectorPanel->OnProjectChanged(Project::GetActiveProject());
+		m_ProjectExplorer->OnProjectChanged(Project::GetActiveProject());
+
+		auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
+		if(!startScenePath.empty())
+		{
+			OpenScene(startScenePath);
+			return;
+		}
+		NewScene();
+		AT_CORE_ERROR("Failed to load start scene at filepath: {0}", startScenePath.string());
 	}
 
 	void EditorLayer::SaveProject()
 	{
-		Project::SaveActiveProject(Project::GetProjectDirectory() / fmt::format("{}.{}", Project::GetActiveProject()->GetConfig().Name, "atpr"));
+		const std::filesystem::path& projectFilepath = Project::GetProjectDirectory() / Project::GetProjectFileName();
+		SaveProject(projectFilepath);
+
+		//Project::SaveActiveProject(Project::GetProjectDirectory() / fmt::format("{}.{}", Project::GetActiveProject()->GetConfig().Name, ATOM_PROJECT_FILE_EXTENSIONS));
 	}
-	
+
 	void EditorLayer::SaveProjectAs()
 	{
 		std::string filepath = FileDialogs::SaveFile(ATOM_PROJECT_FILE_DIALOG_FILTER);
@@ -374,7 +381,39 @@ namespace Atom
 			return;
 		}
 
-		Project::SaveActiveProject(filepath);
+		SaveProject(filepath);
+		
+		//Project::SaveActiveProject(filepath);
+	}
+
+	void EditorLayer::SaveProject(const std::filesystem::path& filepath)
+	{
+		if(!Project::GetActiveProject())
+		{
+			AT_CORE_WARN("Cannot save project - No project loaded");
+			return;
+		}
+
+		ProjectSerializer serializer(Project::GetActiveProject());
+		const std::filesystem::path& projectFilepath = Project::GetProjectDirectory() / Project::GetProjectFileName();
+		if(!serializer.Serialize(projectFilepath))
+		{
+			AT_CORE_ERROR("Failed to save project at filepath: {0}", projectFilepath.string());
+			return;
+		}
+	}
+
+	void EditorLayer::CloseProject(bool unloadProject)
+	{
+		SaveProject();
+
+		ScriptEngine::UnloadAppAssembly();
+		ScriptEngine::SetSceneContext(nullptr);
+
+		if(unloadProject)
+		{
+			Project::SetActiveProject(nullptr);
+		}
 	}
 
 	void EditorLayer::NewScene()
