@@ -355,14 +355,14 @@ namespace Atom
 		m_ScriptEngineInspectorPanel->OnProjectChanged(Project::GetActiveProject());
 		m_ProjectExplorer->OnProjectChanged(Project::GetActiveProject());
 
-		auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
-		if(!startScenePath.empty())
+		if(!Project::GetActiveProject()->GetConfig().StartScene.empty())
 		{
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
 			OpenScene(startScenePath);
 			return;
 		}
 		NewScene();
-		AT_CORE_ERROR("Failed to load start scene at filepath: {0}", startScenePath.string());
+		AT_CORE_ERROR("Failed to load start scene");
 	}
 
 	void EditorLayer::SaveProject()
@@ -418,6 +418,12 @@ namespace Atom
 
 	void EditorLayer::NewScene()
 	{
+		delete m_EditorScene;
+		m_EditorScene = nullptr;
+
+		//delete m_ActiveScene;
+		//m_ActiveScene = nullptr;
+
 		m_ActiveScene = new Scene();
 		//m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);

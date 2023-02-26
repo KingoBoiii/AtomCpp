@@ -1,0 +1,5 @@
+Project:
+  Name: CatchGame
+  StartScene: ""
+  AssetDirectory: Assets
+  ScriptModulePath: Cache\\Scripts\\Binaries
