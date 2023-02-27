@@ -67,6 +67,18 @@ namespace Atom
         internal static extern void Text_SetTextString(ulong entityId, string text);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_GetKerning(ulong entityId, out float kerning);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_SetKerning(ulong entityId, ref float kerning);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_GetLineSpacing(ulong entityId, out float lineSpacing);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Text_SetLineSpacing(ulong entityId, ref float lineSpacing);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Text_GetColor(ulong entityId, out Color color);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

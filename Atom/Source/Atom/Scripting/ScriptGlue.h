@@ -64,6 +64,12 @@ namespace Atom
 		void Text_GetTextString(UUID uuid, MonoString** outText);
 		void Text_SetTextString(UUID uuid, MonoString* text);
 
+		void Text_GetKerning(UUID uuid, float* kerning);
+		void Text_SetKerning(UUID uuid, float kerning);
+		
+		void Text_GetLineSpacing(UUID uuid, float* lineSpacing);
+		void Text_SetLineSpacing(UUID uuid, float lineSpacing);
+
 		void Text_GetColor(UUID uuid, glm::vec4* outColor);
 		void Text_SetColor(UUID uuid, glm::vec4* color);
 

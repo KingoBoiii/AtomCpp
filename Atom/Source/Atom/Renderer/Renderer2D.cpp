@@ -164,7 +164,7 @@ namespace Atom
 		s_Renderer2DData.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters)
 	{
 		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
 		const auto& metrics = fontGeometry.getMetrics();
@@ -175,12 +175,13 @@ namespace Atom
 		double x = 0.0;
 		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 		double y = 0.0f; // -fsScale * metrics.ascenderY;
-		float lineHeightOffset = 0.0f;
 
 		//if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
 		//{
 		//	NextBatch();
 		//}
+
+		float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
 
 		for(size_t i = 0; i < string.size(); i++)
 		{
@@ -189,13 +190,143 @@ namespace Atom
 			if(character == '\n')
 			{
 				x = 0.0;
-				y -= fsScale * metrics.lineHeight + lineHeightOffset;
+				y -= fsScale * metrics.lineHeight + textParameters.LineSpacing;
+				continue;
+			}
+
+			if(character == ' ')
+			{
+				float advance = spaceGlyphAdvance;
+				if(i < string.size() - 1)
+				{
+					char nextCharacter = string[i + 1];
+					double dAdvance;
+					fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+					advance = (float)dAdvance;
+				}
+				x += fsScale * advance + textParameters.Kerning;
 				continue;
 			}
 
 			if(character == '\t')
 			{
-				character = ' ';
+				x += 4.0f * (fsScale * spaceGlyphAdvance + textParameters.Kerning);
+				continue;
+			}
+
+			auto glyph = fontGeometry.getGlyph(character);
+			if(!glyph)
+			{
+				glyph = fontGeometry.getGlyph('?');
+			}
+			if(!glyph)
+			{
+				return;
+			}
+
+			double al, ab, ar, at;
+			glyph->getQuadAtlasBounds(al, ab, ar, at);
+			glm::vec2 texCoordMin((float)al, (float)ab);
+			glm::vec2 texCoordMax((float)ar, (float)at);
+
+			double pl, pb, pr, pt;
+			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+			glm::vec2 quadMin((float)pl, (float)pb);
+			glm::vec2 quadMax((float)pr, (float)pt);
+
+			quadMin *= fsScale, quadMax *= fsScale;
+			quadMin += glm::vec2(x, y);
+			quadMax += glm::vec2(x, y);
+
+			float texelWidth = 1.0f / fontAtlas->GetWidth();
+			float texelHeight = 1.0f / fontAtlas->GetHeight();
+			texCoordMin *= glm::vec2(texelWidth, texelHeight);
+			texCoordMax *= glm::vec2(texelWidth, texelHeight);
+
+			// Render here!
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMin;
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMax;
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
+			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+			s_Renderer2DData.TextVertexBufferPtr++;
+
+			s_Renderer2DData.TextIndexCount += 6;
+
+			s_Renderer2DData.Stats.QuadCount++;
+
+			if(i < string.size() - 1)
+			{
+				double advance = glyph->getAdvance();
+				char nextCharacter = string[i + 1];
+				fontGeometry.getAdvance(advance, character, nextCharacter);
+
+				x += fsScale * advance + textParameters.Kerning;
+			}
+		}
+	}
+
+	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4 color, float kerning, float lineSpacing)
+	{
+		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
+		const auto& metrics = fontGeometry.getMetrics();
+		auto fontAtlas = font->GetAtlasTexture();
+
+		s_Renderer2DData.FontAtlasTexture = fontAtlas;
+
+		double x = 0.0;
+		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+		double y = 0.0f; // -fsScale * metrics.ascenderY;
+
+		//if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
+		//{
+		//	NextBatch();
+		//}
+
+		float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+		for(size_t i = 0; i < string.size(); i++)
+		{
+			char character = string[i];
+
+			if(character == '\n')
+			{
+				x = 0.0;
+				y -= fsScale * metrics.lineHeight + lineSpacing;
+				continue;
+			}
+
+			if(character == ' ')
+			{
+				float advance = spaceGlyphAdvance;
+				if(i < string.size() - 1)
+				{
+					char nextCharacter = string[i + 1];
+					double dAdvance;
+					fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+					advance = (float)dAdvance;
+				}
+				x += fsScale * advance + kerning;
+				continue;
+			}
+
+			if(character == '\t')
+			{
+				x += 4.0f * (fsScale * spaceGlyphAdvance + kerning);
+				continue;
 			}
 
 			auto glyph = fontGeometry.getGlyph(character);
@@ -258,8 +389,7 @@ namespace Atom
 				char nextCharacter = string[i + 1];
 				fontGeometry.getAdvance(advance, character, nextCharacter);
 
-				float kerningOffset = 0.0f;
-				x += fsScale * advance + kerningOffset;
+				x += fsScale * advance + kerning;
 			}
 		}
 	}

@@ -71,6 +71,10 @@ namespace Atom
 		
 		AT_ADD_INTERNAL_CALL(Text_GetTextString);
 		AT_ADD_INTERNAL_CALL(Text_SetTextString);
+		AT_ADD_INTERNAL_CALL(Text_GetKerning);
+		AT_ADD_INTERNAL_CALL(Text_SetKerning);
+		AT_ADD_INTERNAL_CALL(Text_GetLineSpacing);
+		AT_ADD_INTERNAL_CALL(Text_SetLineSpacing);
 		AT_ADD_INTERNAL_CALL(Text_GetColor);
 		AT_ADD_INTERNAL_CALL(Text_SetColor);
 
@@ -251,6 +255,46 @@ namespace Atom
 
 			std::string newTextString = ScriptUtils::MonoStringToUTF8(text);
 			entity.GetComponent<Component::Text>().TextString = newTextString;
+		}
+
+		void Text_GetKerning(UUID uuid, float* kerning)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*kerning = entity.GetComponent<Component::Text>().Kerning;
+		}
+
+		void Text_SetKerning(UUID uuid, float kerning)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::Text>().Kerning = kerning;
+		}
+
+		void Text_GetLineSpacing(UUID uuid, float* lineSpacing)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*lineSpacing = entity.GetComponent<Component::Text>().LineSpacing;
+		}
+
+		void Text_SetLineSpacing(UUID uuid, float lineSpacing)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::Text>().LineSpacing = lineSpacing;
 		}
 
 		void Text_GetColor(UUID uuid, glm::vec4* outColor)

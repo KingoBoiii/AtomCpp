@@ -176,7 +176,6 @@ namespace Atom
 		}
 
 		{
-#ifndef USE_GROUP
 			auto view = m_Registry.view<Component::Text>();
 			for(auto e : view)
 			{
@@ -185,21 +184,9 @@ namespace Atom
 				auto& transform = entity.GetComponent<Component::Transform>();
 				auto& text = entity.GetComponent<Component::Text>();
 
-				Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+				text.FontAsset = Font::GetDefaultFont();
+				Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
 			}
-#else
-			auto group = m_Registry.group<Component::Transform>(entt::get<Component::Text>);
-			for(auto entity : group)
-			{
-				auto [tranform, text] = group.get<Component::Transform, Component::Text>(entity);
-
-				Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), tranform.GetTransform(), text.Color);
-			}
-#endif
-
-#ifdef USE_GROUP
-#undef USE_GROUP
-#endif
 		}
 
 		Renderer2D::EndScene();
@@ -326,7 +313,8 @@ namespace Atom
 						auto& transform = entity.GetComponent<Component::Transform>();
 						auto& text = entity.GetComponent<Component::Text>();
 
-						Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+						text.FontAsset = Font::GetDefaultFont();
+						Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
 					}
 				}
 
@@ -388,7 +376,6 @@ namespace Atom
 			}
 
 			{
-#ifndef USE_GROUP
 				auto view = m_Registry.view<Component::Text>();
 				for(auto e : view)
 				{
@@ -397,21 +384,9 @@ namespace Atom
 					auto& transform = entity.GetComponent<Component::Transform>();
 					auto& text = entity.GetComponent<Component::Text>();
 
-					Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+					text.FontAsset = Font::GetDefaultFont();
+					Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
 				}
-#else
-				auto group = m_Registry.group<Component::Transform>(entt::get<Component::Text>);
-				for(auto entity : group)
-				{
-					auto [tranform, text] = group.get<Component::Transform, Component::Text>(entity);
-
-					Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), tranform.GetTransform(), text.Color);
-				}
-#endif
-
-#ifdef USE_GROUP
-#undef USE_GROUP
-#endif
 			}
 		}
 

@@ -340,6 +340,8 @@ namespace Atom
 
 				out << YAML::Key << "TextString" << YAML::Value << text.TextString;
 				out << YAML::Key << "Color" << YAML::Value << text.Color;
+				out << YAML::Key << "Kerning" << YAML::Value << text.Kerning;
+				out << YAML::Key << "LineSpacing" << YAML::Value << text.LineSpacing;
 
 				out << YAML::EndMap;		// Text
 			}
@@ -539,6 +541,8 @@ namespace Atom
 
 				text.TextString = textComponent["TextString"].as<std::string>();
 				text.Color = textComponent["Color"].as<glm::vec4>();
+				text.Kerning = textComponent["Kerning"].as<float>();
+				text.LineSpacing = textComponent["LineSpacing"].as<float>();
 			}
 		}
 

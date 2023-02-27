@@ -786,6 +786,8 @@ namespace Atom
 			component.TextString = buffer;
 		}
 		ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+		ImGui::DragFloat("Kerning", &component.Kerning, 0.025f);
+		ImGui::DragFloat("Line Spacing", &component.LineSpacing, 0.025f);
 	}
 
 	void SceneHierarchyPanel::DrawAddComponentPopup()
