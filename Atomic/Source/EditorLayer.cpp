@@ -337,8 +337,9 @@ namespace Atom
 			return;
 		}
 
-		const wchar_t* path = (const wchar_t*)payload->Data;
-		OpenScene(path);
+		const char* path = (const char*)payload->Data;
+		std::filesystem::path filepath = Project::GetAssetDirectory() / path;
+		OpenScene(filepath);
 	}
 
 	void EditorLayer::NewProject()

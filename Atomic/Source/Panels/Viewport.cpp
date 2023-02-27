@@ -40,7 +40,7 @@ namespace Atom
 
 		if(ImGui::BeginDragDropTarget())
 		{
-			m_DragDropCallback(ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM_SCENE"));
+			m_DragDropCallback(ImGui::AcceptDragDropPayload("PROJECT_EXPLORER_ITEM_SCENE"));
 			//if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			//{
 			//	const wchar_t* path = (const wchar_t*)payload->Data;
