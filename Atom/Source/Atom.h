@@ -40,3 +40,5 @@
 #include "Atom/Scripting/ScriptEngine.h"
 
 #include "Atom/Project/Project.h"
+
+#include "Atom/Utils/PlatformUtils.h"

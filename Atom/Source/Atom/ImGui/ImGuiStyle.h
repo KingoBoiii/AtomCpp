@@ -22,6 +22,23 @@ namespace Atom::UI
 		ScopedStyle& operator=(const ScopedStyle&) = delete;
 	};
 
+	class ScopedFont
+	{
+	public:
+		ScopedFont(ImFont* font)
+		{
+			ImGui::PushFont(font);
+		}
+
+		~ScopedFont()
+		{
+			ImGui::PopFont();
+		}
+
+		ScopedFont(const ScopedFont&) = delete;
+		ScopedFont& operator=(const ScopedFont&) = delete;
+	};
+
 	class ScopedId
 	{
 	public:

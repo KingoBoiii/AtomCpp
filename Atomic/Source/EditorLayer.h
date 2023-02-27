@@ -29,9 +29,12 @@ namespace Atom
 		void DrawTopMenuBar();
 		void UI_Toolbar();
 
+		void UI_ShowNewProjectDialog();
+
 		void OnViewportDragDropTarget(const ImGuiPayload* payload);
 	private: // Project commands
 		void NewProject();
+		void CreateProject(const std::filesystem::path& projectPath);
 		void OpenProject();
 		void OpenProject(const std::filesystem::path& filepath);
 		void SaveProject();
@@ -58,6 +61,8 @@ namespace Atom
 		std::filesystem::path m_EditorScenePath;
 		Scene* m_ActiveScene = nullptr;
 		Scene* m_EditorScene = nullptr;
+
+		bool m_ShowNewProjectDialog = false;
 
 		Framebuffer* m_Framebuffer = nullptr;
 		EditorCamera m_EditorCamera;
