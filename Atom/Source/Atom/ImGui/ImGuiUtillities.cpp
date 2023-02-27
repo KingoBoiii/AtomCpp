@@ -1,5 +1,6 @@
 #include "ATPCH.h"
 #include "ImGuiUtillities.h"
+#include "ImGuiStyle.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -17,9 +18,8 @@ namespace Atom::UI
 		float availableWidth = ImGui::GetContentRegionAvail().x;
 		float height = ImGui::GetFrameHeightWithSpacing();
 
-		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0.0f, 0.5f });
+		ScopedStyle buttonTextAlign(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 		ImGui::Button(text, { availableWidth, 0.0f });
-		ImGui::PopStyleVar();
 		if(ImGui::BeginDragDropTarget())
 		{
 			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type))
