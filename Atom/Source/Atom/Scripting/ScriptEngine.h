@@ -134,6 +134,8 @@ namespace Atom
 		static AssemblyMetadata LoadAssemblyMetadata(MonoImage* image);
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& filepath);
 
+		static std::vector<AssemblyMetadata> GetReferencedAssembliesMetadata(MonoImage* image);
+
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();
 

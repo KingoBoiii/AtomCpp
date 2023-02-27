@@ -216,6 +216,7 @@ namespace Atom
 		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
 		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
 		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
+		s_ScriptEngineData->AppAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
 
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
 
@@ -445,6 +446,7 @@ namespace Atom
 		s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssemblyInfo->Assembly);
 		s_ScriptEngineData->CoreAssemblyInfo->IsCoreAssembly = true;
 		s_ScriptEngineData->CoreAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
+		s_ScriptEngineData->CoreAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
 
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded core assembly from: {0}", s_ScriptEngineData->Config.CoreAssemblyPath);
 
@@ -492,6 +494,28 @@ namespace Atom
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
 		mono_image_close(image);
 		return assembly;
+	}
+
+	std::vector<AssemblyMetadata> ScriptEngine::GetReferencedAssembliesMetadata(MonoImage* image)
+	{
+		const MonoTableInfo* t = mono_image_get_table_info(image, MONO_TABLE_ASSEMBLYREF);
+		int rows = mono_table_info_get_rows(t);
+
+		std::vector<AssemblyMetadata> metadata;
+		for(int i = 0; i < rows; i++)
+		{
+			uint32_t cols[MONO_ASSEMBLYREF_SIZE];
+			mono_metadata_decode_row(t, i, cols, MONO_ASSEMBLYREF_SIZE);
+
+			auto& assemblyMetadata = metadata.emplace_back();
+			assemblyMetadata.Name = mono_metadata_string_heap(image, cols[MONO_ASSEMBLYREF_NAME]);
+			assemblyMetadata.MajorVersion = cols[MONO_ASSEMBLYREF_MAJOR_VERSION];
+			assemblyMetadata.MinorVersion = cols[MONO_ASSEMBLYREF_MINOR_VERSION];
+			assemblyMetadata.BuildVersion = cols[MONO_ASSEMBLYREF_BUILD_NUMBER];
+			assemblyMetadata.RevisionVersion = cols[MONO_ASSEMBLYREF_REV_NUMBER];
+		}
+
+		return metadata;
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
