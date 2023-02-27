@@ -18,6 +18,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "Sandbox"
 	kind "SharedLib"
+	namespace "Sandbox"
 	language "C#"
 	dotnetframework "4.7.2"
 

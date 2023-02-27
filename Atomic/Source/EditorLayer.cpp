@@ -12,6 +12,8 @@
 #include "ImGuizmo.h"
 #include <Atom/Project/ProjectSerializer.h>
 
+#include <shellapi.h>
+
 namespace Atom
 {
 
@@ -209,6 +211,28 @@ namespace Atom
 				if(ImGui::MenuItem("Reload Assembly"))
 				{
 					ScriptEngine::ReloadAssembly();
+				}
+
+				if(ImGui::MenuItem("Open C# Solution"))
+				{
+					static std::filesystem::path s_ProjectSolutionPath = Project::GetProjectDirectory() / std::filesystem::path(Project::GetProjectName() + ".sln");
+
+					auto absolutePath = std::filesystem::canonical(s_ProjectSolutionPath);
+					AT_CORE_ASSERT(std::filesystem::exists(absolutePath));
+
+					ShellExecute(NULL, L"open", absolutePath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				}
+
+				if(ImGui::MenuItem("Regenerate C# Solution"))
+				{
+					std::string s_BatchFilePath = Project::GetProjectDirectory().string();
+
+					std::replace(s_BatchFilePath.begin(), s_BatchFilePath.end(), '/', '\\');
+
+					s_BatchFilePath += "\\Generate.bat";
+
+					uint32_t result = system(s_BatchFilePath.c_str());
+					AT_CORE_INFO("Regenerated C# Solution! Result: {}", result);
 				}
 
 				ImGui::EndMenu();
