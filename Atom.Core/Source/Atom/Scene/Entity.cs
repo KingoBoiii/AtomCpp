@@ -1,14 +1,8 @@
 ﻿namespace Atom
 {
 
-    public delegate void OnCollision2DEnter(Entity entity);
-    public delegate void OnCollision2DExit(Entity entity);
-
     public class Entity
     {
-        public event OnCollision2DEnter OnCollision2DEnter;
-        public event OnCollision2DExit OnCollision2DExit;
-
         protected Entity() { Id = 0; }
 
         internal Entity(ulong id)
@@ -36,12 +30,26 @@
 
         internal void OnCollision2DEnter_Internal(ulong entityId)
         {
-            OnCollision2DEnter?.Invoke(new Entity(entityId));
+            if (!HasComponent<BoxCollider2D>())
+            {
+                Log.Warn("Entity {0} has no BoxCollider2D component", Name);
+                return;
+            }
+
+            var boxCollider2D = GetComponent<BoxCollider2D>();
+            boxCollider2D.InvokeOnCollision2DEnter(entityId);
         }
 
         internal void OnCollision2DExit_Internal(ulong entityId)
         {
-            OnCollision2DExit?.Invoke(new Entity(entityId));
+            if (!HasComponent<BoxCollider2D>())
+            {
+                Log.Warn("Entity {0} has no BoxCollider2D component", Name);
+                return;
+            }
+
+            var boxCollider2D = GetComponent<BoxCollider2D>();
+            boxCollider2D.InvokeOnCollision2DExit(entityId);
         }
 
         #endregion
