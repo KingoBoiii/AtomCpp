@@ -4,6 +4,7 @@
 #include "ScriptCache.h"
 
 #include "Atom/Core/Application.h"
+#include "Atom/Core/FileSystem.h"
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
 #include "Atom/Project/Project.h"
@@ -16,6 +17,8 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/tabledefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 namespace Atom
 {
@@ -40,60 +43,7 @@ namespace Atom
 
 	namespace Utils
 	{
-
-		char* ReadBytes(const std::string& filepath, uint32_t* outSize)
-		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if(!stream)
-			{
-				// Failed to open the file
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint32_t size = end - stream.tellg();
-
-			if(size == 0)
-			{
-				// File is empty
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read((char*)buffer, size);
-			stream.close();
-
-			*outSize = size;
-			return buffer;
-		}
-
-		MonoAssembly* LoadCSharpAssembly(const std::string& assemblyPath)
-		{
-			uint32_t fileSize = 0;
-			char* fileData = ReadBytes(assemblyPath, &fileSize);
-
-			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
-			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
-
-			if(status != MONO_IMAGE_OK)
-			{
-				const char* errorMessage = mono_image_strerror(status);
-				// Log some error message using the errorMessage data
-				return nullptr;
-			}
-
-			MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.c_str(), &status, 0);
-			mono_image_close(image);
-
-			// Don't forget to free the file data
-			delete[] fileData;
-
-			return assembly;
-		}
-
+		
 		void PrintAssemblyTypes(MonoAssembly* assembly)
 		{
 			MonoImage* image = mono_assembly_get_image(assembly);
@@ -133,7 +83,7 @@ namespace Atom
 		MonoDomain* AppDomain = nullptr;
 
 		ScriptEngineConfig Config;
-		
+
 		AssemblyInfo* CoreAssemblyInfo = nullptr;
 		AssemblyInfo* AppAssemblyInfo = nullptr;
 
@@ -147,6 +97,8 @@ namespace Atom
 		filewatch::FileWatch<std::string>* AppAssemblyWatcher;
 		bool AppAssemblyReloadPending = false;
 
+		bool EnableDebugging = true;
+
 		Scene* SceneContext;
 	};
 
@@ -158,12 +110,11 @@ namespace Atom
 		s_ScriptEngineData->Config = config;
 
 		InitializeMono();
-		
+
 		LoadCoreAssembly();
 		ScriptCache::Initialize();
-		
-		LoadAppAssembly();
-		LoadAssemblyClasses(); // TODO: Move to ScriptCache
+
+		//LoadAppAssembly();
 
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
@@ -193,6 +144,45 @@ namespace Atom
 		ScriptGlue::RegisterComponents();
 
 		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
+	}
+
+	bool ScriptEngine::LoadAppAssembly()
+	{
+		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
+			AT_CORE_ERROR("[ScriptEngine] Filepath = {}", Project::GetScriptModuleFilepath());
+			return false;
+		}
+
+		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
+		if(assembly == nullptr)
+		{
+			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
+			return false;
+		}
+
+		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
+		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
+		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
+		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
+		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
+		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
+		s_ScriptEngineData->AppAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
+
+		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
+
+		LoadAssemblyClasses(); // TODO: Move to ScriptCache
+
+		return true;
+	}
+
+	void ScriptEngine::UnloadAppAssembly()
+	{
+		// Call OnDestroy method from here!
+
+		ScriptCache::ClearCache();
+		ScriptCache::CacheCoreClasses();
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
@@ -296,11 +286,11 @@ namespace Atom
 			Application::Get().SubmitToMainThread([]()
 			{
 				delete s_ScriptEngineData->AppAssemblyWatcher;
-				s_ScriptEngineData->AppAssemblyWatcher = nullptr;
-				
-				AT_CORE_INFO("Reloading Assembly!");
+			s_ScriptEngineData->AppAssemblyWatcher = nullptr;
 
-				ScriptEngine::ReloadAssembly();
+			AT_CORE_INFO("Reloading Assembly!");
+
+			ScriptEngine::ReloadAssembly();
 			});
 		}
 	}
@@ -368,10 +358,28 @@ namespace Atom
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.txt",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* rootDomain = mono_jit_init("AtomJITRuntime");
 		AT_CORE_ASSERT(rootDomain);
 
 		s_ScriptEngineData->RootDomain = rootDomain;
+
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			mono_debug_domain_create(s_ScriptEngineData->RootDomain);
+		}
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::ShutdownMono()
@@ -394,7 +402,7 @@ namespace Atom
 
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
-		
+
 		MonoAssembly* assembly = LoadMonoAssembly(s_ScriptEngineData->Config.CoreAssemblyPath);
 		if(assembly == nullptr)
 		{
@@ -408,36 +416,9 @@ namespace Atom
 		s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssemblyInfo->Assembly);
 		s_ScriptEngineData->CoreAssemblyInfo->IsCoreAssembly = true;
 		s_ScriptEngineData->CoreAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
+		s_ScriptEngineData->CoreAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
 
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded core assembly from: {0}", s_ScriptEngineData->Config.CoreAssemblyPath);
-
-		return true;
-	}
-
-	bool ScriptEngine::LoadAppAssembly()
-	{
-		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
-		{
-			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
-			AT_CORE_ERROR("[ScriptEngine] Filepath = {}", Project::GetScriptModuleFilepath());
-			return false;
-		}
-
-		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
-		if(assembly == nullptr)
-		{
-			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
-			return false;
-		}
-
-		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
-		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
-		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
-		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
-		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
-		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
-
-		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
 
 		return true;
 	}
@@ -463,15 +444,14 @@ namespace Atom
 	{
 		if(!std::filesystem::exists(filepath))
 		{
-			return false;
+			return nullptr;
 		}
 
-		uint32_t size;
-		char* data = Utils::ReadBytes(filepath.string(), &size);
-		
-				// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
+		ScopedBuffer buffer = FileSystem::ReadFileBinary(filepath.string());
+
+		// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(data, size, 1, &status, 0);
+		MonoImage* image = mono_image_open_from_data_full(buffer.As<char>(), buffer.Size(), 1, &status, 0);
 
 		if(status != MONO_IMAGE_OK)
 		{
@@ -480,9 +460,49 @@ namespace Atom
 			return nullptr;
 		}
 
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			std::filesystem::path pdbPath = filepath;
+			pdbPath.replace_extension(".pdb");
+
+			AT_CORE_WARN("Trying to load PDB file: {}", pdbPath);
+
+			if(std::filesystem::exists(pdbPath))
+			{
+				ScopedBuffer pdbFileBuffer = FileSystem::ReadFileBinary(pdbPath.string());
+
+				mono_debug_open_image_from_memory(image, pdbFileBuffer.As<const mono_byte>(), pdbFileBuffer.Size());
+
+				AT_CORE_INFO("Loaded PDB {}", pdbPath);
+			}
+		}
+
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
 		mono_image_close(image);
+
 		return assembly;
+	}
+
+	std::vector<AssemblyMetadata> ScriptEngine::GetReferencedAssembliesMetadata(MonoImage* image)
+	{
+		const MonoTableInfo* t = mono_image_get_table_info(image, MONO_TABLE_ASSEMBLYREF);
+		int rows = mono_table_info_get_rows(t);
+
+		std::vector<AssemblyMetadata> metadata;
+		for(int i = 0; i < rows; i++)
+		{
+			uint32_t cols[MONO_ASSEMBLYREF_SIZE];
+			mono_metadata_decode_row(t, i, cols, MONO_ASSEMBLYREF_SIZE);
+
+			auto& assemblyMetadata = metadata.emplace_back();
+			assemblyMetadata.Name = mono_metadata_string_heap(image, cols[MONO_ASSEMBLYREF_NAME]);
+			assemblyMetadata.MajorVersion = cols[MONO_ASSEMBLYREF_MAJOR_VERSION];
+			assemblyMetadata.MinorVersion = cols[MONO_ASSEMBLYREF_MINOR_VERSION];
+			assemblyMetadata.BuildVersion = cols[MONO_ASSEMBLYREF_BUILD_NUMBER];
+			assemblyMetadata.RevisionVersion = cols[MONO_ASSEMBLYREF_REV_NUMBER];
+		}
+
+		return metadata;
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
@@ -566,16 +586,14 @@ namespace Atom
 		}
 	}
 
-#if 0
-	MonoImage* ScriptEngine::GetCoreAssemblyImage()
-	{
-		return s_ScriptEngineData->CoreAssemblyImage;
-	}
-#endif
-
 	MonoDomain* ScriptEngine::GetAppDomain()
 	{
 		return s_ScriptEngineData->AppDomain;
+	}
+
+	void ScriptEngine::SetSceneContext(Scene* scene)
+	{
+		s_ScriptEngineData->SceneContext = scene;
 	}
 
 	Scene* ScriptEngine::GetSceneContext()
@@ -603,7 +621,8 @@ namespace Atom
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** parameters)
 	{
-		return mono_runtime_invoke(monoMethod, instance, parameters, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(monoMethod, instance, parameters, &exception);
 	}
 
 	ScriptInstance::ScriptInstance(ScriptClass* scriptClass, Entity entity)

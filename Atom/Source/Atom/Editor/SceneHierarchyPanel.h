@@ -23,10 +23,11 @@ namespace Atom
 		void DrawTransformComponent(Component::Transform& component);
 		void DrawCameraComponent(Component::Camera& component);
 		void DrawBasicRendererComponent(Component::BasicRenderer& component);
+		void DrawCircleRendererComponent(Component::CircleRenderer& component);
 		void DrawScriptComponent(Component::Script& component);
 		void DrawRigidbody2DComponent(Component::Rigidbody2D& component);
 		void DrawBoxCollider2DComponent(Component::BoxCollider2D& component);
-		void DrawTextComponent(Component::Text& component);
+		void DrawTextRendererComponent(Component::TextRenderer& component);
 
 		void DrawAddComponentPopup();
 		template<typename Component>

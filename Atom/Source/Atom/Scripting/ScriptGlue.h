@@ -61,11 +61,17 @@ namespace Atom
 
 #pragma region Text
 
-		void Text_GetTextString(UUID uuid, MonoString** outText);
-		void Text_SetTextString(UUID uuid, MonoString* text);
+		void TextRenderer_GetTextString(UUID uuid, MonoString** outText);
+		void TextRenderer_SetTextString(UUID uuid, MonoString* text);
 
-		void Text_GetColor(UUID uuid, glm::vec4* outColor);
-		void Text_SetColor(UUID uuid, glm::vec4* color);
+		void TextRenderer_GetKerning(UUID uuid, float* kerning);
+		void TextRenderer_SetKerning(UUID uuid, float kerning);
+		
+		void TextRenderer_GetLineSpacing(UUID uuid, float* lineSpacing);
+		void TextRenderer_SetLineSpacing(UUID uuid, float lineSpacing);
+
+		void TextRenderer_GetColor(UUID uuid, glm::vec4* outColor);
+		void TextRenderer_SetColor(UUID uuid, glm::vec4* color);
 
 #pragma endregion
 

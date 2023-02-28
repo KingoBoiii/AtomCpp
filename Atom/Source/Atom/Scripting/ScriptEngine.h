@@ -91,6 +91,9 @@ namespace Atom
 		static void Shutdown();
 		static void ReloadAssembly();
 
+		static bool LoadAppAssembly();
+		static void UnloadAppAssembly();
+
 		static void OnRuntimeStart(Scene* scene);
 		static void OnRuntimeStop();
 
@@ -101,8 +104,10 @@ namespace Atom
 		static void InvokeOnCollection2DEnter(Entity entity, Entity other);
 		static void InvokeOnCollection2DExit(Entity entity, Entity other);
 
+#if 0
 		static void LoadAssembly(const std::filesystem::path& filepath);
 		static void LoadAppAssembly(const std::filesystem::path& filepath);
+#endif
 
 		static bool EntityClassExists(const std::string& fullName);
 
@@ -114,9 +119,9 @@ namespace Atom
 
 		static MonoObject* GetManagedInstance(UUID entityId);
 
-		//static MonoImage* GetCoreAssemblyImage();
 		static MonoDomain* GetAppDomain();
 
+		static void SetSceneContext(Scene* scene);
 		static Scene* GetSceneContext();
 
 		static AssemblyInfo* GetCoreAssemblyInfo();
@@ -126,9 +131,10 @@ namespace Atom
 		static void ShutdownMono();
 
 		static bool LoadCoreAssembly();
-		static bool LoadAppAssembly();
 		static AssemblyMetadata LoadAssemblyMetadata(MonoImage* image);
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& filepath);
+
+		static std::vector<AssemblyMetadata> GetReferencedAssembliesMetadata(MonoImage* image);
 
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();

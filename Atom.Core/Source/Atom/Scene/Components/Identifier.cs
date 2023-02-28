@@ -1,6 +1,9 @@
-﻿namespace Atom
+﻿using Atom.Bindings;
+
+namespace Atom
 {
 
+    [NativeComponent("Atom::Identifier")]
     public class Identifier : ComponentBase
     {
         public string Name

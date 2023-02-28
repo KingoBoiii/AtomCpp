@@ -1,0 +1,6 @@
+Project:
+  Name: $$PROJECT_NAME$$
+  StartScene: Scenes\TextComponent.atsc
+  AssetDirectory: Assets
+  ScriptModulePath: Cache/Scripts/Binaries
+  DefaultNamespace: $$PROJECT_NAME$$

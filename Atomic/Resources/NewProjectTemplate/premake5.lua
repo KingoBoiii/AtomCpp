@@ -1,9 +1,9 @@
-local AtomRootDir = '../../../..'
+AtomRootDir = os.getenv("ATOM_DIR")
 include (AtomRootDir .. "/Vendor/premake/premake_customization/solution_items.lua")
 
-workspace "Sandbox"
+workspace "$$PROJECT_NAME$$"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "$$PROJECT_NAME$$"
 
 	configurations {
 		"Debug",
@@ -16,16 +16,17 @@ workspace "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "Sandbox"
+project "$$PROJECT_NAME$$"
 	kind "SharedLib"
+	namespace "Sandbox"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("Binaries")
-	objdir ("Intermediates")
+	targetdir ("Cache/Scripts/Binaries")
+	objdir ("Cache/Scripts/Intermediates")
 
 	files {
-		"**.cs"
+		"Assets/**.cs"
 	}
 
 	links {

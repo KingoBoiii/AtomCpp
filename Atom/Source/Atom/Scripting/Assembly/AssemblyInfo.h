@@ -17,6 +17,7 @@ namespace Atom
 		MonoImage* AssemblyImage = nullptr;
 		AssemblyMetadata Metadata;
 		bool IsCoreAssembly = false;
-	}; 
+		std::vector<AssemblyMetadata> ReferencedAssemblies;
+	};
 
 }

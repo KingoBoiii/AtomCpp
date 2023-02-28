@@ -240,6 +240,20 @@ namespace Atom
 				out << YAML::EndMap;		// BasicRenderer
 			}
 
+			if(entity.HasComponent<Component::CircleRenderer>())
+			{
+				auto& circleRenderer = entity.GetComponent<Component::CircleRenderer>();
+
+				out << YAML::Key << "CircleRenderer";
+				out << YAML::BeginMap;		// CircleRenderer
+
+				out << YAML::Key << "Color" << YAML::Value << circleRenderer.Color;
+				out << YAML::Key << "Thickness" << YAML::Value << circleRenderer.Thickness;
+				out << YAML::Key << "Fade" << YAML::Value << circleRenderer.Fade;
+
+				out << YAML::EndMap;		// CircleRenderer
+			}
+
 			if(entity.HasComponent<Component::Script>())
 			{
 				auto& script = entity.GetComponent<Component::Script>();
@@ -331,17 +345,19 @@ namespace Atom
 				out << YAML::EndMap;		// BoxCollider2D
 			}
 
-			if(entity.HasComponent<Component::Text>())
+			if(entity.HasComponent<Component::TextRenderer>())
 			{
-				auto& text = entity.GetComponent<Component::Text>();
+				auto& textRenderer = entity.GetComponent<Component::TextRenderer>();
 
-				out << YAML::Key << "Text";
-				out << YAML::BeginMap;		// Text
+				out << YAML::Key << "TextRenderer";
+				out << YAML::BeginMap;		// TextRenderer
 
-				out << YAML::Key << "TextString" << YAML::Value << text.TextString;
-				out << YAML::Key << "Color" << YAML::Value << text.Color;
+				out << YAML::Key << "Text" << YAML::Value << textRenderer.Text;
+				out << YAML::Key << "Color" << YAML::Value << textRenderer.Color;
+				out << YAML::Key << "Kerning" << YAML::Value << textRenderer.Kerning;
+				out << YAML::Key << "LineSpacing" << YAML::Value << textRenderer.LineSpacing;
 
-				out << YAML::EndMap;		// Text
+				out << YAML::EndMap;		// TextRenderer
 			}
 
 			out << YAML::EndMap;		// Entity
@@ -455,6 +471,15 @@ namespace Atom
 				basicRenderer.Color = basicRendererComponent["Color"].as<glm::vec4>();
 			}
 
+			auto circleRendererComponent = entity["CircleRenderer"];
+			if(circleRendererComponent)
+			{
+				auto& circleRenderer = deserializedEntity.AddComponent<Component::CircleRenderer>();
+				circleRenderer.Color = circleRendererComponent["Color"].as<glm::vec4>();
+				circleRenderer.Thickness = circleRendererComponent["Thickness"].as<float>();
+				circleRenderer.Fade = circleRendererComponent["Fade"].as<float>();
+			}
+
 			auto scriptComponent = entity["Script"];
 			if(scriptComponent)
 			{
@@ -532,13 +557,15 @@ namespace Atom
 
 			}
 
-			auto textComponent = entity["Text"];
-			if(textComponent)
+			auto textRendererComponent = entity["TextRenderer"];
+			if(textRendererComponent)
 			{
-				auto& text = deserializedEntity.AddComponent<Component::Text>();
+				auto& textRenderer = deserializedEntity.AddComponent<Component::TextRenderer>();
 
-				text.TextString = textComponent["TextString"].as<std::string>();
-				text.Color = textComponent["Color"].as<glm::vec4>();
+				textRenderer.Text = textRendererComponent["Text"].as<std::string>();
+				textRenderer.Color = textRendererComponent["Color"].as<glm::vec4>();
+				textRenderer.Kerning = textRendererComponent["Kerning"].as<float>();
+				textRenderer.LineSpacing = textRendererComponent["LineSpacing"].as<float>();
 			}
 		}
 

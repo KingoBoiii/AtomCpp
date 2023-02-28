@@ -38,6 +38,18 @@ namespace Atom
 
 		ImGui::Image(m_Framebuffer->GetImage(), viewportPanelSize);
 
+		if(ImGui::BeginDragDropTarget())
+		{
+			m_DragDropCallback(ImGui::AcceptDragDropPayload("PROJECT_EXPLORER_ITEM_SCENE"));
+			//if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			//{
+			//	const wchar_t* path = (const wchar_t*)payload->Data;
+			//	AT_CORE_ASSERT(false);
+			//	//OpenScene(path);
+			//}
+			ImGui::EndDragDropTarget();
+		}
+
 		// Gizmos
 		Atom::Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
 		if(selectedEntity && m_GizmoType != -1)

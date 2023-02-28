@@ -17,13 +17,13 @@ namespace Sandbox.CatchGame
             _rb = GetComponent<Rigidbody2D>();
 
             Log.Info("CatchGame.Player.OnCreate({0})", Name);
-            OnCollision2DEnter += OnCollision2DEnterFunc;
+            //OnCollision2DEnter += OnCollision2DEnterFunc;
         }
 
         private void OnDestroy()
         {
             Log.Info("CatchGame.Player.OnDestroy({0})", Name);
-            OnCollision2DEnter -= OnCollision2DEnterFunc;
+            //OnCollision2DEnter -= OnCollision2DEnterFunc;
         }
 
         private void OnUpdate(float deltaTime)

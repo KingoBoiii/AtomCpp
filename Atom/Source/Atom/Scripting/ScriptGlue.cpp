@@ -69,10 +69,14 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
 		
-		AT_ADD_INTERNAL_CALL(Text_GetTextString);
-		AT_ADD_INTERNAL_CALL(Text_SetTextString);
-		AT_ADD_INTERNAL_CALL(Text_GetColor);
-		AT_ADD_INTERNAL_CALL(Text_SetColor);
+		AT_ADD_INTERNAL_CALL(TextRenderer_GetTextString);
+		AT_ADD_INTERNAL_CALL(TextRenderer_SetTextString);
+		AT_ADD_INTERNAL_CALL(TextRenderer_GetKerning);
+		AT_ADD_INTERNAL_CALL(TextRenderer_SetKerning);
+		AT_ADD_INTERNAL_CALL(TextRenderer_GetLineSpacing);
+		AT_ADD_INTERNAL_CALL(TextRenderer_SetLineSpacing);
+		AT_ADD_INTERNAL_CALL(TextRenderer_GetColor);
+		AT_ADD_INTERNAL_CALL(TextRenderer_SetColor);
 
 		AT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 
@@ -231,18 +235,18 @@ namespace Atom
 
 #pragma region Text
 
-		void Text_GetTextString(UUID uuid, MonoString** outText)
+		void TextRenderer_GetTextString(UUID uuid, MonoString** outText)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 			
-			std::string text = entity.GetComponent<Component::Text>().TextString;
+			std::string text = entity.GetComponent<Component::TextRenderer>().Text;
 			*outText = ScriptUtils::UTF8ToMonoString(text);
 		}
 
-		void Text_SetTextString(UUID uuid, MonoString* text)
+		void TextRenderer_SetTextString(UUID uuid, MonoString* text)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
@@ -250,27 +254,67 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 
 			std::string newTextString = ScriptUtils::MonoStringToUTF8(text);
-			entity.GetComponent<Component::Text>().TextString = newTextString;
+			entity.GetComponent<Component::TextRenderer>().Text = newTextString;
 		}
 
-		void Text_GetColor(UUID uuid, glm::vec4* outColor)
+		void TextRenderer_GetKerning(UUID uuid, float* kerning)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			*outColor = entity.GetComponent<Component::Text>().Color;
+			*kerning = entity.GetComponent<Component::TextRenderer>().Kerning;
 		}
 
-		void Text_SetColor(UUID uuid, glm::vec4* color)
+		void TextRenderer_SetKerning(UUID uuid, float kerning)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
 
-			entity.GetComponent<Component::Text>().Color = *color;
+			entity.GetComponent<Component::TextRenderer>().Kerning = kerning;
+		}
+
+		void TextRenderer_GetLineSpacing(UUID uuid, float* lineSpacing)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*lineSpacing = entity.GetComponent<Component::TextRenderer>().LineSpacing;
+		}
+
+		void TextRenderer_SetLineSpacing(UUID uuid, float lineSpacing)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::TextRenderer>().LineSpacing = lineSpacing;
+		}
+
+		void TextRenderer_GetColor(UUID uuid, glm::vec4* outColor)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			*outColor = entity.GetComponent<Component::TextRenderer>().Color;
+		}
+
+		void TextRenderer_SetColor(UUID uuid, glm::vec4* color)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			entity.GetComponent<Component::TextRenderer>().Color = *color;
 		}
 
 #pragma endregion

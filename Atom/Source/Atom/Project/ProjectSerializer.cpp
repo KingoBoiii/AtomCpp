@@ -65,6 +65,9 @@ namespace Atom
 		config.AssetDirectory = projectNode["AssetDirectory"].as<std::string>();
 		config.ScriptModulePath = projectNode["ScriptModulePath"].as<std::string>();
 
+		config.ProjectDirectory = filepath.parent_path();
+		config.ProjectFilename = filepath.filename();
+
 		return true;
 	}
 

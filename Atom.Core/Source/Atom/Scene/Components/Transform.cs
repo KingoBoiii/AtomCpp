@@ -1,6 +1,9 @@
-﻿namespace Atom
+﻿using Atom.Bindings;
+
+namespace Atom
 {
 
+    [NativeComponent("Atom::Transform")]
     public class Transform : ComponentBase
     {
         public Vector3 Position

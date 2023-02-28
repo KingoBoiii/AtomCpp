@@ -2,6 +2,10 @@
 
 #include "PlatformDetection.h"
 
+#ifndef AT_PLATFORM_WINDOWS
+	#error Atom only supports Windows!
+#endif
+
 #ifdef ATOM_STATIC_LIB
 	#define ATOM_API
 #else

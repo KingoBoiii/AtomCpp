@@ -1,0 +1,26 @@
+﻿using Atom.Bindings;
+
+namespace Atom
+{
+
+    public delegate void OnCollision2DEnter(Entity entity);
+    public delegate void OnCollision2DExit(Entity entity);
+
+    [NativeComponent("Atom::BoxCollider2D")]
+    public class BoxCollider2D : ComponentBase
+    {
+        public event OnCollision2DEnter OnCollision2DEnter;
+        public event OnCollision2DExit OnCollision2DExit;
+
+        internal void InvokeOnCollision2DEnter(ulong entityId)
+        {
+            OnCollision2DEnter?.Invoke(new Entity(entityId));
+        }
+
+        internal void InvokeOnCollision2DExit(ulong entityId)
+        {
+            OnCollision2DExit?.Invoke(new Entity(entityId));
+        }
+    }
+
+}

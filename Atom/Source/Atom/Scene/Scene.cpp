@@ -95,7 +95,7 @@ namespace Atom
 		CopyComponent<Component::Script>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<Component::Text>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::TextRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -136,7 +136,7 @@ namespace Atom
 		CopyComponentIfExists<Component::Script>(newEntity, entity);
 		CopyComponentIfExists<Component::Rigidbody2D>(newEntity, entity);
 		CopyComponentIfExists<Component::BoxCollider2D>(newEntity, entity);
-		CopyComponentIfExists<Component::Text>(newEntity, entity);
+		CopyComponentIfExists<Component::TextRenderer>(newEntity, entity);
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -176,30 +176,24 @@ namespace Atom
 		}
 
 		{
-#ifndef USE_GROUP
-			auto view = m_Registry.view<Component::Text>();
+			auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
 			for(auto e : view)
 			{
-				Entity entity = { e, this };
+				auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
 
-				auto& transform = entity.GetComponent<Component::Transform>();
-				auto& text = entity.GetComponent<Component::Text>();
-
-				Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+				Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
 			}
-#else
-			auto group = m_Registry.group<Component::Transform>(entt::get<Component::Text>);
-			for(auto entity : group)
+		}
+		
+		{
+			auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
+			for(auto e : view)
 			{
-				auto [tranform, text] = group.get<Component::Transform, Component::Text>(entity);
+				auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
-				Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), tranform.GetTransform(), text.Color);
+				textRenderer.FontAsset = Font::GetDefaultFont();
+				Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 			}
-#endif
-
-#ifdef USE_GROUP
-#undef USE_GROUP
-#endif
 		}
 
 		Renderer2D::EndScene();
@@ -318,15 +312,23 @@ namespace Atom
 				}
 
 				{
-					auto view = m_Registry.view<Component::Text>();
+					auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
 					for(auto e : view)
 					{
-						Entity entity = { e, this };
+						auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
 
-						auto& transform = entity.GetComponent<Component::Transform>();
-						auto& text = entity.GetComponent<Component::Text>();
+						Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+					}
+				}
 
-						Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+				{
+					auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
+					for(auto e : view)
+					{
+						auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
+
+						textRenderer.FontAsset = Font::GetDefaultFont();
+						Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 					}
 				}
 
@@ -388,30 +390,24 @@ namespace Atom
 			}
 
 			{
-#ifndef USE_GROUP
-				auto view = m_Registry.view<Component::Text>();
+				auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
 				for(auto e : view)
 				{
-					Entity entity = { e, this };
+					auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
 
-					auto& transform = entity.GetComponent<Component::Transform>();
-					auto& text = entity.GetComponent<Component::Text>();
-
-					Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), transform.GetTransform(), text.Color);
+					Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
 				}
-#else
-				auto group = m_Registry.group<Component::Transform>(entt::get<Component::Text>);
-				for(auto entity : group)
+			}
+
+			{
+				auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
+				for(auto e : view)
 				{
-					auto [tranform, text] = group.get<Component::Transform, Component::Text>(entity);
+					auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
-					Renderer2D::DrawString(text.TextString, Font::GetDefaultFont(), tranform.GetTransform(), text.Color);
+					textRenderer.FontAsset = Font::GetDefaultFont();
+					Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 				}
-#endif
-
-#ifdef USE_GROUP
-#undef USE_GROUP
-#endif
 			}
 		}
 

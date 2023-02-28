@@ -33,12 +33,21 @@ namespace Atom
 
 		static void RenderQuad(const glm::mat4& transform, const glm::vec4& color);
 
-		static void DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.0f));
+		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f);
+
+		struct TextParameters
+		{
+			glm::vec4 Color{ 1.0f };
+			float Kerning = 0.0f;
+			float LineSpacing = 0.0f;
+		};
+		static void DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters);
 
 		static void ResetStats();
 		static const Statistics& GetStats();
 	private:
 		static void CreateQuadPipeline();
+		static void CreateCirclePipeline();
 		static void CreateTextPipeline();
 
 		static void NextBatch();

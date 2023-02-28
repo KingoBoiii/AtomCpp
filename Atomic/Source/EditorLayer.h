@@ -3,7 +3,10 @@
 #include <Atom/Editor/EditorCamera.h>
 
 #include "Panels/Viewport.h"
+#include "Panels/ProjectExplorer.h"
 #include <Atom/Editor/EditorPanels.h>
+
+struct ImGuiPayload;
 
 namespace Atom
 {
@@ -11,7 +14,7 @@ namespace Atom
 	class EditorLayer : public Layer
 	{
 	public:
-		EditorLayer() : Layer("Atom Editor Layer")
+		EditorLayer(std::string_view projectPath) : Layer("Atom Editor Layer"), m_ProjectPath(projectPath)
 		{
 		}
 
@@ -25,17 +28,25 @@ namespace Atom
 	private:
 		void DrawTopMenuBar();
 		void UI_Toolbar();
+
+		void UI_ShowNewProjectDialog();
+
+		void OnViewportDragDropTarget(const ImGuiPayload* payload);
 	private: // Project commands
 		void NewProject();
+		void CreateProject(const std::filesystem::path& projectPath);
 		void OpenProject();
 		void OpenProject(const std::filesystem::path& filepath);
 		void SaveProject();
 		void SaveProjectAs();
+		void SaveProject(const std::filesystem::path& filepath);
+		void CloseProject(bool unloadProject = true);
 	private: // Scene commands
 		void NewScene();
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
-		void SaveAs();
+		void SaveScene();
+		void SaveSceneAs();
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -46,9 +57,12 @@ namespace Atom
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 	private:
+		std::string m_ProjectPath;
 		std::filesystem::path m_EditorScenePath;
 		Scene* m_ActiveScene = nullptr;
 		Scene* m_EditorScene = nullptr;
+
+		bool m_ShowNewProjectDialog = false;
 
 		Framebuffer* m_Framebuffer = nullptr;
 		EditorCamera m_EditorCamera;
@@ -58,6 +72,8 @@ namespace Atom
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;
 		StatisticsPanel* m_StatisticsPanel = nullptr;
 		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
+		ProjectExplorer* m_ProjectExplorer = nullptr;
+		ProjectSettingsPanel* m_ProjectSettingsPanel = nullptr;
 
 		enum class SceneState
 		{
