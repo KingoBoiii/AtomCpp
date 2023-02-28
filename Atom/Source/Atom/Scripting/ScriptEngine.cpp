@@ -4,6 +4,7 @@
 #include "ScriptCache.h"
 
 #include "Atom/Core/Application.h"
+#include "Atom/Core/FileSystem.h"
 #include "Atom/Scene/Scene.h"
 #include "Atom/Scene/Entity.h"
 #include "Atom/Project/Project.h"
@@ -42,60 +43,7 @@ namespace Atom
 
 	namespace Utils
 	{
-
-		char* ReadBytes(const std::string& filepath, uint32_t* outSize)
-		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if(!stream)
-			{
-				// Failed to open the file
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint32_t size = end - stream.tellg();
-
-			if(size == 0)
-			{
-				// File is empty
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read((char*)buffer, size);
-			stream.close();
-
-			*outSize = size;
-			return buffer;
-		}
-
-		MonoAssembly* LoadCSharpAssembly(const std::string& assemblyPath)
-		{
-			uint32_t fileSize = 0;
-			char* fileData = ReadBytes(assemblyPath, &fileSize);
-
-			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
-			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
-
-			if(status != MONO_IMAGE_OK)
-			{
-				const char* errorMessage = mono_image_strerror(status);
-				// Log some error message using the errorMessage data
-				return nullptr;
-			}
-
-			MonoAssembly* assembly = mono_assembly_load_from_full(image, assemblyPath.c_str(), &status, 0);
-			mono_image_close(image);
-
-			// Don't forget to free the file data
-			delete[] fileData;
-
-			return assembly;
-		}
-
+		
 		void PrintAssemblyTypes(MonoAssembly* assembly)
 		{
 			MonoImage* image = mono_assembly_get_image(assembly);
@@ -498,15 +446,14 @@ namespace Atom
 	{
 		if(!std::filesystem::exists(filepath))
 		{
-			return false;
+			return nullptr;
 		}
 
-		uint32_t size;
-		char* data = Utils::ReadBytes(filepath.string(), &size);
+		ScopedBuffer buffer = FileSystem::ReadFileBinary(filepath.string());
 
-				// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
+		// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(data, size, 1, &status, 0);
+		MonoImage* image = mono_image_open_from_data_full(buffer.As<char>(), buffer.Size(), 1, &status, 0);
 
 		if(status != MONO_IMAGE_OK)
 		{
@@ -524,21 +471,16 @@ namespace Atom
 
 			if(std::filesystem::exists(pdbPath))
 			{
-				uint32_t pdbFileSize;
-				char* pdbFileData = Utils::ReadBytes(pdbPath.string(), &pdbFileSize);
+				ScopedBuffer pdbFileBuffer = FileSystem::ReadFileBinary(pdbPath.string());
 
-				mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+				mono_debug_open_image_from_memory(image, pdbFileBuffer.As<const mono_byte>(), pdbFileBuffer.Size());
 
 				AT_CORE_INFO("Loaded PDB {}", pdbPath);
-
-				delete[] pdbFileData;
 			}
 		}
 
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
 		mono_image_close(image);
-
-		delete[] data;
 
 		return assembly;
 	}

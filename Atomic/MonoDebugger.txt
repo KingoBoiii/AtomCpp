@@ -1,8 +1,8 @@
 VM start event not sent yet: dropping APPDOMAIN_CREATE
-[00000000000010E4] Thread started, obj=000001FA0A420130, tls=000001FA0A77FDB0.
+[00000000000060E4] Thread started, obj=000002AF75EF0130, tls=000002AF7626C700.
 VM start event not sent yet: dropping THREAD_START
-[00000000000010E4] Suspended.
-[00000000000010E4] Resumed.
+[00000000000060E4] Suspended.
+[00000000000060E4] Resumed.
 VM start event not sent yet: dropping ASSEMBLY_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
@@ -12,12 +12,12 @@ VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
-[0000000000007B54] Thread started, obj=000001FA0A420278, tls=000001FA0A7D9D30.
+[00000000000087AC] Thread started, obj=000002AF75EF0278, tls=000002AF762CD1D0.
 VM start event not sent yet: dropping THREAD_START
+[00000000000087AC] Suspended.
+[00000000000087AC] Resumed.
 Debugger client is not connected: dropping VM_START
-[0000000000007B54] Suspended.
-[0000000000007B54] Resumed.
-[dbg] Agent thread started, pid=00000000000041B0
+[dbg] Agent thread started, pid=0000000000006198
 VM start event not sent yet: dropping APPDOMAIN_CREATE
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
@@ -27,540 +27,25 @@ VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
-Accepted connection from client, connection fd=2032.
-Accepted connection on 2032
-[00000000000041B0] Sent 1 events VM_START(1), suspend=0.
-[dbg] Command VM(VERSION) [1][at=6ae5].
-[dbg] Command VM(SET_PROTOCOL_VERSION) [2][at=6ae5].
-[dbg] Protocol version 2.57, client protocol version 2.56.
-[dbg] Command APPDOMAIN(GET_ROOT_DOMAIN) [3][at=6ae5].
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [4][at=6ae5].
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[00000000000041B0] Sent 1 events ASSEMBLY_LOAD(2), suspend=0.
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[00000000000041B0] Sent 1 events ASSEMBLY_LOAD(3), suspend=0.
-[dbg]   send assembly [Atom.Core][AtomScriptRuntime][3]
-[00000000000041B0] Sent 1 events ASSEMBLY_LOAD(4), suspend=0.
-[dbg]   send assembly [Sandbox][AtomScriptRuntime][4]
-[00000000000041B0] Sent 1 events ASSEMBLY_LOAD(5), suspend=0.
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [5][at=6ae5].
-[00000000000041B0] Sent 1 events THREAD_START(6), suspend=0.
-[00000000000041B0] Sent 1 events THREAD_START(7), suspend=0.
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [6][at=6ae5].
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [7][at=6ae5].
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [8][at=6ae5].
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [9][at=6ae5].
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [10][at=6ae5].
-[dbg] 	EXCEPTION_ONLY 2 filter (all, uncaught, include-subclasses).
-[dbg] Command EVENT_REQUEST(REQUEST_SET) [11][at=6ae5].
-[dbg] Command OBJECT_REF(GET_INFO) [12][at=6ae5].
-[dbg]   send class [System.Threading.Thread]
-[dbg] Command TYPE(GET_INFO) [13][at=6ae5].
-[dbg]   recv class [System.Threading.Thread]
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[dbg]   send class [System.Runtime.ConstrainedExecution.CriticalFinalizerObject]
-[dbg] Command APPDOMAIN(GET_CORLIB) [14][at=6ae5].
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[dbg] Command THREAD(GET_ID) [15][at=6ae6].
-[dbg] Command THREAD(GET_NAME) [16][at=6ae6].
-[dbg] Command THREAD(GET_INFO) [17][at=6ae6].
-[dbg] Command ASSEMBLY(GET_TYPE) [18][at=6bb8].
-[dbg]   send class [System.Exception]
-[dbg] Command TYPE(GET_INFO) [19][at=6bb9].
-[dbg]   recv class [System.Exception]
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[dbg]   send class [object]
-[dbg]   send class [System.Exception/__RestrictedErrorObject]
-[dbg]   send class [System.Exception/ExceptionMessageKind]
-[dbg] Command ASSEMBLY(GET_DOMAIN) [20][at=6bb9].
-[dbg] Command TYPE(GET_SOURCE_FILES) [21][at=6bb9].
-[dbg]   recv class [System.Exception]
-[dbg] Command ASSEMBLY(GET_NAME) [22][at=6bb9].
-[dbg] Command ASSEMBLY(GET_OBJECT) [23][at=6bb9].
-[dbg] Command OBJECT_REF(GET_INFO) [24][at=6bba].
-[dbg]   send class [System.Reflection.RuntimeAssembly]
-[dbg] Command TYPE(GET_INFO) [25][at=6bba].
-[dbg]   recv class [System.Reflection.RuntimeAssembly]
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[dbg]   send class [System.Reflection.Assembly]
-[dbg]   send class [System.Reflection.RuntimeAssembly/UnmanagedMemoryStreamForModule]
-[dbg] Command ASSEMBLY(9) [26][at=6bba].
-[dbg] Command ASSEMBLY(HAS_DEBUG_INFO) [27][at=6bba].
-[dbg] Command ASSEMBLY(GET_LOCATION) [28][at=6bc4].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [29][at=6bc4].
-[dbg] Command APPDOMAIN(GET_FRIENDLY_NAME) [30][at=6bc4].
-[dbg] Command ASSEMBLY(GET_NAME) [31][at=6bc4].
-[dbg] Command ASSEMBLY(GET_OBJECT) [32][at=6bc4].
-[dbg] Command OBJECT_REF(GET_INFO) [33][at=6bc5].
-[dbg]   send class [System.Reflection.RuntimeAssembly]
-[dbg] Command TYPE(GET_INFO) [34][at=6bc5].
-[dbg]   recv class [System.Reflection.RuntimeAssembly]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.Reflection.Assembly]
-[dbg]   send class [System.Reflection.RuntimeAssembly/UnmanagedMemoryStreamForModule]
-[dbg] Command APPDOMAIN(GET_CORLIB) [35][at=6bc5].
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg] Command ASSEMBLY(9) [36][at=6bc5].
-[dbg] Command ASSEMBLY(HAS_DEBUG_INFO) [37][at=6bc5].
-[dbg] Command ASSEMBLY(GET_LOCATION) [38][at=6bd5].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [39][at=6bd5].
-[dbg] Command ASSEMBLY(GET_DOMAIN) [40][at=6bd5].
-[dbg] Command APPDOMAIN(GET_FRIENDLY_NAME) [41][at=6bd5].
-[dbg] Command ASSEMBLY(GET_NAME) [42][at=6bd5].
-[dbg] Command ASSEMBLY(GET_OBJECT) [43][at=6bd5].
-[dbg] Command OBJECT_REF(GET_INFO) [44][at=6bd5].
-[dbg]   send class [System.Reflection.RuntimeAssembly]
-[dbg] Command ASSEMBLY(9) [45][at=6bd5].
-[dbg] Command ASSEMBLY(HAS_DEBUG_INFO) [46][at=6bd5].
-[dbg] Command ASSEMBLY(GET_LOCATION) [47][at=6bd5].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [48][at=6bd5].
-[dbg] Command ASSEMBLY(GET_DOMAIN) [49][at=6bd5].
-[dbg] Command ASSEMBLY(GET_NAME) [50][at=6bd6].
-[dbg] Command ASSEMBLY(GET_OBJECT) [51][at=6bd6].
-[dbg] Command OBJECT_REF(GET_INFO) [52][at=6bd6].
-[dbg]   send class [System.Reflection.RuntimeAssembly]
-[dbg] Command ASSEMBLY(9) [53][at=6bd6].
-[dbg] Command ASSEMBLY(HAS_DEBUG_INFO) [54][at=6bd6].
-[dbg] Command ASSEMBLY(GET_LOCATION) [55][at=6bd6].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [56][at=6bd6].
-[dbg] Command ASSEMBLY(GET_DOMAIN) [57][at=6bd6].
-[dbg]   send assembly [Atom.Core][AtomScriptRuntime][3]
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Sent 1 events ASSEMBLY_LOAD(8), suspend=2.
-[00000000000010E4] Suspended.
-[dbg] Command ASSEMBLY(GET_OBJECT) [58][at=7285].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [59][at=7285].
-[dbg] Command VM(RESUME) [60][at=7285].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   send assembly [Sandbox][AtomScriptRuntime][4]
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Sent 1 events ASSEMBLY_LOAD(9), suspend=2.
-[00000000000010E4] Suspended.
-[dbg] Command ASSEMBLY(GET_OBJECT) [61][at=7285].
-[dbg] Command OBJECT_REF(GET_ADDRESS) [62][at=7285].
-[dbg] Command VM(RESUME) [63][at=7285].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Sent 1 events EXCEPTION(10), suspend=2.
-[00000000000010E4] Suspended.
-[dbg] Command OBJECT_REF(GET_INFO) [64][at=7295].
-[dbg]   send class [System.NullReferenceException]
-[dbg] Command TYPE(GET_INFO) [65][at=7295].
-[dbg]   recv class [System.NullReferenceException]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.SystemException]
-[dbg] Command OBJECT_REF(GET_INFO) [66][at=7295].
-[dbg]   send class [System.Threading.Thread]
-[dbg] Command TYPE(GET_INFO) [67][at=7295].
-[dbg]   recv class [System.Threading.Thread]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.Runtime.ConstrainedExecution.CriticalFinalizerObject]
-[dbg] Command THREAD(GET_ID) [68][at=7295].
-[dbg] Command THREAD(GET_FRAME_INFO) [69][at=7295].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [70][at=7295].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg]   send class [Sandbox.Tests.TextComponentTest]
-[dbg] Command METHOD(GET_DEBUG_INFO) [71][at=7295].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command METHOD(GET_INFO) [72][at=7295].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command METHOD(GET_NAME) [73][at=7295].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command TYPE(GET_INFO) [74][at=7295].
-[dbg]   recv class [Sandbox.Tests.TextComponentTest]
-[dbg]   send assembly [Sandbox][AtomScriptRuntime][4]
-[dbg]   send class [Atom.Entity]
-[dbg] Command MODULE(GET_INFO) [75][at=7296].
-[dbg]   send assembly [Sandbox][AtomScriptRuntime][4]
-[dbg] Command STACK_FRAME(GET_DOMAIN) [76][at=7296].
-[dbg] Command ASSEMBLY(GET_MANIFEST_MODULE) [77][at=7296].
-[dbg] Command APPDOMAIN(GET_ASSEMBLIES) [78][at=7296].
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send assembly [Atom.Core][AtomScriptRuntime][3]
-[dbg]   send assembly [Sandbox][AtomScriptRuntime][4]
-[dbg] Command ASSEMBLY(GET_TYPE) [79][at=7296].
-[dbg]   send class [System.Diagnostics.DebuggerHiddenAttribute]
-[dbg] Command METHOD(GET_CATTRS ) [80][at=7296].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command ASSEMBLY(GET_TYPE) [81][at=7296].
-[dbg]   send class [System.Diagnostics.DebuggerNonUserCodeAttribute]
-[dbg] Command METHOD(GET_PARAM_INFO) [82][at=7296].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg]   send class [void]
-[dbg] Command TYPE(GET_INFO) [83][at=7296].
-[dbg]   recv class [void]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.ValueType]
-[dbg] Command VM(ALL_THREADS) [84][at=7296].
-[dbg] Command METHOD(GET_LOCALS_INFO) [85][at=7299].
-[dbg]   recv method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg]   send class [string]
-[dbg]   send class [string]
-[dbg] Command TYPE(GET_INFO) [86][at=72b7].
-[dbg]   recv class [System.SystemException]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.Exception]
-[dbg] Command TYPE(GET_INFO) [87][at=72b7].
-[dbg]   recv class [System.Exception]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [object]
-[dbg]   send class [System.Exception/__RestrictedErrorObject]
-[dbg]   send class [System.Exception/ExceptionMessageKind]
-[dbg] Command TYPE(GET_CATTRS) [88][at=72b8].
-[dbg]   recv class [System.Exception]
-[dbg]   send method [System.Runtime.InteropServices.ComVisibleAttribute:.ctor (bool)]
-[dbg] Command TYPE(GET_INFO) [89][at=72bb].
-[dbg]   recv class [object]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg] Command TYPE(GET_CATTRS) [90][at=72bb].
-[dbg]   recv class [object]
-[dbg]   send method [System.Runtime.InteropServices.ClassInterfaceAttribute:.ctor (System.Runtime.InteropServices.ClassInterfaceType)]
-[dbg]   send class [System.Runtime.InteropServices.ClassInterfaceType]
-[dbg]   send method [System.Runtime.InteropServices.ComVisibleAttribute:.ctor (bool)]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [91][at=72bc].
-[dbg]   recv method [System.Runtime.InteropServices.ComVisibleAttribute:.ctor (bool)]
-[dbg]   send class [System.Runtime.InteropServices.ComVisibleAttribute]
-[dbg] Command TYPE(GET_INFO) [92][at=72bc].
-[dbg]   recv class [System.Runtime.InteropServices.ComVisibleAttribute]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.Attribute]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [93][at=72bc].
-[dbg]   recv method [System.Runtime.InteropServices.ClassInterfaceAttribute:.ctor (System.Runtime.InteropServices.ClassInterfaceType)]
-[dbg]   send class [System.Runtime.InteropServices.ClassInterfaceAttribute]
-[dbg] Command TYPE(GET_INFO) [94][at=72bc].
-[dbg]   recv class [System.Runtime.InteropServices.ClassInterfaceAttribute]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [System.Attribute]
-[dbg] Command TYPE(GET_FIELDS) [95][at=72bc].
-[dbg]   recv class [System.NullReferenceException]
-[dbg] Command TYPE(GET_PROPERTIES ) [96][at=72bc].
-[dbg]   recv class [System.NullReferenceException]
-[dbg] Command TYPE(GET_FIELDS) [97][at=72bf].
-[dbg]   recv class [System.SystemException]
-[dbg] Command TYPE(GET_PROPERTIES ) [98][at=72bf].
-[dbg]   recv class [System.SystemException]
-[dbg] Command TYPE(GET_FIELDS) [99][at=72c0].
-[dbg]   recv class [System.Exception]
-[dbg]   send class [object]
-[dbg]   send class [string]
-[dbg]   send class [string]
-[dbg]   send class [System.Collections.IDictionary]
-[dbg]   send class [System.Exception]
-[dbg]   send class [string]
-[dbg]   send class [object]
-[dbg]   send class [string]
-[dbg]   send class [string]
-[dbg]   send class [int]
-[dbg]   send class [object]
-[dbg]   send class [int]
-[dbg]   send class [string]
-[dbg]   send class [System.Runtime.Serialization.SafeSerializationManager]
-[dbg]   send class [System.Diagnostics.StackTrace[]]
-[dbg]   send class [intptr[]]
-[dbg]   send class [int]
-[dbg]   send class [int]
-[dbg] Command TYPE(GET_PROPERTIES ) [100][at=72c0].
-[dbg]   recv class [System.Exception]
-[dbg]   send method [System.Exception:get_Message ()]
-[dbg]   send method [System.Exception:get_Data ()]
-[dbg]   send method [System.Exception:get_InnerException ()]
-[dbg]   send method [System.Exception:get_TargetSite ()]
-[dbg]   send method [System.Exception:get_StackTrace ()]
-[dbg]   send method [System.Exception:get_HelpLink ()]
-[dbg]   send method [System.Exception:set_HelpLink (string)]
-[dbg]   send method [System.Exception:get_Source ()]
-[dbg]   send method [System.Exception:set_Source (string)]
-[dbg]   send method [System.Exception:get_RemoteStackTrace ()]
-[dbg]   send method [System.Exception:get_HResult ()]
-[dbg]   send method [System.Exception:set_HResult (int)]
-[dbg]   send method [System.Exception:get_IsTransient ()]
-[dbg] Command METHOD(GET_INFO) [101][at=72c0].
-[dbg]   recv method [System.Exception:get_Message ()]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [102][at=72c0].
-[dbg]   recv method [System.Exception:get_Message ()]
-[dbg]   send class [System.Exception]
-[dbg] Command METHOD(GET_BODY) [103][at=72c0].
-[dbg]   recv method [System.Exception:get_Message ()]
-[dbg] Command THREAD(GET_STATE) [104][at=72c0].
-[dbg] Command VM(INVOKE_METHOD) [105][at=72c1].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_Message ()]
-[00000000000010E4] Invoking method 'System.Exception:get_Message ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 000001FA0A3F8130, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [106][at=72c1].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command OBJECT_REF(GET_INFO) [107][at=72c2].
-[dbg]   send class [string]
-[dbg] Command TYPE(GET_INFO) [108][at=72c2].
-[dbg]   recv class [string]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg]   send class [object]
-[dbg]   send class [System.String/TrimType]
-[dbg]   send class [System.String/ProbabilisticMap]
-[dbg] Command STRING_REF(GET_VALUE) [109][at=72c2].
-[dbg] Command METHOD(GET_INFO) [110][at=72c2].
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [111][at=72c2].
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[dbg]   send class [System.Exception]
-[dbg] Command METHOD(GET_BODY) [112][at=72c3].
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[dbg] Command THREAD(GET_STATE) [113][at=72c3].
-[dbg] Command VM(INVOKE_METHOD) [114][at=72c3].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[00000000000010E4] Invoking method 'System.Exception:get_HelpLink ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [115][at=72c3].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command METHOD(GET_INFO) [116][at=72c4].
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [117][at=72c4].
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[dbg]   send class [System.Exception]
-[dbg] Command METHOD(GET_BODY) [118][at=72c4].
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[dbg] Command THREAD(GET_STATE) [119][at=72c4].
-[dbg] Command VM(INVOKE_METHOD) [120][at=72c4].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[00000000000010E4] Invoking method 'System.Exception:get_InnerException ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [121][at=72c4].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command TYPE(GET_FIELDS) [122][at=72c5].
-[dbg]   recv class [object]
-[dbg] Command TYPE(GET_PROPERTIES ) [123][at=72c5].
-[dbg]   recv class [object]
-[dbg] Command METHOD(GET_INFO) [124][at=72c6].
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[dbg] Command METHOD(GET_DECLARING_TYPE) [125][at=72c6].
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[dbg]   send class [System.Exception]
-[dbg] Command METHOD(GET_BODY) [126][at=72c6].
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[dbg] Command THREAD(GET_STATE) [127][at=72c6].
-[dbg] Command VM(INVOKE_METHOD) [128][at=72c6].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[00000000000010E4] Invoking method 'System.Exception:get_StackTrace ()' on receiver 'NullReferenceException'.
-[dbg] Command THREAD(GET_FRAME_INFO) [129][at=7346].
-[00000000000010E4] Invoke result: 000001FA10806150, exc: (null), time: 478 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-Waiting for 1(2) threads to suspend...
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-Waiting for 1(2) threads to suspend...
-Waiting for 1(2) threads to suspend...
-[00000000000010E4] Suspended.
-2 threads suspended.
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command THREAD(GET_FRAME_INFO) [130][at=74a5].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command STACK_FRAME(GET_DOMAIN) [131][at=74a5].
-[dbg] Command OBJECT_REF(GET_INFO) [132][at=74a5].
-[dbg]   send class [string]
-[dbg] Command APPDOMAIN(GET_ASSEMBLIES) [133][at=74a5].
-[dbg]   send assembly [mscorlib][AtomJITRuntime][1]
-[dbg] Command STRING_REF(GET_VALUE) [134][at=74a5].
-[dbg] Command THREAD(GET_STATE) [135][at=74b5].
-[dbg] Command VM(INVOKE_METHOD) [136][at=74b5].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_Message ()]
-[00000000000010E4] Invoking method 'System.Exception:get_Message ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 000001FA0A3F8130, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [137][at=74b5].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command STRING_REF(GET_VALUE) [138][at=74b5].
-[dbg] Command THREAD(GET_STATE) [139][at=74b5].
-[dbg] Command VM(INVOKE_METHOD) [140][at=74b5].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[00000000000010E4] Invoking method 'System.Exception:get_HelpLink ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [141][at=74b5].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command THREAD(GET_STATE) [142][at=74b6].
-[dbg] Command VM(INVOKE_METHOD) [143][at=74b6].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[00000000000010E4] Invoking method 'System.Exception:get_InnerException ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [144][at=74b6].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command THREAD(GET_STATE) [145][at=74b6].
-[dbg] Command VM(INVOKE_METHOD) [146][at=74b6].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[00000000000010E4] Invoking method 'System.Exception:get_StackTrace ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 000001FA10806890, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [147][at=74b6].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command OBJECT_REF(GET_INFO) [148][at=74b7].
-[dbg]   send class [string]
-[dbg] Command STRING_REF(GET_VALUE) [149][at=74b7].
-[dbg] Command TYPE(GET_INTERFACES) [150][at=74c5].
-[dbg]   recv class [System.NullReferenceException]
-[dbg]   send class [System.Runtime.InteropServices._Exception]
-[dbg]   send class [System.Runtime.Serialization.ISerializable]
-[dbg] Command TYPE(GET_INFO) [151][at=74c5].
-[dbg]   recv class [System.Runtime.InteropServices._Exception]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg] Command TYPE(GET_INFO) [152][at=74c6].
-[dbg]   recv class [System.Runtime.Serialization.ISerializable]
-[dbg]   send assembly [mscorlib][AtomScriptRuntime][2]
-[dbg] Command THREAD(GET_STATE) [153][at=74f6].
-[dbg] Command VM(INVOKE_METHOD) [154][at=74f6].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_Message ()]
-[00000000000010E4] Invoking method 'System.Exception:get_Message ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 000001FA0A3F8130, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [155][at=74f7].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command STRING_REF(GET_VALUE) [156][at=74f7].
-[dbg] Command THREAD(GET_STATE) [157][at=74f7].
-[dbg] Command VM(INVOKE_METHOD) [158][at=74f8].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_HelpLink ()]
-[00000000000010E4] Invoking method 'System.Exception:get_HelpLink ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [159][at=74f8].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command THREAD(GET_STATE) [160][at=74f8].
-[dbg] Command VM(INVOKE_METHOD) [161][at=74f9].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_InnerException ()]
-[00000000000010E4] Invoking method 'System.Exception:get_InnerException ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 0000000000000000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [162][at=74f9].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command THREAD(GET_STATE) [163][at=74f9].
-[dbg] Command VM(INVOKE_METHOD) [164][at=74f9].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg]   recv method [System.Exception:get_StackTrace ()]
-[00000000000010E4] Invoking method 'System.Exception:get_StackTrace ()' on receiver 'NullReferenceException'.
-[00000000000010E4] Invoke result: 000001FA10807000, exc: (null), time: 0 ms.
-[00000000000010E4] Suspending vm...
-[00000000000010E4] Interrupting 0000000000007B54...
-[0000000000007B54] Received interrupt while at 00007FFCB604EE84, treating as suspended.
-[00000000000010E4] Invoke finished (0), resume_count = 0.
-[00000000000010E4] Suspended.
-[dbg] Command THREAD(GET_FRAME_INFO) [165][at=74fa].
-Frames for 000001FA0A420130(tid=10e4):
-	Frame: Sandbox.Tests.TextComponentTest:OnCreate ():[il=0xd, native=0xef] 1
-[dbg]   send method [Sandbox.Tests.TextComponentTest:OnCreate ()]
-[dbg] Command OBJECT_REF(GET_INFO) [166][at=74fa].
-[dbg]   send class [string]
-[dbg] Command STRING_REF(GET_VALUE) [167][at=74fa].
-[dbg] Command VM(DISPOSE) [168][at=810f].
-[00000000000041B0] Resuming vm, suspend count=0...
-[00000000000010E4] Resumed.
-[dbg] Debugger thread exited.
-[dbg] Detached - restarting clean debugger thread.
-[dbg] Agent thread started, pid=0000000000006E80
+VM start event not sent yet: dropping ASSEMBLY_LOAD
+VM start event not sent yet: dropping ASSEMBLY_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
-[0000000000008164] Thread started, obj=000001FA0A420650, tls=000001FA16378CD0.
+[00000000000068F4] Thread started, obj=000002AF75EF0508, tls=000002AF76494E50.
 VM start event not sent yet: dropping THREAD_START
-[0000000000008164] Suspended.
-[0000000000008164] Resumed.
+[00000000000068F4] Suspended.
+[00000000000068F4] Resumed.
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping TYPE_LOAD
@@ -576,3 +61,39 @@ VM start event not sent yet: dropping TYPE_LOAD
 VM start event not sent yet: dropping ASSEMBLY_UNLOAD
 VM start event not sent yet: dropping ASSEMBLY_UNLOAD
 VM start event not sent yet: dropping APPDOMAIN_UNLOAD
+[00000000000068F4] Thread terminated, obj=000002AF75EF0508, tls=000002AF76494E50 (domain=000002AF76239480).
+VM start event not sent yet: dropping THREAD_DEATH
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+VM start event not sent yet: dropping TYPE_LOAD
+[00000000000087AC] Thread terminated, obj=000002AF75EF0278, tls=000002AF762CD1D0 (domain=000002AF76239480).
+VM start event not sent yet: dropping THREAD_DEATH
+VM start event not sent yet: dropping VM_DEATH
+Accepted connection on -1
+[dbg] Bad client connection
+[dbg] Can't attach, aborting debugger thread.
+[dbg] Debugger thread exited.
