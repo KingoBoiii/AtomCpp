@@ -161,6 +161,31 @@ namespace Atom
 					m_Scene->CreateEntity("Empty Entity");
 				}
 
+				if(ImGui::MenuItem("Create Camera"))
+				{
+					auto& entity = m_Scene->CreateEntity("Camera");
+					entity.AddComponent<Component::Camera>();
+				}
+
+				ImGui::Separator();
+
+				if(ImGui::BeginMenu("2D"))
+				{
+					if(ImGui::MenuItem("Create Basic Sprite"))
+					{
+						auto& entity = m_Scene->CreateEntity("Basic Sprite");
+						entity.AddComponent<Component::BasicRenderer>();
+					}
+					
+					if(ImGui::MenuItem("Create Circle"))
+					{
+						auto& entity = m_Scene->CreateEntity("Circle");
+						entity.AddComponent<Component::CircleRenderer>();
+					}
+					
+					ImGui::EndMenu();
+				}
+				
 				ImGui::EndPopup();
 			}
 		}
