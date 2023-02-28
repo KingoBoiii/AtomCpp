@@ -16,6 +16,8 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/tabledefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 namespace Atom
 {
@@ -133,7 +135,7 @@ namespace Atom
 		MonoDomain* AppDomain = nullptr;
 
 		ScriptEngineConfig Config;
-		
+
 		AssemblyInfo* CoreAssemblyInfo = nullptr;
 		AssemblyInfo* AppAssemblyInfo = nullptr;
 
@@ -147,6 +149,8 @@ namespace Atom
 		filewatch::FileWatch<std::string>* AppAssemblyWatcher;
 		bool AppAssemblyReloadPending = false;
 
+		bool EnableDebugging = true;
+
 		Scene* SceneContext;
 	};
 
@@ -158,10 +162,10 @@ namespace Atom
 		s_ScriptEngineData->Config = config;
 
 		InitializeMono();
-		
+
 		LoadCoreAssembly();
 		ScriptCache::Initialize();
-		
+
 		//LoadAppAssembly();
 
 		ScriptGlue::RegisterComponents();
@@ -334,11 +338,11 @@ namespace Atom
 			Application::Get().SubmitToMainThread([]()
 			{
 				delete s_ScriptEngineData->AppAssemblyWatcher;
-				s_ScriptEngineData->AppAssemblyWatcher = nullptr;
-				
-				AT_CORE_INFO("Reloading Assembly!");
+			s_ScriptEngineData->AppAssemblyWatcher = nullptr;
 
-				ScriptEngine::ReloadAssembly();
+			AT_CORE_INFO("Reloading Assembly!");
+
+			ScriptEngine::ReloadAssembly();
 			});
 		}
 	}
@@ -406,15 +410,35 @@ namespace Atom
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.txt",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* rootDomain = mono_jit_init("AtomJITRuntime");
 		AT_CORE_ASSERT(rootDomain);
 
 		s_ScriptEngineData->RootDomain = rootDomain;
+
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			mono_debug_domain_create(s_ScriptEngineData->RootDomain);
+		}
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::ShutdownMono()
 	{
 		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_debug_cleanup();
 
 		mono_domain_unload(s_ScriptEngineData->AppDomain);
 		s_ScriptEngineData->AppDomain = nullptr;
@@ -432,7 +456,7 @@ namespace Atom
 
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
-		
+
 		MonoAssembly* assembly = LoadMonoAssembly(s_ScriptEngineData->Config.CoreAssemblyPath);
 		if(assembly == nullptr)
 		{
@@ -479,7 +503,7 @@ namespace Atom
 
 		uint32_t size;
 		char* data = Utils::ReadBytes(filepath.string(), &size);
-		
+
 				// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 		MonoImageOpenStatus status;
 		MonoImage* image = mono_image_open_from_data_full(data, size, 1, &status, 0);
@@ -491,8 +515,31 @@ namespace Atom
 			return nullptr;
 		}
 
+		if(s_ScriptEngineData->EnableDebugging)
+		{
+			std::filesystem::path pdbPath = filepath;
+			pdbPath.replace_extension(".pdb");
+
+			AT_CORE_WARN("Trying to load PDB file: {}", pdbPath);
+
+			if(std::filesystem::exists(pdbPath))
+			{
+				uint32_t pdbFileSize;
+				char* pdbFileData = Utils::ReadBytes(pdbPath.string(), &pdbFileSize);
+
+				mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+
+				AT_CORE_INFO("Loaded PDB {}", pdbPath);
+
+				delete[] pdbFileData;
+			}
+		}
+
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
 		mono_image_close(image);
+
+		delete[] data;
+
 		return assembly;
 	}
 
@@ -634,7 +681,8 @@ namespace Atom
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** parameters)
 	{
-		return mono_runtime_invoke(monoMethod, instance, parameters, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(monoMethod, instance, parameters, &exception);
 	}
 
 	ScriptInstance::ScriptInstance(ScriptClass* scriptClass, Entity entity)
