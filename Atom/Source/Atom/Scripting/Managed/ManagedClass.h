@@ -12,6 +12,7 @@ namespace Atom
 	{
 		uint32_t Id;
 		std::string FullName;
+		int32_t Size;
 
 		MonoClass* Class = nullptr;
 

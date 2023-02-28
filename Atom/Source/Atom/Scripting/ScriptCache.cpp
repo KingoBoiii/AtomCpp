@@ -2,13 +2,15 @@
 #include "ScriptCache.h"
 #include "ScriptEngine.h"
 
+#include "Atom/Core/Hash.h"
+
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/class.h>
 #include <mono/metadata/object.h>
 
 namespace Atom
 {
-
+	
 	struct Cache
 	{
 		std::unordered_map<uint32_t, ManagedClass> Classes;
@@ -76,6 +78,9 @@ namespace Atom
 		ManagedClass managedClass;
 		managedClass.Id = Hash::GenerateFNVHash(className);
 		managedClass.FullName = className;
+
+		int32_t alignment = 0;
+		managedClass.Size = mono_type_size(monoType, &alignment);
 		managedClass.Class = monoClass;
 		s_Cache->Classes[managedClass.Id] = managedClass;
 	}
