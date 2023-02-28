@@ -42,6 +42,7 @@ namespace Atom
 		s_RendererData->ShaderLibrary = ShaderLibrary::Create();
 
 		Renderer::GetShaderLibrary()->Load("Resources/Shaders/Renderer2D.shader");
+		Renderer::GetShaderLibrary()->Load("Resources/Shaders/Renderer2D_Circle.shader");
 		Renderer::GetShaderLibrary()->Load("Resources/Shaders/Renderer2D_Text.shader");
 		
 		Renderer2D::Initialize();

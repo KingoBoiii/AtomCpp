@@ -240,6 +240,20 @@ namespace Atom
 				out << YAML::EndMap;		// BasicRenderer
 			}
 
+			if(entity.HasComponent<Component::CircleRenderer>())
+			{
+				auto& circleRenderer = entity.GetComponent<Component::CircleRenderer>();
+
+				out << YAML::Key << "CircleRenderer";
+				out << YAML::BeginMap;		// CircleRenderer
+
+				out << YAML::Key << "Color" << YAML::Value << circleRenderer.Color;
+				out << YAML::Key << "Thickness" << YAML::Value << circleRenderer.Thickness;
+				out << YAML::Key << "Fade" << YAML::Value << circleRenderer.Fade;
+
+				out << YAML::EndMap;		// CircleRenderer
+			}
+
 			if(entity.HasComponent<Component::Script>())
 			{
 				auto& script = entity.GetComponent<Component::Script>();
@@ -455,6 +469,15 @@ namespace Atom
 			{
 				auto& basicRenderer = deserializedEntity.AddComponent<Component::BasicRenderer>();
 				basicRenderer.Color = basicRendererComponent["Color"].as<glm::vec4>();
+			}
+
+			auto circleRendererComponent = entity["CircleRenderer"];
+			if(circleRendererComponent)
+			{
+				auto& circleRenderer = deserializedEntity.AddComponent<Component::CircleRenderer>();
+				circleRenderer.Color = circleRendererComponent["Color"].as<glm::vec4>();
+				circleRenderer.Thickness = circleRendererComponent["Thickness"].as<float>();
+				circleRenderer.Fade = circleRendererComponent["Fade"].as<float>();
 			}
 
 			auto scriptComponent = entity["Script"];

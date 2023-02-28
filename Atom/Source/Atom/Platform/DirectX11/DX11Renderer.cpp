@@ -8,6 +8,8 @@
 namespace Atom
 {
 
+#define BLENDING_TEST
+
 	DX11Renderer::DX11Renderer(Window* window)
 		: m_Window(window), m_Viewport({ 0.0f, 0.0f, 1280.0f, 720.0f, 0.0f, 1.0f })
 	{
@@ -38,6 +40,10 @@ namespace Atom
 	void DX11Renderer::BeginFrame()
 	{
 		m_DeviceContext->OMSetRenderTargets(1, &m_SwapChain->m_RenderTargetView, m_SwapChain->m_DepthStencilView);
+
+		m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState, NULL);
+		m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xffffffff);
+		
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
@@ -85,6 +91,78 @@ namespace Atom
 		SetD3D11Viewport(x, y, width, height);
 		
 		m_SwapChain->Resize(width, height);
+	}
+
+	void DX11Renderer::CreateBlendState()
+	{
+		D3D11_BLEND_DESC blendStateDesc;
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
+#ifndef BLENDING_TEST
+		blendStateDesc.RenderTarget[0].BlendEnable = false;
+		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+#else
+		blendStateDesc.AlphaToCoverageEnable = false;
+		blendStateDesc.IndependentBlendEnable = false;
+
+		blendStateDesc.RenderTarget[0].BlendEnable = true;
+
+		blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+#endif
+
+		HRESULT hr = m_Device->CreateBlendState(&blendStateDesc, &m_BlendState);
+		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create Blend State");
+	}
+
+	void DX11Renderer::CreateDepthStencilState()
+	{
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+		ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+#ifndef BLENDING_TEST
+		depthStencilDesc.DepthEnable = true;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		depthStencilDesc.StencilEnable = true;
+		depthStencilDesc.StencilReadMask = 0xff;
+		depthStencilDesc.StencilWriteMask = 0xff;
+
+		// Stencil operations if pixel is front-facing
+		depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		// Stencil operations if pixel is back-facing
+		depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+#else
+		depthStencilDesc.DepthEnable = false;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+		depthStencilDesc.StencilEnable = true;
+		depthStencilDesc.StencilReadMask = 0xff;
+		depthStencilDesc.StencilWriteMask = 0xff;
+
+		depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_INCR_SAT;
+		depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
+#endif
+
+		HRESULT hr = m_Device->CreateDepthStencilState(&depthStencilDesc, &m_DepthStencilState);
+		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create Depth Stencil State");
 	}
 
 	void DX11Renderer::SetD3D11Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)

@@ -24,11 +24,30 @@ namespace Atom
 		glm::vec4 Color;
 	};
 
+	struct CircleVertex
+	{
+		glm::vec3 WorldPosition;
+		glm::vec3 LocalPosition;
+		glm::vec4 Color;
+		float Thickness;
+		float Fade;
+	};
+
 	struct TextVertex
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
+	};
+	
+	template<typename T>
+	struct Renderer2DPipeline
+	{
+		Pipeline* Pipeline = nullptr;
+		VertexBuffer* VertexBuffer = nullptr;
+		T* VertexBufferBase = nullptr;
+		T* VertexBufferPtr = nullptr;
+		uint32_t IndexCount = 0;
 	};
 
 	struct Renderer2DData
@@ -40,6 +59,7 @@ namespace Atom
 		static constexpr uint32_t MaxIndices = MaxQuads * 6;
 		static constexpr uint32_t MaxTextureSlots = 16; // 32 is the max for OpenGL, 16 for DirectX
 
+		// Quad
 		Pipeline* QuadPipeline;
 		VertexBuffer* QuadVertexBuffer;
 		IndexBuffer* QuadIndexBuffer;
@@ -48,6 +68,15 @@ namespace Atom
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
+		// Circle
+		Pipeline* CirclePipeline;
+		VertexBuffer* CircleVertexBuffer;
+
+		uint32_t CircleIndexCount = 0;
+		CircleVertex* CircleVertexBufferBase = nullptr;
+		CircleVertex* CircleVertexBufferPtr = nullptr;
+
+		// Text
 		Pipeline* TextPipeline;
 		VertexBuffer* TextVertexBuffer;
 
@@ -55,6 +84,7 @@ namespace Atom
 		TextVertex* TextVertexBufferBase = nullptr;
 		TextVertex* TextVertexBufferPtr = nullptr;
 
+		// Font
 		Texture2D* FontAtlasTexture;
 
 		glm::vec4 QuadVertexPositions[4];
@@ -94,6 +124,7 @@ namespace Atom
 		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(quadIndices, s_Renderer2DData.MaxIndices);
 
 		CreateQuadPipeline();
+		CreateCirclePipeline();
 		CreateTextPipeline();
 
 		s_Renderer2DData.CameraUniformBuffer = UniformBuffer::Create(&s_Renderer2DData.CameraData, sizeof(Renderer2DData::CameraDataCS));
@@ -160,6 +191,30 @@ namespace Atom
 		}
 
 		s_Renderer2DData.QuadIndexCount += 6;
+
+		s_Renderer2DData.Stats.QuadCount++;
+	}
+
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade)
+	{
+		constexpr size_t quadVertexCount = 4;
+
+		if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
+		{
+			NextBatch();
+		}
+
+		for(size_t i = 0; i < quadVertexCount; i++)
+		{
+			s_Renderer2DData.CircleVertexBufferPtr->WorldPosition = transform * s_Renderer2DData.QuadVertexPositions[i];
+			s_Renderer2DData.CircleVertexBufferPtr->LocalPosition = s_Renderer2DData.QuadVertexPositions[i] * 2.0f;
+			s_Renderer2DData.CircleVertexBufferPtr->Color = color;
+			s_Renderer2DData.CircleVertexBufferPtr->Thickness = thickness;
+			s_Renderer2DData.CircleVertexBufferPtr->Fade = fade;
+			s_Renderer2DData.CircleVertexBufferPtr++;
+		}
+
+		s_Renderer2DData.CircleIndexCount += 6;
 
 		s_Renderer2DData.Stats.QuadCount++;
 	}
@@ -279,121 +334,6 @@ namespace Atom
 		}
 	}
 
-	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const glm::vec4 color, float kerning, float lineSpacing)
-	{
-		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
-		const auto& metrics = fontGeometry.getMetrics();
-		auto fontAtlas = font->GetAtlasTexture();
-
-		s_Renderer2DData.FontAtlasTexture = fontAtlas;
-
-		double x = 0.0;
-		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
-		double y = 0.0f; // -fsScale * metrics.ascenderY;
-
-		//if(s_Renderer2DData.QuadIndexCount >= Renderer2DData::MaxIndices)
-		//{
-		//	NextBatch();
-		//}
-
-		float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
-
-		for(size_t i = 0; i < string.size(); i++)
-		{
-			char character = string[i];
-
-			if(character == '\n')
-			{
-				x = 0.0;
-				y -= fsScale * metrics.lineHeight + lineSpacing;
-				continue;
-			}
-
-			if(character == ' ')
-			{
-				float advance = spaceGlyphAdvance;
-				if(i < string.size() - 1)
-				{
-					char nextCharacter = string[i + 1];
-					double dAdvance;
-					fontGeometry.getAdvance(dAdvance, character, nextCharacter);
-					advance = (float)dAdvance;
-				}
-				x += fsScale * advance + kerning;
-				continue;
-			}
-
-			if(character == '\t')
-			{
-				x += 4.0f * (fsScale * spaceGlyphAdvance + kerning);
-				continue;
-			}
-
-			auto glyph = fontGeometry.getGlyph(character);
-			if(!glyph)
-			{
-				glyph = fontGeometry.getGlyph('?');
-			}
-			if(!glyph)
-			{
-				return;
-			}
-
-			double al, ab, ar, at;
-			glyph->getQuadAtlasBounds(al, ab, ar, at);
-			glm::vec2 texCoordMin((float)al, (float)ab);
-			glm::vec2 texCoordMax((float)ar, (float)at);
-
-			double pl, pb, pr, pt;
-			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
-			glm::vec2 quadMin((float)pl, (float)pb);
-			glm::vec2 quadMax((float)pr, (float)pt);
-
-			quadMin *= fsScale, quadMax *= fsScale;
-			quadMin += glm::vec2(x, y);
-			quadMax += glm::vec2(x, y);
-
-			float texelWidth = 1.0f / fontAtlas->GetWidth();
-			float texelHeight = 1.0f / fontAtlas->GetHeight();
-			texCoordMin *= glm::vec2(texelWidth, texelHeight);
-			texCoordMax *= glm::vec2(texelWidth, texelHeight);
-
-			// Render here!
-			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
-			s_Renderer2DData.TextVertexBufferPtr->Color = color;
-			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMin;
-			s_Renderer2DData.TextVertexBufferPtr++;
-
-			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
-			s_Renderer2DData.TextVertexBufferPtr->Color = color;
-			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
-			s_Renderer2DData.TextVertexBufferPtr++;
-
-			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
-			s_Renderer2DData.TextVertexBufferPtr->Color = color;
-			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMax;
-			s_Renderer2DData.TextVertexBufferPtr++;
-
-			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
-			s_Renderer2DData.TextVertexBufferPtr->Color = color;
-			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
-			s_Renderer2DData.TextVertexBufferPtr++;
-
-			s_Renderer2DData.TextIndexCount += 6;
-
-			s_Renderer2DData.Stats.QuadCount++;
-
-			if(i < string.size() - 1)
-			{
-				double advance = glyph->getAdvance();
-				char nextCharacter = string[i + 1];
-				fontGeometry.getAdvance(advance, character, nextCharacter);
-
-				x += fsScale * advance + kerning;
-			}
-		}
-	}
-
 	void Renderer2D::ResetStats()
 	{
 		memset(&s_Renderer2DData.Stats, 0, sizeof(Statistics));
@@ -420,6 +360,27 @@ namespace Atom
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
 		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
+	}
+
+	void Renderer2D::CreateCirclePipeline()
+	{
+		PipelineOptions pipelineOptions{ };
+		pipelineOptions.InputLayout = {
+			{ ShaderDataType::Float3, "WORLD_POSITION" },
+			{ ShaderDataType::Float3, "LOCAL_POSITION" },
+			{ ShaderDataType::Float4, "COLOR" },
+			{ ShaderDataType::Float, "THICKNESS" },
+			{ ShaderDataType::Float, "FADE" }
+		};
+		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D_Circle");
+		s_Renderer2DData.CirclePipeline = Pipeline::Create(pipelineOptions);
+
+		s_Renderer2DData.CircleVertexBufferBase = new CircleVertex[s_Renderer2DData.MaxVertices];
+
+		VertexBufferOptions vertexBufferOptions{ };
+		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
+		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		s_Renderer2DData.CircleVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 
 	void Renderer2D::CreateTextPipeline()
@@ -452,6 +413,9 @@ namespace Atom
 		s_Renderer2DData.QuadIndexCount = 0;
 		s_Renderer2DData.QuadVertexBufferPtr = s_Renderer2DData.QuadVertexBufferBase;
 
+		s_Renderer2DData.CircleIndexCount = 0;
+		s_Renderer2DData.CircleVertexBufferPtr = s_Renderer2DData.CircleVertexBufferBase;
+
 		s_Renderer2DData.TextIndexCount = 0;
 		s_Renderer2DData.TextVertexBufferPtr = s_Renderer2DData.TextVertexBufferBase;
 
@@ -466,6 +430,15 @@ namespace Atom
 			s_Renderer2DData.QuadVertexBuffer->SetData(s_Renderer2DData.QuadVertexBufferBase, dataSize);
 
 			Renderer::RenderGeometry(s_Renderer2DData.QuadPipeline, s_Renderer2DData.QuadVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.QuadIndexCount);
+			s_Renderer2DData.Stats.DrawCalls++;
+		}
+
+		if(s_Renderer2DData.CircleIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Renderer2DData.CircleVertexBufferPtr - (uint8_t*)s_Renderer2DData.CircleVertexBufferBase);
+			s_Renderer2DData.CircleVertexBuffer->SetData(s_Renderer2DData.CircleVertexBufferBase, dataSize);
+
+			Renderer::RenderGeometry(s_Renderer2DData.CirclePipeline, s_Renderer2DData.CircleVertexBuffer, s_Renderer2DData.QuadIndexBuffer, s_Renderer2DData.CameraUniformBuffer, s_Renderer2DData.CircleIndexCount);
 			s_Renderer2DData.Stats.DrawCalls++;
 		}
 

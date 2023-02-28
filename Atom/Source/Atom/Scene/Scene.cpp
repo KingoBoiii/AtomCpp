@@ -176,6 +176,16 @@ namespace Atom
 		}
 
 		{
+			auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
+			for(auto e : view)
+			{
+				auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
+
+				Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+			}
+		}
+		
+		{
 			auto view = m_Registry.view<Component::Text>();
 			for(auto e : view)
 			{
@@ -305,6 +315,16 @@ namespace Atom
 				}
 
 				{
+					auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
+					for(auto e : view)
+					{
+						auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
+
+						Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+					}
+				}
+
+				{
 					auto view = m_Registry.view<Component::Text>();
 					for(auto e : view)
 					{
@@ -373,6 +393,16 @@ namespace Atom
 				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
 				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
+			}
+
+			{
+				auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
+				for(auto e : view)
+				{
+					auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
+
+					Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+				}
 			}
 
 			{

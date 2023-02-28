@@ -26,6 +26,8 @@ namespace Atom
 
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 	private:
+		void CreateBlendState();
+		void CreateDepthStencilState();
 		void SetD3D11Viewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 	private:
 		Window* m_Window = nullptr;
@@ -35,6 +37,8 @@ namespace Atom
 		ID3D11Device* m_Device = nullptr;
 		ID3D11DeviceContext* m_DeviceContext = nullptr;
 
+		ID3D11BlendState* m_BlendState = nullptr;
+		ID3D11DepthStencilState* m_DepthStencilState = nullptr;
 		D3D11_VIEWPORT m_Viewport;
 	};
 }
