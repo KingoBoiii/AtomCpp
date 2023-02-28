@@ -5,6 +5,7 @@
 
 extern "C" {
 	typedef struct _MonoString MonoString;
+	typedef struct _MonoAssembly MonoAssembly;
 }
 
 namespace Atom
@@ -18,6 +19,8 @@ namespace Atom
 		static MonoString* EmptyMonoString();
 		static MonoString* UTF8ToMonoString(const std::string& string);
 		static std::string MonoStringToUTF8(MonoString* string);
+
+		static void PrintAssemblyTypes(MonoAssembly* assembly);
 	};
 
 }
