@@ -345,19 +345,19 @@ namespace Atom
 				out << YAML::EndMap;		// BoxCollider2D
 			}
 
-			if(entity.HasComponent<Component::Text>())
+			if(entity.HasComponent<Component::TextRenderer>())
 			{
-				auto& text = entity.GetComponent<Component::Text>();
+				auto& textRenderer = entity.GetComponent<Component::TextRenderer>();
 
-				out << YAML::Key << "Text";
-				out << YAML::BeginMap;		// Text
+				out << YAML::Key << "TextRenderer";
+				out << YAML::BeginMap;		// TextRenderer
 
-				out << YAML::Key << "TextString" << YAML::Value << text.TextString;
-				out << YAML::Key << "Color" << YAML::Value << text.Color;
-				out << YAML::Key << "Kerning" << YAML::Value << text.Kerning;
-				out << YAML::Key << "LineSpacing" << YAML::Value << text.LineSpacing;
+				out << YAML::Key << "Text" << YAML::Value << textRenderer.Text;
+				out << YAML::Key << "Color" << YAML::Value << textRenderer.Color;
+				out << YAML::Key << "Kerning" << YAML::Value << textRenderer.Kerning;
+				out << YAML::Key << "LineSpacing" << YAML::Value << textRenderer.LineSpacing;
 
-				out << YAML::EndMap;		// Text
+				out << YAML::EndMap;		// TextRenderer
 			}
 
 			out << YAML::EndMap;		// Entity
@@ -557,15 +557,15 @@ namespace Atom
 
 			}
 
-			auto textComponent = entity["Text"];
-			if(textComponent)
+			auto textRendererComponent = entity["TextRenderer"];
+			if(textRendererComponent)
 			{
-				auto& text = deserializedEntity.AddComponent<Component::Text>();
+				auto& textRenderer = deserializedEntity.AddComponent<Component::TextRenderer>();
 
-				text.TextString = textComponent["TextString"].as<std::string>();
-				text.Color = textComponent["Color"].as<glm::vec4>();
-				text.Kerning = textComponent["Kerning"].as<float>();
-				text.LineSpacing = textComponent["LineSpacing"].as<float>();
+				textRenderer.Text = textRendererComponent["Text"].as<std::string>();
+				textRenderer.Color = textRendererComponent["Color"].as<glm::vec4>();
+				textRenderer.Kerning = textRendererComponent["Kerning"].as<float>();
+				textRenderer.LineSpacing = textRendererComponent["LineSpacing"].as<float>();
 			}
 		}
 

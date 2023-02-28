@@ -10,8 +10,8 @@ namespace Sandbox
             Log.Info("Collision2DTest.OnCreate({0}, {1})", Id, Name);
             Log.Info("Has Transform Component: {0}", HasComponent<Transform>());
 
-            OnCollision2DEnter += OnCollision2DEnterFunc;
-            OnCollision2DExit += OnCollision2DExitFunc;
+            //OnCollision2DEnter += OnCollision2DEnterFunc;
+            //OnCollision2DExit += OnCollision2DExitFunc;
         }
 
         private void OnCollision2DEnterFunc(Entity entity)

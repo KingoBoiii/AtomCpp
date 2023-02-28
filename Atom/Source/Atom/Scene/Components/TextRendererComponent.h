@@ -6,16 +6,16 @@
 namespace Atom::Component
 {
 
-	struct Text
+	struct TextRenderer
 	{
-		std::string TextString = "";
+		std::string Text = "";
 		Font* FontAsset = Font::GetDefaultFont();
 		float Kerning = 0.0f;
 		float LineSpacing = 0.0f;
 		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-		Text() = default;
-		Text(const Text& text) = default;
+		TextRenderer() = default;
+		TextRenderer(const TextRenderer& text) = default;
 	};
 
 }

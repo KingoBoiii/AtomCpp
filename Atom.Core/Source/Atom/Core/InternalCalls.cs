@@ -62,27 +62,27 @@ namespace Atom
         #region Text 
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_GetTextString(ulong entityId, out string text);
+        internal static extern void TextRenderer_GetTextString(ulong entityId, out string text);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_SetTextString(ulong entityId, string text);
+        internal static extern void TextRenderer_SetTextString(ulong entityId, string text);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_GetKerning(ulong entityId, out float kerning);
+        internal static extern void TextRenderer_GetKerning(ulong entityId, out float kerning);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_SetKerning(ulong entityId, ref float kerning);
+        internal static extern void TextRenderer_SetKerning(ulong entityId, ref float kerning);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_GetLineSpacing(ulong entityId, out float lineSpacing);
+        internal static extern void TextRenderer_GetLineSpacing(ulong entityId, out float lineSpacing);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_SetLineSpacing(ulong entityId, ref float lineSpacing);
+        internal static extern void TextRenderer_SetLineSpacing(ulong entityId, ref float lineSpacing);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_GetColor(ulong entityId, out Color color);
+        internal static extern void TextRenderer_GetColor(ulong entityId, out Color color);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Text_SetColor(ulong entityId, ref Color color);
+        internal static extern void TextRenderer_SetColor(ulong entityId, ref Color color);
 
         #endregion
 

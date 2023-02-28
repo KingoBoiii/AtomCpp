@@ -95,7 +95,7 @@ namespace Atom
 		CopyComponent<Component::Script>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<Component::Text>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::TextRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -136,7 +136,7 @@ namespace Atom
 		CopyComponentIfExists<Component::Script>(newEntity, entity);
 		CopyComponentIfExists<Component::Rigidbody2D>(newEntity, entity);
 		CopyComponentIfExists<Component::BoxCollider2D>(newEntity, entity);
-		CopyComponentIfExists<Component::Text>(newEntity, entity);
+		CopyComponentIfExists<Component::TextRenderer>(newEntity, entity);
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -186,16 +186,13 @@ namespace Atom
 		}
 		
 		{
-			auto view = m_Registry.view<Component::Text>();
+			auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
 			for(auto e : view)
 			{
-				Entity entity = { e, this };
+				auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
-				auto& transform = entity.GetComponent<Component::Transform>();
-				auto& text = entity.GetComponent<Component::Text>();
-
-				text.FontAsset = Font::GetDefaultFont();
-				Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
+				textRenderer.FontAsset = Font::GetDefaultFont();
+				Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 			}
 		}
 
@@ -325,16 +322,13 @@ namespace Atom
 				}
 
 				{
-					auto view = m_Registry.view<Component::Text>();
+					auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
 					for(auto e : view)
 					{
-						Entity entity = { e, this };
+						auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
-						auto& transform = entity.GetComponent<Component::Transform>();
-						auto& text = entity.GetComponent<Component::Text>();
-
-						text.FontAsset = Font::GetDefaultFont();
-						Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
+						textRenderer.FontAsset = Font::GetDefaultFont();
+						Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 					}
 				}
 
@@ -406,16 +400,13 @@ namespace Atom
 			}
 
 			{
-				auto view = m_Registry.view<Component::Text>();
+				auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
 				for(auto e : view)
 				{
-					Entity entity = { e, this };
+					auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
-					auto& transform = entity.GetComponent<Component::Transform>();
-					auto& text = entity.GetComponent<Component::Text>();
-
-					text.FontAsset = Font::GetDefaultFont();
-					Renderer2D::DrawString(text.TextString, text.FontAsset, transform.GetTransform(), { text.Color, text.Kerning, text.LineSpacing });
+					textRenderer.FontAsset = Font::GetDefaultFont();
+					Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
 				}
 			}
 		}

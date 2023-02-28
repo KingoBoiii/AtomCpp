@@ -7,8 +7,8 @@ Entities:
       Position: [-13.9541893, 11.0200005, -1.72354722]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    Text:
-      TextString: "struct VSInput\n{\n    float3 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\nstruct VSOutput\n{\n    float4 PositionCS : SV_POSITION;\n    float4 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\ncbuffer VS_CONSTANT_BUFFER : register(b0)\n{\n    float4x4 ProjectionViewMatrix;\n}\n\nVSOutput VSMain(VSInput input)\n{\n    float4 pos = float4(input.Position, 1.0);\n\n    VSOutput output = (VSOutput)0; // zero the memory first\n    output.PositionCS = mul(ProjectionViewMatrix, pos);\n    output.Position = pos;\n    output.Color = input.Color;\n    output.TexCoord = input.TexCoord;\n    return output;\n}\n\nTexture2D FontAtlasTexture : register(t0);\nSamplerState FontAtlasSampler : register(s0);\n\nstruct PSOutput\n{\n    float4 Color : SV_TARGET;\n};\n\nfloat median(float r, float g, float b)\n{\n    return max(min(r, g), min(max(r, g), b));\n}\n\nfloat screenPxRange(float2 texCoord)\n{\n    float pxRange = 2.0f;\n\n    float width, height, levels;\n    FontAtlasTexture.GetDimensions(0, width, height, levels);\n\n    float2 unitRange = float2(pxRange, pxRange) / float2(width, height);\n    float2 screenTexSize = float2(1.0f, 1.0f) / fwidth(texCoord);\n    return max(0.5 * dot(unitRange, screenTexSize), 1.0);\n}\n\nPSOutput PSMain(VSOutput input)\n{\n    float4 msdf = FontAtlasTexture.Sample(FontAtlasSampler, input.TexCoord);\n    float3 msd = msdf.rgb;\n\n    float sd = median(msd.r, msd.g, msd.b);\n\n    float screenPxDistance = screenPxRange(input.TexCoord) * (sd - 0.5f);\n\n    float opacity = clamp(screenPxDistance + 0.5f, 0.0f, 1.0f);\n    if(opacity == 0.0f)\n    {\n        discard;\n    }\n\n    float4 bgColor = float4(0.0f, 0.0f, 0.0f, 0.0f);\n\n    float4 color = lerp(bgColor, input.Color, opacity);\n    if(color.a == 0.0f)\n    {\n        discard;\n    }\n\n    PSOutput output = (PSOutput)0;\n    output.Color = color;\n    return output;\n}"
+    TextRenderer:
+      Text: "struct VSInput\n{\n    float3 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\nstruct VSOutput\n{\n    float4 PositionCS : SV_POSITION;\n    float4 Position : POSITION;\n    float4 Color : COLOR;\n    float2 TexCoord : TEXCOORD;\n};\n\ncbuffer VS_CONSTANT_BUFFER : register(b0)\n{\n    float4x4 ProjectionViewMatrix;\n}\n\nVSOutput VSMain(VSInput input)\n{\n    float4 pos = float4(input.Position, 1.0);\n\n    VSOutput output = (VSOutput)0; // zero the memory first\n    output.PositionCS = mul(ProjectionViewMatrix, pos);\n    output.Position = pos;\n    output.Color = input.Color;\n    output.TexCoord = input.TexCoord;\n    return output;\n}\n\nTexture2D FontAtlasTexture : register(t0);\nSamplerState FontAtlasSampler : register(s0);\n\nstruct PSOutput\n{\n    float4 Color : SV_TARGET;\n};\n\nfloat median(float r, float g, float b)\n{\n    return max(min(r, g), min(max(r, g), b));\n}\n\nfloat screenPxRange(float2 texCoord)\n{\n    float pxRange = 2.0f;\n\n    float width, height, levels;\n    FontAtlasTexture.GetDimensions(0, width, height, levels);\n\n    float2 unitRange = float2(pxRange, pxRange) / float2(width, height);\n    float2 screenTexSize = float2(1.0f, 1.0f) / fwidth(texCoord);\n    return max(0.5 * dot(unitRange, screenTexSize), 1.0);\n}\n\nPSOutput PSMain(VSOutput input)\n{\n    float4 msdf = FontAtlasTexture.Sample(FontAtlasSampler, input.TexCoord);\n    float3 msd = msdf.rgb;\n\n    float sd = median(msd.r, msd.g, msd.b);\n\n    float screenPxDistance = screenPxRange(input.TexCoord) * (sd - 0.5f);\n\n    float opacity = clamp(screenPxDistance + 0.5f, 0.0f, 1.0f);\n    if(opacity == 0.0f)\n    {\n        discard;\n    }\n\n    float4 bgColor = float4(0.0f, 0.0f, 0.0f, 0.0f);\n\n    float4 color = lerp(bgColor, input.Color, opacity);\n    if(color.a == 0.0f)\n    {\n        discard;\n    }\n\n    PSOutput output = (PSOutput)0;\n    output.Color = color;\n    return output;\n}"
       Color: [0.702702522, 0, 1, 1]
       Kerning: 0.0
       LineSpacing: 0.0
@@ -19,8 +19,8 @@ Entities:
       Position: [-0.677380562, 9.96345901, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    Text:
-      TextString: "Hello world!\nThis is written from Text Component!"
+    TextRenderer:
+      Text: "Hello world!\nThis is written from Text Component!"
       Color: [0, 1, 0.98841691, 1]
       Kerning: 0.0
       LineSpacing: 0.0
@@ -33,8 +33,8 @@ Entities:
       Scale: [1, 1, 1]
     Script:
       ClassName: Sandbox.Tests.TextComponentTest
-    Text:
-      TextString: "Hello world! - Dynamic Text\nThis is written from Text Component!"
+    TextRenderer:
+      Text: "Hello world! - Dynamic Text\nThis is written from Text Component!"
       Color: [0, 1, 0.98841691, 1]
       Kerning: 0.0
       LineSpacing: 0.0

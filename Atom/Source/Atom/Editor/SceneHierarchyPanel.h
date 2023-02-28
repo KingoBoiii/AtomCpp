@@ -27,7 +27,7 @@ namespace Atom
 		void DrawScriptComponent(Component::Script& component);
 		void DrawRigidbody2DComponent(Component::Rigidbody2D& component);
 		void DrawBoxCollider2DComponent(Component::BoxCollider2D& component);
-		void DrawTextComponent(Component::Text& component);
+		void DrawTextRendererComponent(Component::TextRenderer& component);
 
 		void DrawAddComponentPopup();
 		template<typename Component>

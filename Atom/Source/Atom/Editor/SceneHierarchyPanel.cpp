@@ -257,6 +257,8 @@ namespace Atom
 
 		Utils::DrawComponent<Component::Camera>("Camera", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawCameraComponent));
 
+		Utils::DrawComponent<Component::TextRenderer>("Text Renderer", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawTextRendererComponent));
+
 		Utils::DrawComponent<Component::BasicRenderer>("Basic Renderer", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawBasicRendererComponent));
 
 		Utils::DrawComponent<Component::CircleRenderer>("Circle Renderer", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawCircleRendererComponent));
@@ -266,8 +268,20 @@ namespace Atom
 		Utils::DrawComponent<Component::Rigidbody2D>("Rigidbody 2D", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawRigidbody2DComponent));
 
 		Utils::DrawComponent<Component::BoxCollider2D>("Box Collider 2D", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawBoxCollider2DComponent));
+	}
 
-		Utils::DrawComponent<Component::Text>("Text", entity, AT_BIND_EVENT_FN(SceneHierarchyPanel::DrawTextComponent));
+	void SceneHierarchyPanel::DrawTextRendererComponent(Component::TextRenderer& component)
+	{
+		static char buffer[1024 * 10];
+		strcpy_s(buffer, sizeof(buffer), component.Text.c_str());
+
+		if(ImGui::InputTextMultiline("Text", buffer, sizeof(buffer)))
+		{
+			component.Text = buffer;
+		}
+		ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+		ImGui::DragFloat("Kerning", &component.Kerning, 0.025f);
+		ImGui::DragFloat("Line Spacing", &component.LineSpacing, 0.025f);
 	}
 
 	void SceneHierarchyPanel::DrawTransformComponent(Component::Transform& component)
@@ -566,31 +580,17 @@ namespace Atom
 		ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f, 0.0f);
 	}
 
-	void SceneHierarchyPanel::DrawTextComponent(Component::Text& component)
-	{
-		static char buffer[1024 * 10];
-		strcpy_s(buffer, sizeof(buffer), component.TextString.c_str());
-
-		if(ImGui::InputTextMultiline("Text", buffer, sizeof(buffer)))
-		{
-			component.TextString = buffer;
-		}
-		ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-		ImGui::DragFloat("Kerning", &component.Kerning, 0.025f);
-		ImGui::DragFloat("Line Spacing", &component.LineSpacing, 0.025f);
-	}
-
 	void SceneHierarchyPanel::DrawAddComponentPopup()
 	{
 		if(ImGui::BeginPopup(ADD_COMPONENT_POP_UP_IDENTIFIER))
 		{
 			DrawAddComponentPopupItem<Component::Camera>("Camera");
 			DrawAddComponentPopupItem<Component::Script>("C# Script");
+			DrawAddComponentPopupItem<Component::TextRenderer>("Text Renderer");
 			DrawAddComponentPopupItem<Component::BasicRenderer>("Basic Renderer");
 			DrawAddComponentPopupItem<Component::CircleRenderer>("Circle Renderer");
 			DrawAddComponentPopupItem<Component::Rigidbody2D>("Rigidbody 2D");
 			DrawAddComponentPopupItem<Component::BoxCollider2D>("Box Collider 2D");
-			DrawAddComponentPopupItem<Component::Text>("Text");
 
 			ImGui::EndPopup();
 		}
