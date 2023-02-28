@@ -1,6 +1,9 @@
-﻿namespace Atom
+﻿using Atom.Bindings;
+
+namespace Atom
 {
     
+    [NativeComponent("Atom::Rigidbody2D")]
     public class Rigidbody2D : ComponentBase
     {
         public Vector2 Position

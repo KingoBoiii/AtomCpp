@@ -1,6 +1,9 @@
-﻿namespace Atom
+﻿using Atom.Bindings;
+
+namespace Atom
 {
 
+    [NativeComponent("Atom::BasicRenderer")]
     public class BasicRenderer : ComponentBase
     {
         public Color Color

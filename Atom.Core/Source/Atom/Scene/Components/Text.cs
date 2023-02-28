@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Atom.Bindings;
 
 namespace Atom
 {
 
+    [NativeComponent("Atom::Text")]
     public class Text : ComponentBase
     {
         public string TextString
