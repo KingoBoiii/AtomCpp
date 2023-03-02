@@ -1,0 +1,102 @@
+Scene: Untitled
+Entities:
+  - Entity: 3890364137701878896
+    Identifier:
+      Name: Wall Bottom
+    Transform:
+      Position: [0, -3, 0]
+      Rotation: [0, 0, 0]
+      Scale: [7, 1, 1]
+    BasicRenderer:
+      Color: [1, 1, 1, 1]
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: true
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 1183899870260772087
+    Identifier:
+      Name: Wall Right
+    Transform:
+      Position: [3, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 5, 1]
+    BasicRenderer:
+      Color: [1, 1, 1, 1]
+  - Entity: 1156731509787658719
+    Identifier:
+      Name: Wall Top
+    Transform:
+      Position: [0, 3, 0]
+      Rotation: [0, 0, 0]
+      Scale: [7, 1, 1]
+    BasicRenderer:
+      Color: [1, 1, 1, 1]
+  - Entity: 10031778329720265322
+    Identifier:
+      Name: Player
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderer:
+      Color: [1, 0, 0, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+    Script:
+      ClassName: Sandbox.TopDown2DTest.Player
+    Rigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 17936792938577051256
+    Identifier:
+      Name: Wall Left
+    Transform:
+      Position: [-3, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 5, 1]
+    BasicRenderer:
+      Color: [1, 1, 1, 1]
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: true
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 17996773953004586713
+    Identifier:
+      Name: Camera
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false

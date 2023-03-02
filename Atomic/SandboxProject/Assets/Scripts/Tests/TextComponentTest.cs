@@ -5,10 +5,28 @@ namespace Sandbox.Tests
 
     internal class TextComponentTest : Entity
     {
+        [VisibleInEditor] private float m_Time = 346.523f;
+        [VisibleInEditor] private bool Enabled = true;
+        [VisibleInEditor] private bool Disabled;
+
         private TextRenderer _text;
+
+        protected override void Start()
+        {
+            //base.Start();
+            Log.Info("{0}.Start({1}) - Enabled: {2}", nameof(TextComponentTest), Id, Enabled);
+        }
+
+        protected override void Destroy()
+        {
+            //base.Destroy();
+            Log.Info("{0}.Destroy({1}) - Enabled: {2}", nameof(TextComponentTest), Id, Enabled);
+        }
 
         private void OnCreate()
         {
+            Log.Info("Enabled: {}", Enabled);
+
             Name = "Dynamic Text - C#";
 
             _text = GetComponent<TextRenderer>();

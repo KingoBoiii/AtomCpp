@@ -11,12 +11,15 @@ namespace Sandbox
         public Entity OtherEntity;
 
         public Vector3 Position;
-        public char Character;
+        public char Character = 'A';
+        [VisibleInEditor] private bool Enabled = true;
         public string PlayerName;
 
         //public float Speed = 2.5f;
         public float Speed;
-        public float Time;
+
+        [HiddenFromEditor] public float Time;
+        [VisibleInEditor] private float m_Time = 1.0f;
 
         private BasicRenderer m_Renderer;
 
