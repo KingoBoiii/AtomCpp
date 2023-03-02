@@ -57,6 +57,8 @@ namespace Atom
 		void Rigidbody2D_GetPosition(UUID uuid, glm::vec2* outPosition);
 		void Rigidbody2D_SetPosition(UUID uuid, glm::vec2* position);
 
+		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity);
+
 #pragma endregion
 
 #pragma region Text

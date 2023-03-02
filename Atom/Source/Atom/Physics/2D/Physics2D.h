@@ -27,6 +27,8 @@ namespace Atom
 
 		static void CreatePhysicsBody(Entity entity);
 		
+		static void SetLinearVelocity(const glm::vec2& velocity, Entity entity);
+
 		static void SetTransform(const glm::vec2& position, Entity entity);
 		static glm::vec2 GetTransform(Entity entity);
 

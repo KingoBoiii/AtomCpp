@@ -144,6 +144,12 @@ namespace Atom
 		Utils::CreatePhysicsFixtures<Component::BoxCollider2D>(entity, transform);
 	}
 
+	void Physics2D::SetLinearVelocity(const glm::vec2& velocity, Entity entity)
+	{
+		b2Body* body = GetBox2DBody(entity);
+		body->SetLinearVelocity({ velocity.x, velocity.y });
+	}
+
 	void Physics2D::SetTransform(const glm::vec2& position, Entity entity)
 	{
 		b2Body* body = GetBox2DBody(entity);

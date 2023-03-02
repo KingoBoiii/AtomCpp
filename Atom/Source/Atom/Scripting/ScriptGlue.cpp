@@ -68,6 +68,7 @@ namespace Atom
 
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetLinearVelocity);
 		
 		AT_ADD_INTERNAL_CALL(TextRenderer_GetTextString);
 		AT_ADD_INTERNAL_CALL(TextRenderer_SetTextString);
@@ -229,6 +230,16 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 
 			Physics2D::SetTransform(*position, entity);
+		}
+
+		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			Physics2D::SetLinearVelocity(*velocity, entity);
 		}
 
 #pragma endregion
