@@ -28,12 +28,12 @@ namespace Atom
 
 		// Draw calls
 		
-		static void RenderQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f));
-		static void RenderQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f));
+		static void RenderQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f), int32_t entityId = -1);
+		static void RenderQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = glm::vec4(1.0f), int32_t entityId = -1);
 
-		static void RenderQuad(const glm::mat4& transform, const glm::vec4& color);
+		static void RenderQuad(const glm::mat4& transform, const glm::vec4& color, int32_t entityId = -1);
 
-		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f);
+		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f, int32_t entityId = -1);
 
 		struct TextParameters
 		{
@@ -41,7 +41,7 @@ namespace Atom
 			float Kerning = 0.0f;
 			float LineSpacing = 0.0f;
 		};
-		static void DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters);
+		static void DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters, int32_t entityId = -1);
 
 		static void ResetStats();
 		static const Statistics& GetStats();

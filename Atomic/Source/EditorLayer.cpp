@@ -7,6 +7,7 @@
 #include <Atom/Scripting/ScriptEngine.h>
 #include <Atom/Renderer/Font.h>
 
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui.h>
@@ -56,7 +57,7 @@ namespace Atom
 
 		Atom::FramebufferOptions framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
-		framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH24STENCIL8 };
+		framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
 		framebufferOptions.Width = window->GetWidth();
 		framebufferOptions.Height = window->GetHeight();
 		m_Framebuffer = Framebuffer::Create(framebufferOptions);
@@ -76,25 +77,7 @@ namespace Atom
 		m_Viewport->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetDragDropCallback(AT_BIND_EVENT_FN(EditorLayer::OnViewportDragDropTarget));
 
-#if 1
 		OpenProject(m_ProjectPath);
-#else
-		auto commandLineArgs = Application::Get().GetOptions().CommandLineArgs;
-		if(commandLineArgs.Count > 1)
-		{
-			auto projectFilepath = commandLineArgs[1];
-			OpenProject(projectFilepath);
-		}
-		else
-		{
-			// TODO: prompt the user to select a directory
-			// NewProject();
-
-			// If no project is opened, close Atomic
-			// NOTE: this is while we don't have a new project path
-			Application::Get().Close();
-		}
-#endif
 	}
 
 	void EditorLayer::OnDetach()
@@ -120,6 +103,8 @@ namespace Atom
 		m_Framebuffer->Bind();
 		m_Framebuffer->Clear();
 
+		m_Framebuffer->ClearAttachment(1, -1);
+
 		switch(m_SceneState)
 		{
 			case Atom::EditorLayer::SceneState::Edit:		m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
@@ -129,6 +114,20 @@ namespace Atom
 		}
 
 		m_Framebuffer->Unbind();
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_Viewport->m_ViewportBounds[0].x;
+		my -= m_Viewport->m_ViewportBounds[0].y;
+		//my = viewportSize1.y - my;
+		glm::vec2 viewportSize1 = m_Viewport->m_ViewportBounds[1] - m_Viewport->m_ViewportBounds[0];
+		int mouseX = static_cast<int>(mx);
+		int mouseY = static_cast<int>(my);
+
+		if(mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize1.x && mouseY < (int)viewportSize1.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene);
+		}
 	}
 
 	void EditorLayer::OnGUI()
@@ -147,6 +146,8 @@ namespace Atom
 		UI_Toolbar();
 
 		ImGui::Begin("Settings");
+
+		ImGui::Text("Hovered Entity: %s", m_HoveredEntity ? m_HoveredEntity.GetName().c_str() : "None");
 
 		ImGui::Image(s_Font->GetAtlasTexture()->GetTexture(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
@@ -171,6 +172,7 @@ namespace Atom
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	void EditorLayer::DrawTopMenuBar()
@@ -707,6 +709,7 @@ namespace Atom
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+		m_HoveredEntity = {};
 
 		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
@@ -718,6 +721,7 @@ namespace Atom
 	void EditorLayer::OnSceneStop()
 	{
 		AT_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+		m_HoveredEntity = {};
 
 		if(m_SceneState == SceneState::Play)
 		{
@@ -740,6 +744,8 @@ namespace Atom
 
 	void EditorLayer::OnSceneSimulate()
 	{
+		m_HoveredEntity = {};
+
 		if(m_SceneState == SceneState::Play)
 		{
 			OnSceneStop();
@@ -847,6 +853,16 @@ namespace Atom
 		if(m_SceneState == SceneState::Play)
 		{
 			m_Viewport->SetGizmoType(-1);
+		}
+
+		return true;
+	}
+
+	bool EditorLayer::OnMouseButtonPressed(Atom::MouseButtonPressedEvent& e)
+	{
+		if(e.GetMouseButton() == MouseButton::Left || m_Viewport->m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt))
+		{
+			m_SceneHierarchyPanel->SetSelectedEntity(m_HoveredEntity);
 		}
 
 		return true;

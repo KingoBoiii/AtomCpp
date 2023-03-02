@@ -22,6 +22,9 @@ namespace Atom
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
+		
+		//Editor Only!
+		int32_t EntityId;
 	};
 
 	struct CircleVertex
@@ -31,6 +34,9 @@ namespace Atom
 		glm::vec4 Color;
 		float Thickness;
 		float Fade;
+
+		//Editor Only!
+		int32_t EntityId;
 	};
 
 	struct TextVertex
@@ -38,6 +44,9 @@ namespace Atom
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
+
+		//Editor Only!
+		int32_t EntityId;
 	};
 	
 	template<typename T>
@@ -162,19 +171,19 @@ namespace Atom
 		Flush();
 	}
 
-	void Renderer2D::RenderQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::RenderQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, int32_t entityId)
 	{
-		RenderQuad({ position.x, position.y, 0.0f }, size, color);
+		RenderQuad({ position.x, position.y, 0.0f }, size, color, entityId);
 	}
 
-	void Renderer2D::RenderQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::RenderQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int32_t entityId)
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		RenderQuad(transform, color);
+		RenderQuad(transform, color, entityId);
 	}
 
-	void Renderer2D::RenderQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::RenderQuad(const glm::mat4& transform, const glm::vec4& color, int32_t entityId)
 	{
 		constexpr size_t quadVertexCount = 4;
 
@@ -187,6 +196,7 @@ namespace Atom
 		{
 			s_Renderer2DData.QuadVertexBufferPtr->Position = transform * s_Renderer2DData.QuadVertexPositions[i];
 			s_Renderer2DData.QuadVertexBufferPtr->Color = color;
+			s_Renderer2DData.QuadVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.QuadVertexBufferPtr++;
 		}
 
@@ -195,7 +205,7 @@ namespace Atom
 		s_Renderer2DData.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade)
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, int32_t entityId)
 	{
 		constexpr size_t quadVertexCount = 4;
 
@@ -211,6 +221,7 @@ namespace Atom
 			s_Renderer2DData.CircleVertexBufferPtr->Color = color;
 			s_Renderer2DData.CircleVertexBufferPtr->Thickness = thickness;
 			s_Renderer2DData.CircleVertexBufferPtr->Fade = fade;
+			s_Renderer2DData.CircleVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.CircleVertexBufferPtr++;
 		}
 
@@ -219,7 +230,7 @@ namespace Atom
 		s_Renderer2DData.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters)
+	void Renderer2D::DrawString(const std::string& string, const Font* font, const glm::mat4& transform, const TextParameters& textParameters, int32_t entityId)
 	{
 		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
 		const auto& metrics = fontGeometry.getMetrics();
@@ -302,21 +313,25 @@ namespace Atom
 			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
 			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
 			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMin;
+			s_Renderer2DData.TextVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.TextVertexBufferPtr++;
 
 			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
 			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
 			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+			s_Renderer2DData.TextVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.TextVertexBufferPtr++;
 
 			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
 			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
 			s_Renderer2DData.TextVertexBufferPtr->TexCoord = texCoordMax;
+			s_Renderer2DData.TextVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.TextVertexBufferPtr++;
 
 			s_Renderer2DData.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
 			s_Renderer2DData.TextVertexBufferPtr->Color = textParameters.Color;
 			s_Renderer2DData.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+			s_Renderer2DData.TextVertexBufferPtr->EntityId = entityId;
 			s_Renderer2DData.TextVertexBufferPtr++;
 
 			s_Renderer2DData.TextIndexCount += 6;
@@ -349,7 +364,8 @@ namespace Atom
 		PipelineOptions pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
-			{ ShaderDataType::Float4, "COLOR" }
+			{ ShaderDataType::Float4, "COLOR" },
+			{ ShaderDataType::Int, "ENTITY_ID" }
 		};
 		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D");
 		s_Renderer2DData.QuadPipeline = Pipeline::Create(pipelineOptions);
@@ -370,7 +386,8 @@ namespace Atom
 			{ ShaderDataType::Float3, "LOCAL_POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },
 			{ ShaderDataType::Float, "THICKNESS" },
-			{ ShaderDataType::Float, "FADE" }
+			{ ShaderDataType::Float, "FADE" },
+			{ ShaderDataType::Int, "ENTITY_ID" }
 		};
 		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D_Circle");
 		s_Renderer2DData.CirclePipeline = Pipeline::Create(pipelineOptions);
@@ -389,7 +406,8 @@ namespace Atom
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },
-			{ ShaderDataType::Float2, "TEXCOORD" }
+			{ ShaderDataType::Float2, "TEXCOORD" },
+			{ ShaderDataType::Int, "ENTITY_ID" }
 		};
 		pipelineOptions.Shader = Renderer::GetShaderLibrary()->Get("Renderer2D_Text");
 		s_Renderer2DData.TextPipeline = Pipeline::Create(pipelineOptions);
