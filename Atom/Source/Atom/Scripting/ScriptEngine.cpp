@@ -210,16 +210,7 @@ namespace Atom
 		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
 		ScriptCache::InvokeEntityDestroy(entityInstance);
 
-#if 0
-		UUID entityUUID = entity.GetUUID();
-		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
-
-		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
-		scriptInstance->InvokeOnDestroy();
-
-		delete scriptInstance;
-		s_ScriptEngineData->EntityInstances.erase(entity.GetUUID());
-#endif
+		s_ScriptEngineData->EntityManagedInstances.erase(entity.GetUUID());
 	}
 
 	void ScriptEngine::OnUpdateEntity(Entity entity, float deltaTime)
