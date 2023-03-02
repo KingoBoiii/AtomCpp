@@ -92,6 +92,7 @@ namespace Atom
 		CopyComponent<Component::Transform>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BasicRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::CircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Script>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
@@ -133,6 +134,7 @@ namespace Atom
 		CopyComponentIfExists<Component::Transform>(newEntity, entity);
 		CopyComponentIfExists<Component::Camera>(newEntity, entity);
 		CopyComponentIfExists<Component::BasicRenderer>(newEntity, entity);
+		CopyComponentIfExists<Component::CircleRenderer>(newEntity, entity);
 		CopyComponentIfExists<Component::Script>(newEntity, entity);
 		CopyComponentIfExists<Component::Rigidbody2D>(newEntity, entity);
 		CopyComponentIfExists<Component::BoxCollider2D>(newEntity, entity);
