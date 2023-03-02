@@ -128,7 +128,6 @@ namespace Atom
 		s_ScriptEngineData->SceneContext = nullptr;
 
 		s_ScriptEngineData->EntityManagedInstances.clear();
-		//s_ScriptEngineData->EntityInstances.clear();
 	}
 
 	void ScriptEngine::OnCreateEntity(Entity entity)
@@ -374,13 +373,6 @@ namespace Atom
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded core assembly from: {0}", s_ScriptEngineData->Config.CoreAssemblyPath);
 
 		return true;
-	}
-	
-	static MonoObject* InstantiateClass(MonoClass* monoClass)
-	{
-		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
-		mono_runtime_object_init(instance);
-		return instance;
 	}
 
 	MonoDomain* ScriptEngine::GetAppDomain()
