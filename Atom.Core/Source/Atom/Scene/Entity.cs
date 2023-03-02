@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System;
 
 namespace Atom
@@ -34,17 +33,23 @@ namespace Atom
 
         protected virtual void Start()
         {
+#if ATOM_DEBUG
             Log.Info("Entity.Start({0})", Id);
+#endif
         }
 
         protected virtual void Update(float deltaTime)
         {
+#if ATOM_DEBUG
             Log.Info("Entity.Update({0})", deltaTime);
+#endif
         }
 
         protected virtual void Destroy()
         {
+#if ATOM_DEBUG
             Log.Info("Entity.Destroy({0})", Id);
+#endif
         }
 
         #region Physics Test
