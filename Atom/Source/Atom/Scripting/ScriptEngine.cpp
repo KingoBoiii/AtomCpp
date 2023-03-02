@@ -79,6 +79,8 @@ namespace Atom
 	{
 		UnloadAppAssembly();
 
+		s_ScriptEngineData->EntityManagedInstances.clear();
+
 		LoadCoreAssembly();
 		ScriptCache::CacheCoreClasses();
 
@@ -118,7 +120,7 @@ namespace Atom
 
 		mono_domain_unload(s_ScriptEngineData->AppDomain);
 
-		ScriptCache::ClearCache();
+		ScriptCache::Shutdown();
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
