@@ -36,17 +36,10 @@ namespace Atom
 		AssemblyInfo* CoreAssemblyInfo = nullptr;
 		AssemblyInfo* AppAssemblyInfo = nullptr;
 
-		std::unordered_map<UUID, ScriptInstance*> EntityInstances;
-
 		std::unordered_map<UUID, MonoObject*> EntityManagedInstances;
-
-		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
 		filewatch::FileWatch<std::string>* AppAssemblyWatcher = nullptr;
 		bool AppAssemblyReloadPending = false;
-
-		// TODO: Move to ScriptEngineConfig
-		bool EnableDebugging = true;
 
 		Scene* SceneContext = nullptr;
 	};
@@ -240,55 +233,15 @@ namespace Atom
 		}
 	}
 
-#if 0
-	bool ScriptEngine::EntityClassExists(const std::string& fullName)
-	{
-		return s_ScriptEngineData->EntityClasses.find(fullName) != s_ScriptEngineData->EntityClasses.end();
-	}
-
-	ScriptClass* ScriptEngine::GetEntityClass(const std::string& name)
-	{
-		if(s_ScriptEngineData->EntityClasses.find(name) == s_ScriptEngineData->EntityClasses.end())
-		{
-			return nullptr;
-		}
-
-		return s_ScriptEngineData->EntityClasses.at(name);
-	}
-
-	std::unordered_map<std::string, ScriptClass*> ScriptEngine::GetEntityClasses()
-	{
-		return s_ScriptEngineData->EntityClasses;
-	}
-#endif
-	
-	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
-	{
-		AT_CORE_ASSERT(entity);
-
-		UUID entityId = entity.GetUUID();
-		//AT_CORE_ASSERT(s_ScriptEngineData->EntityScriptFields.find(entityId) != s_ScriptEngineData->EntityScriptFields.end());
-
-		return s_ScriptEngineData->EntityScriptFields[entityId];
-	}
-
-	ScriptInstance* ScriptEngine::GetEntityScriptInstance(UUID entityId)
-	{
-		auto it = s_ScriptEngineData->EntityInstances.find(entityId);
-		if(it == s_ScriptEngineData->EntityInstances.end())
-		{
-			return nullptr;
-		}
-
-		return it->second;
-	}
-
 	MonoObject* ScriptEngine::GetManagedInstance(UUID entityId)
 	{
-		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityId) != s_ScriptEngineData->EntityInstances.end());
+		auto iterator = s_ScriptEngineData->EntityManagedInstances.find(entityId);
+		if(iterator != s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			return nullptr;
+		}
 
-		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances.at(entityId);
-		return scriptInstance->GetManagedObject();
+		return iterator->second;
 	}
 
 	AssemblyInfo* ScriptEngine::GetCoreAssemblyInfo()
@@ -305,7 +258,7 @@ namespace Atom
 	{
 		mono_set_assemblies_path("mono/lib");
 
-		if(s_ScriptEngineData->EnableDebugging)
+		if(s_ScriptEngineData->Config.EnableDebugging)
 		{
 			const char* argv[2] = {
 				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.txt",
@@ -321,7 +274,7 @@ namespace Atom
 
 		s_ScriptEngineData->RootDomain = rootDomain;
 
-		if(s_ScriptEngineData->EnableDebugging)
+		if(s_ScriptEngineData->Config.EnableDebugging)
 		{
 			mono_debug_domain_create(s_ScriptEngineData->RootDomain);
 		}
@@ -411,7 +364,7 @@ namespace Atom
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
 
-		s_ScriptEngineData->CoreAssemblyInfo = AssemblyUtils::LoadAssembly(s_ScriptEngineData->Config.CoreAssemblyPath, s_ScriptEngineData->EnableDebugging);
+		s_ScriptEngineData->CoreAssemblyInfo = AssemblyUtils::LoadAssembly(s_ScriptEngineData->Config.CoreAssemblyPath, s_ScriptEngineData->Config.EnableDebugging);
 		if(s_ScriptEngineData->CoreAssemblyInfo == nullptr)
 		{
 			AT_CORE_ERROR("[ScriptEngine] Failed to load core assembly!");
@@ -443,141 +396,6 @@ namespace Atom
 	Scene* ScriptEngine::GetSceneContext()
 	{
 		return s_ScriptEngineData->SceneContext;
-	}
-
-	ScriptClass::ScriptClass(const std::string& classNameSpace, const std::string& className, bool isCore)
-		: m_ClassNamespace(classNameSpace), m_ClassName(className)
-	{
-		MonoImage* image = isCore ? s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage : s_ScriptEngineData->AppAssemblyInfo->AssemblyImage;
-		m_MonoClass = mono_class_from_name(image, classNameSpace.c_str(), className.c_str());
-		//m_MonoClass = mono_class_from_name(isCore ? s_ScriptEngineData->CoreAssemblyImage : s_ScriptEngineData->AppAssemblyImage, classNameSpace.c_str(), className.c_str());
-	}
-
-	MonoObject* ScriptClass::Instantiate() const
-	{
-		return InstantiateClass(m_MonoClass);
-	}
-
-	MonoMethod* ScriptClass::GetMethod(const std::string& methodName, int parameterCount) const
-	{
-		return mono_class_get_method_from_name(m_MonoClass, methodName.c_str(), parameterCount);
-	}
-
-	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** parameters)
-	{
-		MonoObject* exception = nullptr;
-		return mono_runtime_invoke(monoMethod, instance, parameters, &exception);
-	}
-
-	ScriptInstance::ScriptInstance(ScriptClass* scriptClass, Entity entity)
-		: m_ScriptClass(scriptClass)
-	{
-#if 0
-		m_Instance = m_ScriptClass->Instantiate();
-
-		m_Constructor = s_ScriptEngineData->EntityClass.GetMethod(".ctor", 1);
-		m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate");
-		m_OnDestroyMethod = m_ScriptClass->GetMethod("OnDestroy");
-		m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
-
-		m_OnCollision2DEnterMethod = s_ScriptEngineData->EntityClass.GetMethod("OnCollision2DEnter_Internal", 1);
-		m_OnCollision2DExitMethod = s_ScriptEngineData->EntityClass.GetMethod("OnCollision2DExit_Internal", 1);
-
-		{
-			void* param = &entity.GetUUID();
-
-			m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
-		}
-#endif
-	}
-
-	void ScriptInstance::InvokeOnCreate()
-	{
-		if(!m_OnCreateMethod)
-		{
-			return;
-		}
-
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
-	}
-
-	void ScriptInstance::InvokeOnDestroy()
-	{
-		if(!m_OnDestroyMethod)
-		{
-			return;
-		}
-
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnDestroyMethod);
-	}
-
-	void ScriptInstance::InvokeOnUpdate(float deltaTime)
-	{
-		if(!m_OnUpdateMethod)
-		{
-			return;
-		}
-
-		void* param = &deltaTime;
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
-	}
-
-#if 0
-	void ScriptInstance::InvokeOnCollision2DEnter(Entity other)
-	{
-		if(!m_OnCollision2DEnterMethod)
-		{
-			return;
-		}
-
-		void* param = &other.GetUUID();
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollision2DEnterMethod, &param);
-	}
-
-	void ScriptInstance::InvokeOnCollision2DExit(Entity other)
-	{
-		if(!m_OnCollision2DExitMethod)
-		{
-			return;
-		}
-
-		void* param = &other.GetUUID();
-		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollision2DExitMethod, &param);
-	}
-#endif
-
-	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
-	{
-		const auto& fields = m_ScriptClass->GetFields();
-
-		auto it = fields.find(name);
-
-		if(it == fields.end())
-		{
-			return false;
-		}
-
-		const ScriptField& field = it->second;
-
-		mono_field_get_value(m_Instance, field.ClassField, buffer);
-		return true;
-	}
-
-	bool ScriptInstance::SetFieldValueInternal(const std::string& name, const void* value)
-	{
-		const auto& fields = m_ScriptClass->GetFields();
-
-		auto it = fields.find(name);
-
-		if(it == fields.end())
-		{
-			return false;
-		}
-
-		const ScriptField& field = it->second;
-
-		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
-		return true;
 	}
 
 }

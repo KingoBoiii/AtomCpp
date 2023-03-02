@@ -54,6 +54,7 @@ Atom::Application* Atom::CreateApplication(Atom::ApplicationCommandLineArgs args
 	applicationOptions.CommandLineArgs = args;
 
 	applicationOptions.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Atom.Core.dll";
+	applicationOptions.ScriptConfig.EnableDebugging = true;
 
 	return new Atom::AtomEditorApplication(applicationOptions, projectPath);
 }
