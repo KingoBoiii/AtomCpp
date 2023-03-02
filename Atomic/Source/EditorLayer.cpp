@@ -570,7 +570,7 @@ namespace Atom
 			return;
 		}
 		NewScene();
-		AT_CORE_ERROR("Failed to load start scene");
+		AT_CORE_WARN("No start scene has been set - new scene");
 	}
 
 	void EditorLayer::SaveProject()
@@ -615,7 +615,7 @@ namespace Atom
 	{
 		SaveProject();
 
-		ScriptEngine::UnloadAppAssembly();
+		//ScriptEngine::UnloadAppAssembly();
 		ScriptEngine::SetSceneContext(nullptr);
 
 		if(unloadProject)
