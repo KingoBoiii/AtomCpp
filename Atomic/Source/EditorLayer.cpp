@@ -56,6 +56,7 @@ namespace Atom
 
 		Atom::FramebufferOptions framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
+		framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH24STENCIL8 };
 		framebufferOptions.Width = window->GetWidth();
 		framebufferOptions.Height = window->GetHeight();
 		m_Framebuffer = Framebuffer::Create(framebufferOptions);
