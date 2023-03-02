@@ -633,9 +633,12 @@ namespace Atom
 		//m_ActiveScene = nullptr;
 
 		m_ActiveScene = new Scene();
+		m_EditorScene = m_ActiveScene;
+
 		//m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetSceneContext(m_ActiveScene);
+
 	}
 
 	void EditorLayer::OpenScene()
