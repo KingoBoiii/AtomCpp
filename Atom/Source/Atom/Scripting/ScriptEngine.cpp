@@ -125,27 +125,7 @@ namespace Atom
 	{
 		s_ScriptEngineData->SceneContext = scene;
 
-		// Instantiate every managed entity class
-		auto view = s_ScriptEngineData->SceneContext->GetAllEntitiesWith<Component::Identifier, Component::Script>();
-		for(const auto& e : view)
-		{
-			auto [identifier, script] = view.get<Component::Identifier, Component::Script>(e);
-
-			ManagedClass* managedEntityClass = AT_CORE_CLASS("Entity");
-			ManagedClass* managedClass = AT_CACHED_ENTITY_CLASS(script.ClassName);
-			if(!managedEntityClass)
-			{
-				AT_CORE_ERROR("[ScriptEngine] Failed to find managed class for entity: {0}", identifier.Name);
-				continue;
-			}
-
-			MonoObject* entityInstance = ScriptUtils::InstantiateManagedClass(managedClass);
-
-			void* param = &identifier.ID;
-			ScriptUtils::InvokeManagedMethod(AT_CACHED_METHOD(managedEntityClass, ".ctor"), entityInstance, &param);
-
-			s_ScriptEngineData->EntityManagedInstances[identifier.ID] = entityInstance;
-		}
+		InstantiateEntityInstances();
 	}
 
 	void ScriptEngine::OnRuntimeStop()
@@ -158,8 +138,6 @@ namespace Atom
 
 	void ScriptEngine::OnCreateEntity(Entity entity)
 	{
-		const auto& script = entity.GetComponent<Component::Script>();
-
 		UUID entityId = entity.GetUUID();
 		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
 		{
@@ -377,6 +355,31 @@ namespace Atom
 
 		mono_jit_cleanup(s_ScriptEngineData->RootDomain);
 		s_ScriptEngineData->RootDomain = nullptr;
+	}
+
+	void ScriptEngine::InstantiateEntityInstances()
+	{
+		// Instantiate every managed entity class
+		auto view = s_ScriptEngineData->SceneContext->GetAllEntitiesWith<Component::Identifier, Component::Script>();
+		for(const auto& e : view)
+		{
+			auto [identifier, script] = view.get<Component::Identifier, Component::Script>(e);
+
+			ManagedClass* managedEntityClass = AT_CORE_CLASS("Entity");
+			ManagedClass* managedClass = AT_CACHED_ENTITY_CLASS(script.ClassName);
+			if(!managedEntityClass || !managedClass)
+			{
+				AT_CORE_ERROR("[ScriptEngine] Failed to find managed class for entity: {0}", identifier.Name);
+				continue;
+			}
+
+			MonoObject* entityInstance = ScriptUtils::InstantiateManagedClass(managedClass);
+
+			void* param = &identifier.ID;
+			ScriptUtils::InvokeManagedMethod(AT_CACHED_METHOD(managedEntityClass, ".ctor"), entityInstance, &param);
+
+			s_ScriptEngineData->EntityManagedInstances[identifier.ID] = entityInstance;
+		}
 	}
 
 	bool ScriptEngine::LoadCoreAssembly()

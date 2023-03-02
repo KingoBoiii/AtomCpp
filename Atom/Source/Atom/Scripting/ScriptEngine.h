@@ -127,6 +127,8 @@ namespace Atom
 		static void InitializeMono();
 		static void ShutdownMono();
 
+		static void InstantiateEntityInstances();
+
 		static bool LoadCoreAssembly();
 
 		friend class ScriptClass;
