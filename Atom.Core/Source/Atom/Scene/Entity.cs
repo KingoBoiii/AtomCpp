@@ -8,6 +8,7 @@
         internal Entity(ulong id)
         {
             Id = id;
+            Log.Info("Entity::ctor({0})", Id);
         }
 
         public ulong Id { get; }
@@ -24,6 +25,21 @@
             {
                 return GetComponent<Transform>();
             }
+        }
+
+        protected virtual void Start()
+        {
+            Log.Info("Entity.Start({0})", Id);
+        }
+
+        protected virtual void Update(float deltaTime)
+        {
+            Log.Info("Entity.Update({0})", deltaTime);
+        }
+
+        protected virtual void Destroy()
+        {
+            Log.Info("Entity.Destroy({0})", Id);
         }
 
         #region Physics Test
