@@ -98,9 +98,7 @@ namespace Atom
 		CACHE_CORELIB_CLASS("Double");
 		CACHE_CORELIB_CLASS("Char");
 		CACHE_CORELIB_CLASS("String");
-
-		auto d = ScriptEngine::GetCoreAssemblyInfo();
-
+		
 #define CACHE_ATOM_CORE_CLASS(name) CacheClass("Atom." ##name, mono_class_from_name(ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage, "Atom", name))
 
 		CACHE_ATOM_CORE_CLASS("VisibleInEditorAttribute");
@@ -110,13 +108,6 @@ namespace Atom
 		//CACHE_ATOM_CORE_CLASS("Vector3");
 		//CACHE_ATOM_CORE_CLASS("Vector4");
 		CACHE_ATOM_CORE_CLASS("Entity");
-
-//#define CACHE_ATOM_ENTITY_METHOD(name, parameterCount) CacheMethod(AT_CACHED_CLASS_RAW("Atom.Entity"), name, parameterCount);
-//		
-//		CACHE_ATOM_ENTITY_METHOD(".ctor", 1);
-//		CACHE_ATOM_ENTITY_METHOD("Start", 0);
-//		CACHE_ATOM_ENTITY_METHOD("Destroy", 0);
-//		CACHE_ATOM_ENTITY_METHOD("Update", 1);
 	}
 
 	void ScriptCache::CacheAssemblyClasses(AssemblyInfo* assemblyInfo)
