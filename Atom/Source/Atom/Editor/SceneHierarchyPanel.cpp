@@ -3,6 +3,7 @@
 #include "Atom/Scene/Components.h"
 
 #include "Atom/Scripting/ScriptEngine.h"
+#include "Atom/Scripting/ScriptCache.h"
 
 #include "Atom/ImGui/UICore.h"
 
@@ -453,12 +454,14 @@ namespace Atom
 
 	void SceneHierarchyPanel::DrawScriptComponent(Component::Script& component)
 	{
-		bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+		//bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+		ManagedClass* managedClass = AT_CACHED_ENTITY_CLASS(component.ClassName);
 
 		static char buffer[64];
 		strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-		if(!scriptClassExists)
+		if(managedClass == nullptr)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
 		}
@@ -499,6 +502,27 @@ namespace Atom
 		}
 		else
 		{
+			if(managedClass)
+			{
+				const auto& classFields = managedClass->GetFields();
+
+				for(const auto& [fieldName, field] : classFields)
+				{
+					ManagedClassField& classField = managedClass->GetField(fieldName);
+
+#define AT_SCRIPT_FIELD_TYPE_CASE(managedType, type, func) case managedType: { type data = classField.GetValue<type>(); if(func) { classField.SetValue<type>(data); } } break
+
+					switch(field.GetType())
+					{
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Bool, bool, ImGui::Checkbox(fieldName.c_str(), &data));
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Char, char, ImGui::InputText(fieldName.c_str(), &data, sizeof(char)));
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Float, float, ImGui::DragFloat(fieldName.c_str(), &data));
+						default: break;
+					}
+				}
+			}
+
+			bool scriptClassExists = false;
 			if(scriptClassExists)
 			{
 				ScriptClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
@@ -559,7 +583,7 @@ namespace Atom
 		}
 
 
-		if(!scriptClassExists)
+		if(managedClass == nullptr)
 		{
 			ImGui::PopStyleColor();
 		}
