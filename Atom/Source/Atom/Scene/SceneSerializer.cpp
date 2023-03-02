@@ -501,48 +501,6 @@ namespace Atom
 						}
 					}
 				}
-#if 0
-					ScriptClass* entityClass = ScriptEngine::GetEntityClass(script.ClassName);
-					AT_CORE_ASSERT(entityClass);
-					const auto& fields = entityClass->GetFields();
-
-					auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
-
-					for(auto scriptField : scriptFields)
-					{
-						std::string name = scriptField["Name"].as<std::string>();
-						std::string typeString = scriptField["Type"].as<std::string>();
-						ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
-
-						ScriptFieldInstance& fieldInstance = entityFields[name];
-
-						AT_CORE_ASSERT(fields.find(name) != fields.end());
-
-						if(fields.find(name) == fields.end())
-						{
-							continue;
-						}
-						
-						fieldInstance.Field = fields.at(name);
-
-						switch(type)
-						{
-							READ_SCRIPT_FIELD(Bool, bool);
-							READ_SCRIPT_FIELD(Char, char);
-							READ_SCRIPT_FIELD(Float, float);
-							READ_SCRIPT_FIELD(Double, double);
-							READ_SCRIPT_FIELD(Byte, int8_t);
-							READ_SCRIPT_FIELD(Short, int16_t);
-							READ_SCRIPT_FIELD(Int, int32_t);
-							READ_SCRIPT_FIELD(Long, int64_t);
-							READ_SCRIPT_FIELD(Vector2, glm::vec2);
-							READ_SCRIPT_FIELD(Vector3, glm::vec3);
-							READ_SCRIPT_FIELD(Vector4, glm::vec4);
-							READ_SCRIPT_FIELD(Entity, UUID);
-						}
-					}
-				}
-#endif
 			}
 
 			auto rigidbody2DComponent = entity["Rigidbody2D"];
