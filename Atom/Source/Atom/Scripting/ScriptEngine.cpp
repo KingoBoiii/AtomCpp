@@ -1,7 +1,10 @@
 #include "ATPCH.h"
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
+#include "ScriptUtils.h"
 #include "ScriptCache.h"
+
+#include "Atom/Scripting/Assembly/AssemblyUtils.h"
 
 #include "Atom/Core/Application.h"
 #include "Atom/Core/FileSystem.h"
@@ -23,42 +26,6 @@
 namespace Atom
 {
 
-	// TODO: Add unsigned types (and missing types)
-	using ScriptFieldTypeMap = std::unordered_map<std::string, ScriptFieldType>;
-	static ScriptFieldTypeMap s_ScriptFieldTypeMap = {
-		{ "System.Boolean",		ScriptFieldType::Bool },
-		{ "System.Char",		ScriptFieldType::Char },
-		{ "System.String",		ScriptFieldType::String },
-		{ "System.Single",		ScriptFieldType::Float },
-		{ "System.Double",		ScriptFieldType::Double },
-		{ "System.Byte",		ScriptFieldType::Byte },
-		{ "System.Int16",		ScriptFieldType::Short },
-		{ "System.Int32",		ScriptFieldType::Int },
-		{ "System.Int64",		ScriptFieldType::Long },
-		{ "Atom.Vector2",		ScriptFieldType::Vector2 },
-		{ "Atom.Vector3",		ScriptFieldType::Vector3 },
-		{ "Atom.Vector4",		ScriptFieldType::Vector4 },
-		{ "Atom.Entity",		ScriptFieldType::Entity }
-	};
-
-	namespace Utils
-	{
-		
-		ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType)
-		{
-			std::string typeName = mono_type_get_name(monoType);
-
-			auto it = s_ScriptFieldTypeMap.find(typeName);
-			if(it == s_ScriptFieldTypeMap.end())
-			{
-				return ScriptFieldType::None;
-			}
-
-			return it->second;
-		}
-
-	}
-
 	struct ScriptEngineData
 	{
 		MonoDomain* RootDomain = nullptr;
@@ -69,19 +36,19 @@ namespace Atom
 		AssemblyInfo* CoreAssemblyInfo = nullptr;
 		AssemblyInfo* AppAssemblyInfo = nullptr;
 
-		ScriptClass EntityClass;
-
-		std::unordered_map<std::string, ScriptClass*> EntityClasses;
 		std::unordered_map<UUID, ScriptInstance*> EntityInstances;
+
+		std::unordered_map<UUID, MonoObject*> EntityManagedInstances;
 
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
-		filewatch::FileWatch<std::string>* AppAssemblyWatcher;
+		filewatch::FileWatch<std::string>* AppAssemblyWatcher = nullptr;
 		bool AppAssemblyReloadPending = false;
 
+		// TODO: Move to ScriptEngineConfig
 		bool EnableDebugging = true;
 
-		Scene* SceneContext;
+		Scene* SceneContext = nullptr;
 	};
 
 	static ScriptEngineData* s_ScriptEngineData = nullptr;
@@ -96,12 +63,8 @@ namespace Atom
 		LoadCoreAssembly();
 		ScriptCache::Initialize();
 
-		//LoadAppAssembly();
-
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterInternalCalls();
-
-		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
 	}
 
 	void ScriptEngine::Shutdown()
@@ -114,18 +77,14 @@ namespace Atom
 
 	void ScriptEngine::ReloadAssembly()
 	{
-		mono_domain_set(mono_get_root_domain(), false);
-
-		mono_domain_unload(s_ScriptEngineData->AppDomain);
+		UnloadAppAssembly();
 
 		LoadCoreAssembly();
+		ScriptCache::CacheCoreClasses();
+
 		LoadAppAssembly();
 
-		LoadAssemblyClasses();
-
 		ScriptGlue::RegisterComponents();
-
-		s_ScriptEngineData->EntityClass = ScriptClass("Atom", "Entity", true);
 	}
 
 	bool ScriptEngine::LoadAppAssembly()
@@ -137,24 +96,16 @@ namespace Atom
 			return false;
 		}
 
-		MonoAssembly* assembly = LoadMonoAssembly(Project::GetScriptModuleFilepath());
-		if(assembly == nullptr)
+		s_ScriptEngineData->AppAssemblyInfo = AssemblyUtils::LoadAssembly(Project::GetScriptModuleFilepath(), s_ScriptEngineData->EnableDebugging);
+		if(s_ScriptEngineData->AppAssemblyInfo == nullptr)
 		{
 			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
 			return false;
 		}
-
-		s_ScriptEngineData->AppAssemblyInfo = new AssemblyInfo();
-		s_ScriptEngineData->AppAssemblyInfo->Filepath = Project::GetScriptModuleFilepath();
-		s_ScriptEngineData->AppAssemblyInfo->Assembly = assembly;
-		s_ScriptEngineData->AppAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->AppAssemblyInfo->Assembly);
-		s_ScriptEngineData->AppAssemblyInfo->IsCoreAssembly = true;
-		s_ScriptEngineData->AppAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
-		s_ScriptEngineData->AppAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage);
-
+		
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
 
-		LoadAssemblyClasses(); // TODO: Move to ScriptCache
+		ScriptCache::CacheAssemblyClasses(s_ScriptEngineData->AppAssemblyInfo);
 
 		return true;
 	}
@@ -163,32 +114,71 @@ namespace Atom
 	{
 		// Call OnDestroy method from here!
 
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_ScriptEngineData->AppDomain);
+
 		ScriptCache::ClearCache();
-		ScriptCache::CacheCoreClasses();
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
 	{
 		s_ScriptEngineData->SceneContext = scene;
+
+		// Instantiate every managed entity class
+		auto view = s_ScriptEngineData->SceneContext->GetAllEntitiesWith<Component::Identifier, Component::Script>();
+		for(const auto& e : view)
+		{
+			auto [identifier, script] = view.get<Component::Identifier, Component::Script>(e);
+
+			ManagedClass* managedEntityClass = AT_CORE_CLASS("Entity");
+			ManagedClass* managedClass = AT_CACHED_ENTITY_CLASS(script.ClassName);
+			if(!managedEntityClass)
+			{
+				AT_CORE_ERROR("[ScriptEngine] Failed to find managed class for entity: {0}", identifier.Name);
+				continue;
+			}
+
+			MonoObject* entityInstance = ScriptUtils::InstantiateManagedClass(managedClass);
+
+			void* param = &identifier.ID;
+			ScriptUtils::InvokeManagedMethod(AT_CACHED_METHOD(managedEntityClass, ".ctor"), entityInstance, &param);
+
+			s_ScriptEngineData->EntityManagedInstances[identifier.ID] = entityInstance;
+		}
 	}
 
 	void ScriptEngine::OnRuntimeStop()
 	{
 		s_ScriptEngineData->SceneContext = nullptr;
 
-		s_ScriptEngineData->EntityInstances.clear();
+		s_ScriptEngineData->EntityManagedInstances.clear();
+		//s_ScriptEngineData->EntityInstances.clear();
 	}
 
 	void ScriptEngine::OnCreateEntity(Entity entity)
 	{
 		const auto& script = entity.GetComponent<Component::Script>();
+
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
+		
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+		ScriptCache::InvokeEntityStart(entityInstance);
+		
+#if 0
 		if(EntityClassExists(script.ClassName))
 		{
-			UUID entityId = entity.GetUUID();
-
 			ScriptClass* scriptClass = s_ScriptEngineData->EntityClasses[script.ClassName];
 
 			ScriptInstance* scriptInstance = new ScriptInstance(scriptClass, entity);
+
+			UUID entityId = entity.GetUUID();
+			
 			s_ScriptEngineData->EntityInstances[entityId] = scriptInstance;
 
 			// Copy field values
@@ -203,10 +193,24 @@ namespace Atom
 
 			scriptInstance->InvokeOnCreate();
 		}
+#endif
 	}
 
 	void ScriptEngine::OnDestroyEntity(Entity entity)
 	{
+		const auto& script = entity.GetComponent<Component::Script>();
+
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
+
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+		ScriptCache::InvokeEntityDestroy(entityInstance);
+
+#if 0
 		UUID entityUUID = entity.GetUUID();
 		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
 
@@ -215,17 +219,23 @@ namespace Atom
 
 		delete scriptInstance;
 		s_ScriptEngineData->EntityInstances.erase(entity.GetUUID());
+#endif
 	}
 
 	void ScriptEngine::OnUpdateEntity(Entity entity, float deltaTime)
 	{
-		UUID entityUUID = entity.GetUUID();
-		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
 
-		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
-		scriptInstance->InvokeOnUpdate(deltaTime);
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+		ScriptCache::InvokeEntityUpdate(entityInstance, deltaTime);
 	}
 
+#if 0
 	void ScriptEngine::InvokeOnCollection2DEnter(Entity entity, Entity other)
 	{
 		if(!entity.HasComponent<Component::Script>())
@@ -253,6 +263,7 @@ namespace Atom
 		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
 		scriptInstance->InvokeOnCollision2DExit(other);
 	}
+#endif
 
 	static void OnAppAssemblyFileSystemEvent(const std::string& filepath, filewatch::Event changeType)
 	{
@@ -277,6 +288,7 @@ namespace Atom
 		}
 	}
 
+#if 0
 	bool ScriptEngine::EntityClassExists(const std::string& fullName)
 	{
 		return s_ScriptEngineData->EntityClasses.find(fullName) != s_ScriptEngineData->EntityClasses.end();
@@ -296,7 +308,8 @@ namespace Atom
 	{
 		return s_ScriptEngineData->EntityClasses;
 	}
-
+#endif
+	
 	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
 	{
 		AT_CORE_ASSERT(entity);
@@ -385,187 +398,23 @@ namespace Atom
 		s_ScriptEngineData->AppDomain = mono_domain_create_appdomain("AtomScriptRuntime", nullptr);
 		mono_domain_set(s_ScriptEngineData->AppDomain, true);
 
-		MonoAssembly* assembly = LoadMonoAssembly(s_ScriptEngineData->Config.CoreAssemblyPath);
-		if(assembly == nullptr)
+		s_ScriptEngineData->CoreAssemblyInfo = AssemblyUtils::LoadAssembly(s_ScriptEngineData->Config.CoreAssemblyPath, s_ScriptEngineData->EnableDebugging);
+		if(s_ScriptEngineData->CoreAssemblyInfo == nullptr)
 		{
 			AT_CORE_ERROR("[ScriptEngine] Failed to load core assembly!");
 			return false;
 		}
 
-		s_ScriptEngineData->CoreAssemblyInfo = new AssemblyInfo();
-		s_ScriptEngineData->CoreAssemblyInfo->Filepath = s_ScriptEngineData->Config.CoreAssemblyPath;
-		s_ScriptEngineData->CoreAssemblyInfo->Assembly = assembly;
-		s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage = mono_assembly_get_image(s_ScriptEngineData->CoreAssemblyInfo->Assembly);
-		s_ScriptEngineData->CoreAssemblyInfo->IsCoreAssembly = true;
-		s_ScriptEngineData->CoreAssemblyInfo->Metadata = LoadAssemblyMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
-		s_ScriptEngineData->CoreAssemblyInfo->ReferencedAssemblies = GetReferencedAssembliesMetadata(s_ScriptEngineData->CoreAssemblyInfo->AssemblyImage);
-
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded core assembly from: {0}", s_ScriptEngineData->Config.CoreAssemblyPath);
 
 		return true;
 	}
-
-	AssemblyMetadata ScriptEngine::LoadAssemblyMetadata(MonoImage* image)
-	{
-		AssemblyMetadata metadata;
-
-		const MonoTableInfo* t = mono_image_get_table_info(image, MONO_TABLE_ASSEMBLY);
-		uint32_t cols[MONO_ASSEMBLY_SIZE];
-		mono_metadata_decode_row(t, 0, cols, MONO_ASSEMBLY_SIZE);
-
-		metadata.Name = mono_metadata_string_heap(image, cols[MONO_ASSEMBLY_NAME]);
-		metadata.MajorVersion = cols[MONO_ASSEMBLY_MAJOR_VERSION] > 0 ? cols[MONO_ASSEMBLY_MAJOR_VERSION] : 1;
-		metadata.MinorVersion = cols[MONO_ASSEMBLY_MINOR_VERSION];
-		metadata.BuildVersion = cols[MONO_ASSEMBLY_BUILD_NUMBER];
-		metadata.RevisionVersion = cols[MONO_ASSEMBLY_REV_NUMBER];
-
-		return metadata;
-	}
-
-	MonoAssembly* ScriptEngine::LoadMonoAssembly(const std::filesystem::path& filepath)
-	{
-		if(!std::filesystem::exists(filepath))
-		{
-			return nullptr;
-		}
-
-		ScopedBuffer buffer = FileSystem::ReadFileBinary(filepath.string());
-
-		// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
-		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(buffer.As<char>(), buffer.Size(), 1, &status, 0);
-
-		if(status != MONO_IMAGE_OK)
-		{
-			const char* errorMessage = mono_image_strerror(status);
-			AT_CORE_ERROR("[ScriptEngine] Failed to open C# assembly '{0}'\n\t\tMessage: {1}", filepath, errorMessage);
-			return nullptr;
-		}
-
-		if(s_ScriptEngineData->EnableDebugging)
-		{
-			std::filesystem::path pdbPath = filepath;
-			pdbPath.replace_extension(".pdb");
-
-			AT_CORE_WARN("Trying to load PDB file: {}", pdbPath);
-
-			if(std::filesystem::exists(pdbPath))
-			{
-				ScopedBuffer pdbFileBuffer = FileSystem::ReadFileBinary(pdbPath.string());
-
-				mono_debug_open_image_from_memory(image, pdbFileBuffer.As<const mono_byte>(), pdbFileBuffer.Size());
-
-				AT_CORE_INFO("Loaded PDB {}", pdbPath);
-			}
-		}
-
-		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath.string().c_str(), &status, 0);
-		mono_image_close(image);
-
-		return assembly;
-	}
-
-	std::vector<AssemblyMetadata> ScriptEngine::GetReferencedAssembliesMetadata(MonoImage* image)
-	{
-		const MonoTableInfo* t = mono_image_get_table_info(image, MONO_TABLE_ASSEMBLYREF);
-		int rows = mono_table_info_get_rows(t);
-
-		std::vector<AssemblyMetadata> metadata;
-		for(int i = 0; i < rows; i++)
-		{
-			uint32_t cols[MONO_ASSEMBLYREF_SIZE];
-			mono_metadata_decode_row(t, i, cols, MONO_ASSEMBLYREF_SIZE);
-
-			auto& assemblyMetadata = metadata.emplace_back();
-			assemblyMetadata.Name = mono_metadata_string_heap(image, cols[MONO_ASSEMBLYREF_NAME]);
-			assemblyMetadata.MajorVersion = cols[MONO_ASSEMBLYREF_MAJOR_VERSION];
-			assemblyMetadata.MinorVersion = cols[MONO_ASSEMBLYREF_MINOR_VERSION];
-			assemblyMetadata.BuildVersion = cols[MONO_ASSEMBLYREF_BUILD_NUMBER];
-			assemblyMetadata.RevisionVersion = cols[MONO_ASSEMBLYREF_REV_NUMBER];
-		}
-
-		return metadata;
-	}
-
-	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
+	
+	static MonoObject* InstantiateClass(MonoClass* monoClass)
 	{
 		MonoObject* instance = mono_object_new(s_ScriptEngineData->AppDomain, monoClass);
 		mono_runtime_object_init(instance);
 		return instance;
-	}
-
-	void ScriptEngine::LoadAssemblyClasses()
-	{
-		s_ScriptEngineData->EntityClasses.clear();
-
-		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, MONO_TABLE_TYPEDEF);
-		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-
-		MonoClass* entityBaseClass = AT_CACHED_CLASS_RAW("Atom.Entity");
-		//MonoClass* entityBaseClass = mono_class_from_name(s_ScriptEngineData->CoreAssemblyImage, "Atom", "Entity");
-
-		for(int32_t i = 0; i < numTypes; i++)
-		{
-			uint32_t cols[MONO_TYPEDEF_SIZE];
-			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-
-			const char* nameSpace = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-			const char* className = mono_metadata_string_heap(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, cols[MONO_TYPEDEF_NAME]);
-			std::string fullName;
-			if(strlen(nameSpace) != 0)
-			{
-				fullName = fmt::format("{}.{}", nameSpace, className);
-			}
-			else
-			{
-				fullName = className;
-			}
-
-			MonoClass* monoClass = mono_class_from_name(s_ScriptEngineData->AppAssemblyInfo->AssemblyImage, nameSpace, className);
-			if(monoClass == nullptr)
-			{
-				continue;
-			}
-
-			if(monoClass == entityBaseClass)
-			{
-				continue;
-			}
-
-			bool isEntity = mono_class_is_subclass_of(monoClass, entityBaseClass, false);
-			if(!isEntity)
-			{
-				continue;
-			}
-
-			ScriptClass* scriptClass = new ScriptClass(nameSpace, className);
-
-			s_ScriptEngineData->EntityClasses[fullName] = scriptClass;
-
-			uint32_t fieldCount = mono_class_num_fields(monoClass);
-
-			AT_CORE_WARN("{} fields in {}", fieldCount, fullName);
-			void* iterator = nullptr;
-			while(MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
-			{
-				uint32_t flags = mono_field_get_flags(field);
-				const char* fieldName = mono_field_get_name(field);
-
-				if(!(flags & FIELD_ATTRIBUTE_PUBLIC))
-				{
-					continue;
-				}
-
-				MonoType* type = mono_field_get_type(field);
-				ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-
-				const char* fieldTypeName = Utils::ScriptFieldTypeToString(fieldType);
-
-				AT_CORE_INFO(" - {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
-
-				scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
-			}
-		}
 	}
 
 	MonoDomain* ScriptEngine::GetAppDomain()
@@ -593,7 +442,7 @@ namespace Atom
 
 	MonoObject* ScriptClass::Instantiate() const
 	{
-		return ScriptEngine::InstantiateClass(m_MonoClass);
+		return InstantiateClass(m_MonoClass);
 	}
 
 	MonoMethod* ScriptClass::GetMethod(const std::string& methodName, int parameterCount) const
@@ -610,6 +459,7 @@ namespace Atom
 	ScriptInstance::ScriptInstance(ScriptClass* scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass)
 	{
+#if 0
 		m_Instance = m_ScriptClass->Instantiate();
 
 		m_Constructor = s_ScriptEngineData->EntityClass.GetMethod(".ctor", 1);
@@ -625,6 +475,7 @@ namespace Atom
 
 			m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
 		}
+#endif
 	}
 
 	void ScriptInstance::InvokeOnCreate()
@@ -658,6 +509,7 @@ namespace Atom
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
 	}
 
+#if 0
 	void ScriptInstance::InvokeOnCollision2DEnter(Entity other)
 	{
 		if(!m_OnCollision2DEnterMethod)
@@ -679,6 +531,7 @@ namespace Atom
 		void* param = &other.GetUUID();
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnCollision2DExitMethod, &param);
 	}
+#endif
 
 	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
 	{

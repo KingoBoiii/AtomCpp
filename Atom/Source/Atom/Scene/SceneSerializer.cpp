@@ -263,6 +263,7 @@ namespace Atom
 
 				out << YAML::Key << "ClassName" << YAML::Value << script.ClassName;
 
+#if 0
 				// Fields
 				ScriptClass* entityClass = ScriptEngine::GetEntityClass(script.ClassName);
 				const auto& fields = entityClass->GetFields();
@@ -309,6 +310,7 @@ namespace Atom
 
 					out << YAML::EndSeq;
 				}
+#endif
 
 				out << YAML::EndMap;		// Script
 			}
@@ -487,6 +489,7 @@ namespace Atom
 				auto& script = deserializedEntity.AddComponent<Component::Script>();
 				script.ClassName = scriptComponent["ClassName"].as<std::string>();
 
+#if 0
 				auto& scriptFields = scriptComponent["ScriptFields"];
 				if(scriptFields)
 				{
@@ -530,6 +533,7 @@ namespace Atom
 						}
 					}
 				}
+#endif
 			}
 
 			auto rigidbody2DComponent = entity["Rigidbody2D"];

@@ -101,18 +101,15 @@ namespace Atom
 		static void OnDestroyEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, float deltaTime);
 
+#if 0
 		static void InvokeOnCollection2DEnter(Entity entity, Entity other);
 		static void InvokeOnCollection2DExit(Entity entity, Entity other);
-
-#if 0
-		static void LoadAssembly(const std::filesystem::path& filepath);
-		static void LoadAppAssembly(const std::filesystem::path& filepath);
 #endif
 
-		static bool EntityClassExists(const std::string& fullName);
+		static bool EntityClassExists(const std::string& fullName) { return false; }
 
-		static ScriptClass* GetEntityClass(const std::string& name);
-		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses();
+		static ScriptClass* GetEntityClass(const std::string& name) { return nullptr; }
+		static std::unordered_map<std::string, ScriptClass*> GetEntityClasses() { return std::unordered_map<std::string, ScriptClass*>(); }
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
 		static ScriptInstance* GetEntityScriptInstance(UUID entityId);
@@ -131,13 +128,6 @@ namespace Atom
 		static void ShutdownMono();
 
 		static bool LoadCoreAssembly();
-		static AssemblyMetadata LoadAssemblyMetadata(MonoImage* image);
-		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& filepath);
-
-		static std::vector<AssemblyMetadata> GetReferencedAssembliesMetadata(MonoImage* image);
-
-		static MonoObject* InstantiateClass(MonoClass* monoClass);
-		static void LoadAssemblyClasses();
 
 		friend class ScriptClass;
 		friend class ScriptGlue;
@@ -174,8 +164,10 @@ namespace Atom
 		void InvokeOnDestroy();
 		void InvokeOnUpdate(float deltaTime);
 
+#if 0
 		void InvokeOnCollision2DEnter(Entity other);
 		void InvokeOnCollision2DExit(Entity other);
+#endif
 
 		ScriptClass* GetScriptClass() { return m_ScriptClass; }
 		MonoObject* GetManagedObject() { return m_Instance; }
@@ -221,55 +213,5 @@ namespace Atom
 		friend struct ScriptFieldInstance;
 		friend class ScriptEngine;
 	};
-
-	namespace Utils
-	{
-
-		inline const char* ScriptFieldTypeToString(ScriptFieldType scriptFieldType)
-		{
-			switch(scriptFieldType)
-			{
-				case Atom::ScriptFieldType::Bool:		return "Bool";
-				case Atom::ScriptFieldType::Char:		return "Char";
-				case Atom::ScriptFieldType::String:		return "String";
-				case Atom::ScriptFieldType::Float:		return "Float";
-				case Atom::ScriptFieldType::Double:		return "Double";
-				case Atom::ScriptFieldType::Byte:		return "Byte";
-				case Atom::ScriptFieldType::Short:		return "Short";
-				case Atom::ScriptFieldType::Int:		return "Int";
-				case Atom::ScriptFieldType::Long:		return "Long";
-				case Atom::ScriptFieldType::Vector2:	return "Vector2";
-				case Atom::ScriptFieldType::Vector3:	return "Vector3";
-				case Atom::ScriptFieldType::Vector4:	return "Vector4";
-				case Atom::ScriptFieldType::Entity:		return "Entity";
-				case Atom::ScriptFieldType::None:		return "None";
-				default: break;
-			}
-			
-			AT_CORE_ASSERT(false, "Unknown Script Field Type!");
-			return "None";
-		}
-
-		inline ScriptFieldType ScriptFieldTypeFromString(std::string_view scriptFieldType)
-		{
-			if(scriptFieldType == "None")		return ScriptFieldType::None;
-			if(scriptFieldType == "Bool")		return ScriptFieldType::Bool;
-			if(scriptFieldType == "Char")		return ScriptFieldType::Char;
-			if(scriptFieldType == "String")		return ScriptFieldType::String;
-			if(scriptFieldType == "Float")		return ScriptFieldType::Float;
-			if(scriptFieldType == "Double")		return ScriptFieldType::Double;
-			if(scriptFieldType == "Byte")		return ScriptFieldType::Byte;
-			if(scriptFieldType == "Short")		return ScriptFieldType::Short;
-			if(scriptFieldType == "Int")		return ScriptFieldType::Int;
-			if(scriptFieldType == "Long")		return ScriptFieldType::Long;
-			if(scriptFieldType == "Vector2")	return ScriptFieldType::Vector2;
-			if(scriptFieldType == "Vector3")	return ScriptFieldType::Vector3;
-			if(scriptFieldType == "Vector4")	return ScriptFieldType::Vector4;
-			if(scriptFieldType == "Entity")		return ScriptFieldType::Entity;
-
-			return ScriptFieldType::None;
-		}
-
-	}
-
+	
 }
