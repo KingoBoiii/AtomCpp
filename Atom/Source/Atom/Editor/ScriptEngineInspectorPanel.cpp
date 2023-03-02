@@ -51,23 +51,28 @@ namespace Atom
 		AssemblyInfo* coreAssembly = ScriptEngine::GetCoreAssemblyInfo();
 		s_LoadedAssembliesMetadata.push_back(coreAssembly->Metadata);
 
-		AssemblyInfo* appAssembly = ScriptEngine::GetAppAssemblyInfo();
-		s_LoadedAssembliesMetadata.push_back(appAssembly->Metadata);
-
 		for(const auto& referencedAssemblyMetadata : coreAssembly->ReferencedAssemblies)
-			s_LoadedAssembliesMetadata.push_back(referencedAssemblyMetadata);
-
-		for(const auto& referencedAssemblyMetadata : appAssembly->ReferencedAssemblies)
 		{
-			auto it = std::find_if(s_LoadedAssembliesMetadata.begin(), s_LoadedAssembliesMetadata.end(), [&referencedAssemblyMetadata](const AssemblyMetadata& other)
-			{
-				return referencedAssemblyMetadata == other;
-			});
-
-			if(it != s_LoadedAssembliesMetadata.end())
-				continue;
-
 			s_LoadedAssembliesMetadata.push_back(referencedAssemblyMetadata);
+		}
+
+		AssemblyInfo* appAssembly = ScriptEngine::GetAppAssemblyInfo();
+		if(appAssembly)
+		{
+			s_LoadedAssembliesMetadata.push_back(appAssembly->Metadata);
+
+			for(const auto& referencedAssemblyMetadata : appAssembly->ReferencedAssemblies)
+			{
+				auto it = std::find_if(s_LoadedAssembliesMetadata.begin(), s_LoadedAssembliesMetadata.end(), [&referencedAssemblyMetadata](const AssemblyMetadata& other)
+				{
+					return referencedAssemblyMetadata == other;
+				});
+
+				if(it != s_LoadedAssembliesMetadata.end())
+					continue;
+
+				s_LoadedAssembliesMetadata.push_back(referencedAssemblyMetadata);
+			}
 		}
 	}
 

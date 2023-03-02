@@ -15,7 +15,9 @@ project "Atom.Core"
 	filter "configurations:Debug"
 		optimize "Off"
 		symbols "Default"
-
-	filter "configurations:Release"
+        defines "ATOM_DEBUG"
+        
+        filter "configurations:Release"
         optimize "On"
         symbols "Default"
+        defines "ATOM_RELEASE"

@@ -527,6 +527,8 @@ namespace Atom
 		}
 
 		OpenProject(projectPath / newProjectFileName);
+
+		m_ShowNewProjectDialog = false;
 	}
 
 	void EditorLayer::OpenProject()
@@ -570,7 +572,7 @@ namespace Atom
 			return;
 		}
 		NewScene();
-		AT_CORE_ERROR("Failed to load start scene");
+		AT_CORE_WARN("No start scene has been set - new scene");
 	}
 
 	void EditorLayer::SaveProject()
@@ -615,7 +617,7 @@ namespace Atom
 	{
 		SaveProject();
 
-		ScriptEngine::UnloadAppAssembly();
+		//ScriptEngine::UnloadAppAssembly();
 		ScriptEngine::SetSceneContext(nullptr);
 
 		if(unloadProject)
@@ -633,9 +635,12 @@ namespace Atom
 		//m_ActiveScene = nullptr;
 
 		m_ActiveScene = new Scene();
+		m_EditorScene = m_ActiveScene;
+
 		//m_ActiveScene->OnViewportResize(m_Viewport->m_ViewportSize.x, m_Viewport->m_ViewportSize.y);
 		m_SceneHierarchyPanel->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetSceneContext(m_ActiveScene);
+
 	}
 
 	void EditorLayer::OpenScene()

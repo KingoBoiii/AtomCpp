@@ -3,6 +3,7 @@
 #include "Atom/Scene/Components.h"
 
 #include "Atom/Scripting/ScriptEngine.h"
+#include "Atom/Scripting/ScriptCache.h"
 
 #include "Atom/ImGui/UICore.h"
 
@@ -453,12 +454,14 @@ namespace Atom
 
 	void SceneHierarchyPanel::DrawScriptComponent(Component::Script& component)
 	{
-		bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+		//bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+		ManagedClass* managedClass = AT_CACHED_ENTITY_CLASS(component.ClassName);
 
 		static char buffer[64];
 		strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-		if(!scriptClassExists)
+		if(managedClass == nullptr)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
 		}
@@ -472,33 +475,54 @@ namespace Atom
 		bool sceneRunning = m_Scene->IsRunning();
 		if(sceneRunning)
 		{
-			ScriptInstance* scriptInstance = ScriptEngine::GetEntityScriptInstance(m_SelectedEntity.GetUUID());
-			if(scriptInstance)
+			if(managedClass)
 			{
-				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-				for(const auto& [name, field] : fields)
+				const auto& classFields = managedClass->GetFields();
+
+				for(const auto& [fieldName, field] : classFields)
 				{
-					if(field.Type == ScriptFieldType::Float)
+					ManagedClassField& classField = managedClass->GetField(fieldName);
+
+#define AT_CASE_RUNTIME_SCRIPT_FIELD(managedType, type, func) case managedType: { type data = ScriptEngine::GetEntityInstanceFieldValue<type>(m_SelectedEntity, &classField); if(func) { ScriptEngine::SetEntityInstanceFieldValue<type>(m_SelectedEntity, &classField, data); } } break
+
+					switch(field.GetType())
 					{
-						float data = scriptInstance->GetFieldValue<float>(name);
-						if(ImGui::DragFloat(name.c_str(), &data))
-						{
-							scriptInstance->SetFieldValue(name, data);
-						}
+						AT_CASE_RUNTIME_SCRIPT_FIELD(ManagedFieldType::Bool, bool, ImGui::Checkbox(fieldName.c_str(), &data));
+						AT_CASE_RUNTIME_SCRIPT_FIELD(ManagedFieldType::Char, char, ImGui::InputText(fieldName.c_str(), &data, sizeof(char)));
+						AT_CASE_RUNTIME_SCRIPT_FIELD(ManagedFieldType::Float, float, ImGui::DragFloat(fieldName.c_str(), &data));
+						default: break;
 					}
-					if(field.Type == ScriptFieldType::Int)
-					{
-						int32_t data = scriptInstance->GetFieldValue<int32_t>(name);
-						if(ImGui::DragInt(name.c_str(), &data))
-						{
-							scriptInstance->SetFieldValue(name, data);
-						}
-					}
+
+#undef AT_CASE_RUNTIME_SCRIPT_FIELD
 				}
 			}
 		}
 		else
 		{
+			if(managedClass)
+			{
+				const auto& classFields = managedClass->GetFields();
+
+				for(const auto& [fieldName, field] : classFields)
+				{
+					ManagedClassField& classField = managedClass->GetField(fieldName);
+
+#define AT_SCRIPT_FIELD_TYPE_CASE(managedType, type, func) case managedType: { type data = classField.GetValue<type>(); if(func) { classField.SetValue<type>(data); } } break
+
+					switch(field.GetType())
+					{
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Bool, bool, ImGui::Checkbox(fieldName.c_str(), &data));
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Char, char, ImGui::InputText(fieldName.c_str(), &data, sizeof(char)));
+						AT_SCRIPT_FIELD_TYPE_CASE(ManagedFieldType::Float, float, ImGui::DragFloat(fieldName.c_str(), &data));
+						default: break;
+					}
+
+#undef AT_SCRIPT_FIELD_TYPE_CASE
+				}
+			}
+
+#if 0
+			bool scriptClassExists = false;
 			if(scriptClassExists)
 			{
 				ScriptClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
@@ -556,10 +580,11 @@ namespace Atom
 					}
 				}
 			}
+#endif
 		}
 
 
-		if(!scriptClassExists)
+		if(managedClass == nullptr)
 		{
 			ImGui::PopStyleColor();
 		}

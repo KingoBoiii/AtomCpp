@@ -86,10 +86,15 @@ namespace Atom
 					const std::string& relativePathString = itemPath.substr(pos + 1);
 
 					const std::string& extension = relativePath.extension().string();
-					const std::string& dragDropTargetType = s_FileExtensionDragDropTargetMap.at(relativePath.extension().string());
-					//static_assert(sizeof(dragDropTargetType) > 32 + 1);
 
-					ImGui::SetDragDropPayload(dragDropTargetType.c_str(), relativePathString.c_str(), (strlen(relativePathString.c_str()) + 1) * sizeof(wchar_t));
+					auto iterator = s_FileExtensionDragDropTargetMap.find(extension);
+					if(iterator != s_FileExtensionDragDropTargetMap.end())
+					{
+						const std::string& dragDropTargetType = s_FileExtensionDragDropTargetMap.at(extension);
+						//static_assert(sizeof(dragDropTargetType) > 32 + 1);
+
+						ImGui::SetDragDropPayload(dragDropTargetType.c_str(), relativePathString.c_str(), (strlen(relativePathString.c_str()) + 1) * sizeof(char));
+					}
 					ImGui::EndDragDropSource();
 				}
 

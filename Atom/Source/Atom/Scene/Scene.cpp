@@ -8,32 +8,9 @@
 
 #include "Atom/Renderer/Renderer2D.h"
 
-#include <box2d/b2_world.h>
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
-
 namespace Atom
 {
-
-	namespace Utils
-	{
-
-		static b2BodyType AtomBodyTypeToBox2D(Component::Rigidbody2D::BodyType bodyType)
-		{
-			switch(bodyType)
-			{
-				case Atom::Component::Rigidbody2D::BodyType::Static:	return b2_staticBody;
-				case Atom::Component::Rigidbody2D::BodyType::Dynamic:	return b2_dynamicBody;
-				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
-			}
-
-			AT_CORE_ASSERT(false, "Unknown body type!");
-			return b2_staticBody;
-		}
-
-	}
-
+	
 	Scene::Scene()
 	{
 	}
@@ -92,6 +69,7 @@ namespace Atom
 		CopyComponent<Component::Transform>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Camera>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BasicRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<Component::CircleRenderer>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Script>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::Rigidbody2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Component::BoxCollider2D>(dstSceneRegistry, srcSceneRegistry, enttMap);
@@ -133,6 +111,7 @@ namespace Atom
 		CopyComponentIfExists<Component::Transform>(newEntity, entity);
 		CopyComponentIfExists<Component::Camera>(newEntity, entity);
 		CopyComponentIfExists<Component::BasicRenderer>(newEntity, entity);
+		CopyComponentIfExists<Component::CircleRenderer>(newEntity, entity);
 		CopyComponentIfExists<Component::Script>(newEntity, entity);
 		CopyComponentIfExists<Component::Rigidbody2D>(newEntity, entity);
 		CopyComponentIfExists<Component::BoxCollider2D>(newEntity, entity);

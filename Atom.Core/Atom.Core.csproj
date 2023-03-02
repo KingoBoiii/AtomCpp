@@ -21,8 +21,7 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>ATOM_DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -34,8 +33,7 @@
     <OutputPath>..\Atomic\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Atomic\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>ATOM_RELEASE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -45,10 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Atom\Attributes\HiddenFromEditorAttribute.cs" />
+    <Compile Include="Source\Atom\Attributes\VisibleInEditorAttribute.cs" />
+    <Compile Include="Source\Atom\Bindings\InternalCalls.cs" />
     <Compile Include="Source\Atom\Bindings\NativeComponentAttribute.cs" />
     <Compile Include="Source\Atom\Core\FormatUtils.cs" />
     <Compile Include="Source\Atom\Core\Input.cs" />
-    <Compile Include="Source\Atom\Core\InternalCalls.cs" />
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
     <Compile Include="Source\Atom\Graphics\Color.cs" />
@@ -65,7 +65,6 @@
     <Compile Include="Source\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -18,6 +18,11 @@ namespace Atom
                 InternalCalls.Rigidbody2D_SetPosition(Entity.Id, ref value);
             }
         }
+
+        public void SetLinearVelocity(Vector2 velocity)
+        {
+            InternalCalls.Rigidbody2D_SetLinearVelocity(Entity.Id, ref velocity);
+        }
     }
 
 }
