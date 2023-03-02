@@ -56,6 +56,7 @@ namespace Atom
 		void OnDuplicateEntity();
 	private: // Events
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
+		bool OnMouseButtonPressed(Atom::MouseButtonPressedEvent& e);
 	private:
 		std::string m_ProjectPath;
 		std::filesystem::path m_EditorScenePath;
@@ -67,6 +68,8 @@ namespace Atom
 		Framebuffer* m_Framebuffer = nullptr;
 		EditorCamera m_EditorCamera;
 
+		Entity m_HoveredEntity = { };
+		
 		// Panels
 		Viewport* m_Viewport = nullptr;
 		SceneHierarchyPanel* m_SceneHierarchyPanel = nullptr;

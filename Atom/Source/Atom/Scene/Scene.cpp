@@ -150,28 +150,28 @@ namespace Atom
 			{
 				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
-				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
+				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color, (int32_t)entity);
 			}
 		}
 
 		{
 			auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
-			for(auto e : view)
+			for(auto entity : view)
 			{
-				auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
+				auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(entity);
 
-				Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+				Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade, (int32_t)entity);
 			}
 		}
 		
 		{
 			auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
-			for(auto e : view)
+			for(auto entity : view)
 			{
-				auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
+				auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(entity);
 
 				textRenderer.FontAsset = Font::GetDefaultFont();
-				Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
+				Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing }, (int32_t)entity);
 			}
 		}
 
@@ -365,27 +365,27 @@ namespace Atom
 			{
 				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
-				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color);
+				Renderer2D::RenderQuad(transform.GetTransform(), basic.Color, (int32_t)entity);
 			}
 
 			{
 				auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
-				for(auto e : view)
+				for(auto entity : view)
 				{
-					auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
+					auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(entity);
 
-					Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade);
+					Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade, (int32_t)entity);
 				}
 			}
 
 			{
 				auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
-				for(auto e : view)
+				for(auto entity : view)
 				{
-					auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
+					auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(entity);
 
 					textRenderer.FontAsset = Font::GetDefaultFont();
-					Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing });
+					Renderer2D::DrawString(textRenderer.Text, textRenderer.FontAsset, transform.GetTransform(), { textRenderer.Color, textRenderer.Kerning, textRenderer.LineSpacing }, (int32_t)entity);
 				}
 			}
 		}

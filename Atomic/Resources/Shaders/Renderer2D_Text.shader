@@ -3,6 +3,7 @@ struct VSInput
 	float3 Position : POSITION;
 	float4 Color : COLOR;
 	float2 TexCoord : TEXCOORD;
+	int EntityId : ENTITY_ID;
 };
 
 struct VSOutput
@@ -11,6 +12,7 @@ struct VSOutput
 	float4 Position : POSITION;
 	float4 Color : COLOR;
 	float2 TexCoord : TEXCOORD;
+	int EntityId : ENTITY_ID;
 };
 
 cbuffer VS_CONSTANT_BUFFER : register(b0)
@@ -27,6 +29,7 @@ VSOutput VSMain(VSInput input)
 	output.Position = pos;
 	output.Color = input.Color;
 	output.TexCoord = input.TexCoord;
+	output.EntityId = input.EntityId;
 	return output;
 }
 
@@ -35,7 +38,8 @@ SamplerState FontAtlasSampler : register(s0);
 
 struct PSOutput
 {
-	float4 Color : SV_TARGET;
+	float4 Color : SV_TARGET0;
+	int EntityId : SV_TARGET1;
 };
 
 float median(float r, float g, float b)
@@ -80,5 +84,6 @@ PSOutput PSMain(VSOutput input)
 
 	PSOutput output = (PSOutput)0;
 	output.Color = color;
+	output.EntityId = input.EntityId;
 	return output;
 }

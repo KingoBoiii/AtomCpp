@@ -5,6 +5,7 @@ struct VSInput
 	float4 Color : COLOR;
 	float Thickness: THICKNESS;
 	float Fade: FADE;
+	int EntityId : ENTITY_ID;
 };
 
 struct VSOutput
@@ -15,6 +16,7 @@ struct VSOutput
 	float4 Color : COLOR;
 	float Thickness : THICKNESS;
 	float Fade : FADE;
+	int EntityId : ENTITY_ID;
 };
 
 cbuffer VS_CONSTANT_BUFFER : register(b0)
@@ -33,12 +35,14 @@ VSOutput VSMain(VSInput input)
 	output.Color = input.Color;
 	output.Thickness = input.Thickness;
 	output.Fade = input.Fade;
+	output.EntityId = input.EntityId;
 	return output;
 }
 
 struct PSOutput
 {
-	float4 Color : SV_TARGET;
+	float4 Color : SV_TARGET0;
+	int EntityId : SV_TARGET1;
 };
 
 PSOutput PSMain(VSOutput input)
@@ -57,5 +61,6 @@ PSOutput PSMain(VSOutput input)
 
 	PSOutput output = (PSOutput)0;
 	output.Color = color;
+	output.EntityId = input.EntityId;
 	return output;
 }
