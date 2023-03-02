@@ -527,6 +527,8 @@ namespace Atom
 		}
 
 		OpenProject(projectPath / newProjectFileName);
+
+		m_ShowNewProjectDialog = false;
 	}
 
 	void EditorLayer::OpenProject()
