@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Atom/Core/UUID.h"
 #include "Atom/Scripting/Assembly/AssemblyInfo.h"
 #include "Atom/Scripting/Managed/ManagedClass.h"
 #include "Atom/Scripting/Managed/ManagedMethod.h"
@@ -37,6 +38,9 @@ namespace Atom
 		static void InvokeEntityStart(MonoObject* instance);
 		static void InvokeEntityDestroy(MonoObject* instance);
 		static void InvokeEntityUpdate(MonoObject* instance, float deltaTime);
+
+		static void InvokeEntityOnCollision2DEnter(MonoObject* instance, UUID entityId);
+		static void InvokeEntityOnCollision2DExit(MonoObject* instance, UUID entityId);
 	private:
 		static void CacheClass(std::string_view className, MonoClass* monoClass);
 		static void CacheClassMethods(ManagedClass& managedClass);

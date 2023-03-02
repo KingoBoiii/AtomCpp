@@ -20,10 +20,8 @@ namespace Atom
 		Entity entityA = scene->GetEntityByUUID(entityIdA);
 		Entity entityB = scene->GetEntityByUUID(entityIdB);
 
-#if 0
 		ScriptEngine::InvokeOnCollection2DEnter(entityA, entityB);
 		ScriptEngine::InvokeOnCollection2DEnter(entityB, entityA);
-#endif
 
 		//AT_CORE_TRACE("Is Touching: {}", contact->IsTouching());
 	}
@@ -39,10 +37,8 @@ namespace Atom
 		Entity entityA = scene->GetEntityByUUID(entityIdA);
 		Entity entityB = scene->GetEntityByUUID(entityIdB);
 
-#if 0
 		ScriptEngine::InvokeOnCollection2DExit(entityA, entityB);
 		ScriptEngine::InvokeOnCollection2DExit(entityB, entityA);
-#endif
 
 		//AT_CORE_TRACE("Is Touching: {}", contact->IsTouching());
 	}

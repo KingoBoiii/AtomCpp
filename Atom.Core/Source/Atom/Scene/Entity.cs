@@ -1,14 +1,19 @@
-﻿namespace Atom
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System;
+
+namespace Atom
 {
 
     public class Entity
     {
+        private Dictionary<Type, ComponentBase> _componentCache = new Dictionary<Type, ComponentBase>();
+
         protected Entity() { Id = 0; }
 
         internal Entity(ulong id)
         {
             Id = id;
-            Log.Info("Entity::ctor({0})", Id);
         }
 
         public ulong Id { get; }
@@ -78,12 +83,24 @@
 
         public TComponent GetComponent<TComponent>() where TComponent : ComponentBase, new()
         {
+            Type componentType = typeof(TComponent);
+
             if (!HasComponent<TComponent>())
             {
-                return default;
+                if (_componentCache.ContainsKey(componentType))
+                    _componentCache.Remove(componentType);
+
+                return null;
             }
 
-            return new TComponent { Entity = this };
+            if (!_componentCache.ContainsKey(componentType))
+            {
+                TComponent component = new TComponent { Entity = this };
+                _componentCache.Add(componentType, component);
+                return component;
+            }
+
+            return _componentCache[componentType] as TComponent;
         }
 
         public Entity FindEntityByName(string name)

@@ -30,6 +30,9 @@ namespace Atom
 		ManagedMethodThunk<> Entity_StartMethod;
 		ManagedMethodThunk<> Entity_DestroyMethod;
 		ManagedMethodThunk<float> Entity_UpdateMethod;
+
+		ManagedMethodThunk<UUID> Entity_OnCollision2DEnter;
+		ManagedMethodThunk<UUID> Entity_OnCollision2DExit;
 	};
 
 	static Cache* s_Cache = nullptr;
@@ -116,6 +119,9 @@ namespace Atom
 		REGISTER_METHOD_THUNK(Entity_StartMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Start"));
 		REGISTER_METHOD_THUNK(Entity_DestroyMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Destroy"));
 		REGISTER_METHOD_THUNK(Entity_UpdateMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Update"));
+
+		REGISTER_METHOD_THUNK(Entity_OnCollision2DEnter, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "OnCollision2DEnter_Internal"));
+		REGISTER_METHOD_THUNK(Entity_OnCollision2DExit, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "OnCollision2DExit_Internal"));
 
 #undef REGISTER_METHOD_THUNK
 	}
@@ -213,6 +219,20 @@ namespace Atom
 	{
 		MonoException* exception = nullptr;
 		s_MethodThunkCache->Entity_UpdateMethod.Invoke(instance, deltaTime, &exception);
+		ScriptUtils::HandleException((MonoObject*)exception);
+	}
+
+	void ScriptCache::InvokeEntityOnCollision2DEnter(MonoObject* instance, UUID entityId)
+	{
+		MonoException* exception = nullptr;
+		s_MethodThunkCache->Entity_OnCollision2DEnter.Invoke(instance, entityId, &exception);
+		ScriptUtils::HandleException((MonoObject*)exception);
+	}
+
+	void ScriptCache::InvokeEntityOnCollision2DExit(MonoObject* instance, UUID entityId)
+	{
+		MonoException* exception = nullptr;
+		s_MethodThunkCache->Entity_OnCollision2DExit.Invoke(instance, entityId, &exception);
 		ScriptUtils::HandleException((MonoObject*)exception);
 	}
 

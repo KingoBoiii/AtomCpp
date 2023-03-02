@@ -181,7 +181,6 @@ namespace Atom
 		ScriptCache::InvokeEntityUpdate(entityInstance, deltaTime);
 	}
 
-#if 0
 	void ScriptEngine::InvokeOnCollection2DEnter(Entity entity, Entity other)
 	{
 		if(!entity.HasComponent<Component::Script>())
@@ -189,11 +188,15 @@ namespace Atom
 			return;
 		}
 
-		UUID entityUUID = entity.GetUUID();
-		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
 
-		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
-		scriptInstance->InvokeOnCollision2DEnter(other);
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+		ScriptCache::InvokeEntityOnCollision2DEnter(entityInstance, other.GetUUID());
 	}
 
 	void ScriptEngine::InvokeOnCollection2DExit(Entity entity, Entity other)
@@ -203,13 +206,16 @@ namespace Atom
 			return;
 		}
 
-		UUID entityUUID = entity.GetUUID();
-		AT_CORE_ASSERT(s_ScriptEngineData->EntityInstances.find(entityUUID) != s_ScriptEngineData->EntityInstances.end());
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
 
-		ScriptInstance* scriptInstance = s_ScriptEngineData->EntityInstances[entityUUID];
-		scriptInstance->InvokeOnCollision2DExit(other);
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+		ScriptCache::InvokeEntityOnCollision2DExit(entityInstance, other.GetUUID());
 	}
-#endif
 
 	static void OnAppAssemblyFileSystemEvent(const std::string& filepath, filewatch::Event changeType)
 	{

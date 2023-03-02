@@ -102,10 +102,8 @@ namespace Atom
 		static void OnDestroyEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, float deltaTime);
 
-#if 0
 		static void InvokeOnCollection2DEnter(Entity entity, Entity other);
 		static void InvokeOnCollection2DExit(Entity entity, Entity other);
-#endif
 
 		static bool EntityClassExists(const std::string& fullName) { return false; }
 

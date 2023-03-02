@@ -1,4 +1,5 @@
 ﻿using Atom.Bindings;
+using System;
 
 namespace Atom
 {
@@ -9,8 +10,20 @@ namespace Atom
     [NativeComponent("Atom::BoxCollider2D")]
     public class BoxCollider2D : ComponentBase
     {
-        public event OnCollision2DEnter OnCollision2DEnter;
-        public event OnCollision2DExit OnCollision2DExit;
+        //public event OnCollision2DEnter OnCollision2DEnter;
+        //public event OnCollision2DExit OnCollision2DExit;
+        internal event Action<Entity> OnCollision2DEnter;
+        internal event Action<Entity> OnCollision2DExit;
+
+        public void AddOnCollision2DEnterCallback(Action<Entity> callback)
+        {
+            OnCollision2DEnter += callback;
+        }
+
+        public void AddOnCollision2DExitCallback(Action<Entity> callback)
+        {
+            OnCollision2DExit += callback;
+        }
 
         internal void InvokeOnCollision2DEnter(ulong entityId)
         {
