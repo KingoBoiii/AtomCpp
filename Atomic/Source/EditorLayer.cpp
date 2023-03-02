@@ -860,9 +860,12 @@ namespace Atom
 
 	bool EditorLayer::OnMouseButtonPressed(Atom::MouseButtonPressedEvent& e)
 	{
-		if(e.GetMouseButton() == MouseButton::Left || m_Viewport->m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt))
+		if(e.GetMouseButton() == MouseButton::Left)
 		{
-			m_SceneHierarchyPanel->SetSelectedEntity(m_HoveredEntity);
+			if(m_Viewport->m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt))
+			{
+				m_SceneHierarchyPanel->SetSelectedEntity(m_HoveredEntity);
+			}
 		}
 
 		return true;
