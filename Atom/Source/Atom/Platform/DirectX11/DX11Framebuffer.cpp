@@ -134,7 +134,35 @@ namespace Atom
 	{
 		AT_CORE_ASSERT(m_ColorAttachments.size() > attachmentIndex);
 
-		return 0;
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+		desc.Format = Utils::AtomFBTextureFormatToD3DX11(m_ColorAttachments[attachmentIndex].TextureFormat);
+		desc.Width = m_Options.Width;
+		desc.Height = m_Options.Height;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.BindFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		desc.Usage = D3D11_USAGE_STAGING;
+		ID3D11Texture2D* stagingTexture = nullptr;
+		HRESULT hr = m_Device->CreateTexture2D(&desc, NULL, &stagingTexture);
+		AT_CORE_ASSERT(!FAILED(hr), "Failed to create staging texture");
+
+		m_DeviceContext->CopyResource(stagingTexture, m_ColorAttachmentTextures[attachmentIndex]);
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		hr = m_DeviceContext->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &msr);
+		AT_CORE_ASSERT(SUCCEEDED(hr));
+
+		int offset = y * msr.RowPitch + x * 4;
+		int32_t pixelData = *(const int32_t*)((const uint8_t*)msr.pData + offset);
+		m_DeviceContext->Unmap(stagingTexture, 0);
+		
+		ReleaseCOM(stagingTexture);
+
+		return pixelData;
 	}
 
 	void* DX11Framebuffer::GetColorAttachment(uint32_t attachmentIndex) const
