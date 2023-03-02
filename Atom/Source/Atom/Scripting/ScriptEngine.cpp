@@ -84,6 +84,9 @@ namespace Atom
 
 	bool ScriptEngine::LoadAppAssembly()
 	{
+		delete s_ScriptEngineData->AppAssemblyInfo;
+		s_ScriptEngineData->AppAssemblyInfo = nullptr;
+
 		if(!std::filesystem::exists(Project::GetScriptModuleFilepath()))
 		{
 			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly! Invalid filepath");
