@@ -15,25 +15,7 @@
 
 namespace Atom
 {
-
-	namespace Utils
-	{
-
-		static b2BodyType AtomBodyTypeToBox2D(Component::Rigidbody2D::BodyType bodyType)
-		{
-			switch(bodyType)
-			{
-				case Atom::Component::Rigidbody2D::BodyType::Static:	return b2_staticBody;
-				case Atom::Component::Rigidbody2D::BodyType::Dynamic:	return b2_dynamicBody;
-				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
-			}
-
-			AT_CORE_ASSERT(false, "Unknown body type!");
-			return b2_staticBody;
-		}
-
-	}
-
+	
 	Scene::Scene()
 	{
 	}
