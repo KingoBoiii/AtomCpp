@@ -91,7 +91,7 @@ namespace Atom
 			return false;
 		}
 
-		s_ScriptEngineData->AppAssemblyInfo = AssemblyUtils::LoadAssembly(Project::GetScriptModuleFilepath(), s_ScriptEngineData->EnableDebugging);
+		s_ScriptEngineData->AppAssemblyInfo = AssemblyUtils::LoadAssembly(Project::GetScriptModuleFilepath(), s_ScriptEngineData->Config.EnableDebugging);
 		if(s_ScriptEngineData->AppAssemblyInfo == nullptr)
 		{
 			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
