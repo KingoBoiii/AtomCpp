@@ -41,14 +41,7 @@ namespace Atom
 		s_MethodThunkCache = new MethodThunkCache();
 
 		CacheCoreClasses();
-
-#define REGISTER_METHOD_THUNK(var, method) s_MethodThunkCache->var.RegisterMethodThunk(method);
-
-		REGISTER_METHOD_THUNK(Entity_StartMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Start"));
-		REGISTER_METHOD_THUNK(Entity_DestroyMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Destroy"));
-		REGISTER_METHOD_THUNK(Entity_UpdateMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Update"));
-
-#undef REGISTER_METHOD_THUNK
+		CacheMethodThunks();
 	}
 
 	void ScriptCache::Shutdown()
@@ -72,6 +65,12 @@ namespace Atom
 		s_Cache->EntityClasses.clear();
 		s_Cache->Classes.clear();
 		s_Cache->Methods.clear();
+
+		if(s_MethodThunkCache != nullptr)
+		{
+			delete s_MethodThunkCache;
+			s_MethodThunkCache = nullptr;
+		}
 	}
 
 	void ScriptCache::CacheCoreClasses()
@@ -108,6 +107,17 @@ namespace Atom
 		//CACHE_ATOM_CORE_CLASS("Vector3");
 		//CACHE_ATOM_CORE_CLASS("Vector4");
 		CACHE_ATOM_CORE_CLASS("Entity");
+	}
+
+	void ScriptCache::CacheMethodThunks()
+	{
+#define REGISTER_METHOD_THUNK(var, method) s_MethodThunkCache->var.RegisterMethodThunk(method);
+
+		REGISTER_METHOD_THUNK(Entity_StartMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Start"));
+		REGISTER_METHOD_THUNK(Entity_DestroyMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Destroy"));
+		REGISTER_METHOD_THUNK(Entity_UpdateMethod, AT_CACHED_METHOD(AT_CACHED_CLASS("Atom.Entity"), "Update"));
+
+#undef REGISTER_METHOD_THUNK
 	}
 
 	void ScriptCache::CacheAssemblyClasses(AssemblyInfo* assemblyInfo)

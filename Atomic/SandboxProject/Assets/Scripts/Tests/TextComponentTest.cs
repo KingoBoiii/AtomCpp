@@ -29,7 +29,7 @@ namespace Sandbox.Tests
             var newTextString = _text.Text;
             Log.Info("New TextString: {0}", newTextString);
         }
-
+        
         protected override void Destroy()
         {
             //base.Destroy();

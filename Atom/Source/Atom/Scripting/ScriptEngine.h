@@ -1,6 +1,7 @@
 #pragma once
 #include "Assembly/AssemblyInfo.h"
 #include "Assembly/AssemblyMetadata.h"
+#include "Managed/ManagedClassField.h"
 
 #include "Atom/Core/UUID.h"
 
@@ -123,11 +124,26 @@ namespace Atom
 
 		static AssemblyInfo* GetCoreAssemblyInfo();
 		static AssemblyInfo* GetAppAssemblyInfo();
+
+		template<typename T>
+		static T GetEntityInstanceFieldValue(Entity entity, ManagedClassField* managedClassField)
+		{
+			void* buffer = GetEntityInstanceFieldValueInternal(entity, managedClassField);
+			return *(T*)buffer;
+		}
+
+		template<typename T>
+		static void SetEntityInstanceFieldValue(Entity entity, ManagedClassField* managedClassField, const T& value)
+		{
+			SetEntityInstanceFieldValueInternal(entity, managedClassField, &value);
+		}
 	private:
 		static void InitializeMono();
 		static void ShutdownMono();
 
 		static void InstantiateEntityInstances();
+		static void* GetEntityInstanceFieldValueInternal(Entity entity, ManagedClassField* managedClassField);
+		static void SetEntityInstanceFieldValueInternal(Entity entity, ManagedClassField* managedClassField, const void* buffer);
 
 		static bool LoadCoreAssembly();
 

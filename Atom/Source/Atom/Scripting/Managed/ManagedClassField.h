@@ -76,6 +76,7 @@ namespace Atom
 		bool HasFieldFlag(FieldFlag fieldFlag) const { return (uint64_t)m_Flags & (uint64_t)fieldFlag; }
 		bool HasFieldAccessModifier(FieldAccessModifierFlag fieldAccessModifierFlag) const { return (uint64_t)m_AccessModifier & (uint64_t)fieldAccessModifierFlag; }
 
+		MonoClassField* GetRawClassField() const { return m_RawClassField; }
 		std::string GetFullName() const { return m_Name; }
 		ManagedFieldType GetType() const { return m_Type; }
 		std::string GetTypeString() const { return Utils::ManagedFieldTypeToString(m_Type); }
@@ -109,6 +110,8 @@ namespace Atom
 		Buffer m_FieldValueBuffer;
 
 		MonoClassField* m_RawClassField = nullptr;
+
+		friend class ScriptEngine;
 	};
 
 #if 0

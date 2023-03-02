@@ -26,6 +26,7 @@ namespace Atom
 
 		static void ClearCache();
 		static void CacheCoreClasses();
+		static void CacheMethodThunks();
 
 		static void CacheAssemblyClasses(AssemblyInfo* assemblyInfo);
 

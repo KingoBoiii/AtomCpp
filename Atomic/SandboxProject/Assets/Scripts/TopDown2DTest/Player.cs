@@ -7,6 +7,7 @@ namespace Sandbox.TopDown2DTest
     {
 
         [VisibleInEditor] private float m_Speed = 1.0f;
+        [VisibleInEditor] private float m_Time = 0.0f;
 
         private Rigidbody2D rb2d;
 
@@ -17,31 +18,32 @@ namespace Sandbox.TopDown2DTest
 
         protected override void Update(float deltaTime)
         {
+            m_Time += deltaTime;
             //base.Update(deltaTime);
 
             //Log.Warn("Player.Update(DeltaTime: {0}): Speed: {1}", deltaTime, m_Speed);
 
-            Vector2 velocity = new Vector2(0.0f, 0.0f);
+            var position = rb2d.Position;
 
             if (Input.IsKeyDown(KeyCode.W))
             {
-                velocity.Y += m_Speed * deltaTime;
+                position.Y += m_Speed * deltaTime;
             }
             else if (Input.IsKeyDown(KeyCode.S))
             {
-                velocity.Y -= m_Speed * deltaTime;
+                position.Y -= m_Speed * deltaTime;
             }
 
             if (Input.IsKeyDown(KeyCode.A))
             {
-                velocity.X -= m_Speed * deltaTime;
+                position.X -= m_Speed * deltaTime;
             }
             else if (Input.IsKeyDown(KeyCode.D))
             {
-                velocity.X += m_Speed * deltaTime;
+                position.X += m_Speed * deltaTime;
             }
 
-            rb2d.SetLinearVelocity(new Vector2(rb2d.Position.X + velocity.X, rb2d.Position.Y + velocity.Y));
+            rb2d.Position = position;
         }
 
     }

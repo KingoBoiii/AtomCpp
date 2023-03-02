@@ -82,7 +82,7 @@ namespace Atom
 		s_ScriptEngineData->EntityManagedInstances.clear();
 
 		LoadCoreAssembly();
-		ScriptCache::CacheCoreClasses();
+		ScriptCache::Initialize();
 
 		LoadAppAssembly();
 
@@ -149,31 +149,6 @@ namespace Atom
 		
 		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
 		ScriptCache::InvokeEntityStart(entityInstance);
-		
-#if 0
-		if(EntityClassExists(script.ClassName))
-		{
-			ScriptClass* scriptClass = s_ScriptEngineData->EntityClasses[script.ClassName];
-
-			ScriptInstance* scriptInstance = new ScriptInstance(scriptClass, entity);
-
-			UUID entityId = entity.GetUUID();
-			
-			s_ScriptEngineData->EntityInstances[entityId] = scriptInstance;
-
-			// Copy field values
-			if(s_ScriptEngineData->EntityScriptFields.find(entityId) != s_ScriptEngineData->EntityScriptFields.end())
-			{
-				const ScriptFieldMap& fieldMap = s_ScriptEngineData->EntityScriptFields.at(entityId);
-				for(const auto& [name, fieldInstance] : fieldMap)
-				{
-					scriptInstance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
-				}
-			}
-
-			scriptInstance->InvokeOnCreate();
-		}
-#endif
 	}
 
 	void ScriptEngine::OnDestroyEntity(Entity entity)
@@ -380,8 +355,44 @@ namespace Atom
 			void* param = &identifier.ID;
 			ScriptUtils::InvokeManagedMethod(AT_CACHED_METHOD(managedEntityClass, ".ctor"), entityInstance, &param);
 
+			// Copy values from Editor to Runtime
+			for(const auto& [name, field] : managedClass->GetFields())
+			{
+				mono_field_set_value(entityInstance, field.GetRawClassField(), (void*)field.m_FieldValueBuffer.Data);
+			}
+
 			s_ScriptEngineData->EntityManagedInstances[identifier.ID] = entityInstance;
 		}
+	}
+
+	void* ScriptEngine::GetEntityInstanceFieldValueInternal(Entity entity, ManagedClassField* managedClassField)
+	{
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return nullptr;
+		}
+
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+
+		uint8_t* buffer = new uint8_t[16];
+		mono_field_get_value(entityInstance, managedClassField->GetRawClassField(), buffer);
+		return buffer;
+	}
+
+	void ScriptEngine::SetEntityInstanceFieldValueInternal(Entity entity, ManagedClassField* managedClassField, const void* buffer)
+	{
+		UUID entityId = entity.GetUUID();
+		if(s_ScriptEngineData->EntityManagedInstances.find(entityId) == s_ScriptEngineData->EntityManagedInstances.end())
+		{
+			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
+			return;
+		}
+
+		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
+
+		mono_field_set_value(entityInstance, managedClassField->GetRawClassField(), (void*)buffer);
 	}
 
 	bool ScriptEngine::LoadCoreAssembly()
