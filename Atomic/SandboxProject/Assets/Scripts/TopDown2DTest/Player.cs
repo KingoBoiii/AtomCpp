@@ -14,6 +14,8 @@ namespace Sandbox.TopDown2DTest
         protected override void Start()
         {
             rb2d = GetComponent<Rigidbody2D>();
+
+            Entity enemy = Scene.CreateEntity("Enemy");
         }
 
         protected override void Update(float deltaTime)
