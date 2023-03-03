@@ -1,10 +1,11 @@
+!Vendor/premake/
 
 # Binaries
 **/bin/
 bin-int/
 Intermediates/
 
-# Hazel files
+# Atom files
 *.log
 
 # Visual Studio files and folder
