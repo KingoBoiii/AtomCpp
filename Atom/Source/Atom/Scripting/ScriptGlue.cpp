@@ -55,9 +55,9 @@ namespace Atom
 	{
 		AT_ADD_INTERNAL_CALL(Scene_CreateEntity);
 		AT_ADD_INTERNAL_CALL(Scene_DestroyEntity);
+		AT_ADD_INTERNAL_CALL(Scene_FindEntityByName);
 
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
-		AT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		AT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		AT_ADD_INTERNAL_CALL(Identifier_GetName);
