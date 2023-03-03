@@ -27,6 +27,7 @@ namespace Atom
 		static void OnRuntimeUpdate(Entity entity);
 
 		static void CreatePhysicsBody(Entity entity);
+		static void DestroyPhysicsBody(Entity entity);
 		
 		static void SetPhysicsBodyType(Entity entity, PhysicsBodyType physicsBodyType);
 		static void SetLinearVelocity(const glm::vec2& velocity, Entity entity);

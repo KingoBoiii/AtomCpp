@@ -157,6 +157,22 @@ namespace Atom
 		Utils::CreatePhysicsFixtures<Component::BoxCollider2D>(entity, transform);
 	}
 
+	void Physics2D::DestroyPhysicsBody(Entity entity)
+	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
+		UUID entityId = entity.GetUUID();
+		auto iterator = s_PhysicsData->EntityPhysicsBodies.find(entityId);
+		if (iterator == s_PhysicsData->EntityPhysicsBodies.end()) 
+		{
+			return;
+		}
+
+		b2Body* physicsBody = iterator->second;
+
+		s_PhysicsData->World->DestroyBody(physicsBody);
+	}
+
 	void Physics2D::SetPhysicsBodyType(Entity entity, PhysicsBodyType physicsBodyType)
 	{
 		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
