@@ -22,6 +22,13 @@ namespace Atom
 	namespace InternalCalls
 	{
 
+#pragma region Application
+
+		void Application_GetWidth(uint32_t* outWidth);
+		void Application_GetHeight(uint32_t* outHeight);
+
+#pragma endregion
+
 #pragma region Scene
 
 		void Scene_CreateEntity(MonoString* name, UUID* outEntityId);

@@ -6,6 +6,16 @@ namespace Atom
 
     internal static class InternalCalls
     {
+        #region Application
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_GetWidth(out uint width);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_GetHeight(out uint height);
+
+        #endregion
+
         #region Scene
 
         [MethodImpl(MethodImplOptions.InternalCall)]

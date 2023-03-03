@@ -3,6 +3,8 @@
 #include "ScriptEngine.h"
 #include "ScriptUtils.h"
 
+#include "Atom/Core/Application.h"
+
 #include "Atom/Physics/2D/Physics2D.h"
 
 #include "Atom/Scene/Scene.h"
@@ -55,6 +57,9 @@ namespace Atom
 
 	void ScriptGlue::RegisterInternalCalls()
 	{
+		AT_ADD_INTERNAL_CALL(Application_GetWidth);
+		AT_ADD_INTERNAL_CALL(Application_GetHeight);
+
 		AT_ADD_INTERNAL_CALL(Scene_CreateEntity);
 		AT_ADD_INTERNAL_CALL(Scene_DestroyEntity);
 		AT_ADD_INTERNAL_CALL(Scene_FindEntityByName);
@@ -99,6 +104,20 @@ namespace Atom
 
 	namespace InternalCalls
 	{
+
+#pragma region Application
+
+		void Application_GetWidth(uint32_t* outWidth)
+		{
+			*outWidth = Application::Get().GetWindow()->GetWidth();
+		}
+
+		void Application_GetHeight(uint32_t* outHeight)
+		{
+			*outHeight = Application::Get().GetWindow()->GetHeight();
+		}
+
+#pragma endregion
 
 #pragma region Scene
 
