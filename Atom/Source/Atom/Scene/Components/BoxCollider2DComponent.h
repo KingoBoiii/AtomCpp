@@ -16,8 +16,6 @@ namespace Atom::Component
 		float Restitution = 0.0f;
 		float RestitutionThreshold = 0.5f;
 
-		void* RuntimeFixture = nullptr;
-
 		BoxCollider2D() = default;
 		BoxCollider2D(const BoxCollider2D& other) = default;
 	};

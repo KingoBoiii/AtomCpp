@@ -2,6 +2,8 @@
 #include "SceneSerializer.h"
 #include "Entity.h"
 
+#include "Atom/Physics/2D/Physics2DBodyTypes.h"
+
 #include "Atom/Scripting/ScriptEngine.h"
 #include "Atom/Scripting/ScriptCache.h"
 #include "Atom/Scripting/Managed/ManagedClass.h"
@@ -134,29 +136,6 @@ namespace Atom
 
 	namespace Utils
 	{
-
-		static std::string Rigidbody2DBodyTypeToString(Component::Rigidbody2D::BodyType bodyType)
-		{
-			switch(bodyType)
-			{
-				case Atom::Component::Rigidbody2D::BodyType::Static: return "Static";
-				case Atom::Component::Rigidbody2D::BodyType::Dynamic: return "Dynamic";
-				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return "Kinematic";
-			}
-
-			AT_CORE_ASSERT(false, "Unknown Rigidbody2D BodyType!");
-			return "Unknown";
-		}
-
-		static Component::Rigidbody2D::BodyType Rigidbody2DBodyTypeFromString(const std::string& bodyTypeString)
-		{
-			if(bodyTypeString == "Static") return Component::Rigidbody2D::BodyType::Static;
-			if(bodyTypeString == "Dynamic") return Component::Rigidbody2D::BodyType::Dynamic;
-			if(bodyTypeString == "Kinematic") return Component::Rigidbody2D::BodyType::Kinematic;
-
-			AT_CORE_ASSERT(false, "Unknown Rigidbody2D BodyType!");
-			return Component::Rigidbody2D::BodyType::Static;
-		}
 
 		static void SerializeEntity(YAML::Emitter& out, Entity entity)
 		{
@@ -305,8 +284,10 @@ namespace Atom
 				out << YAML::Key << "Rigidbody2D";
 				out << YAML::BeginMap;		// Rigidbody2D
 
-				out << YAML::Key << "BodyType" << YAML::Value << Rigidbody2DBodyTypeToString(rigidbody2D.Type);
+				out << YAML::Key << "BodyType" << YAML::Value << Utils::AtomPhysicsBodyTypeToString(rigidbody2D.BodyType);
 				out << YAML::Key << "FixedRotation" << YAML::Value << rigidbody2D.FixedRotation;
+				out << YAML::Key << "AffectedByGravity" << YAML::Value << rigidbody2D.AffectedByGravity;
+				out << YAML::Key << "GravityScale" << YAML::Value << rigidbody2D.GravityScale;
 
 				out << YAML::EndMap;		// Rigidbody2D
 			}
@@ -508,8 +489,10 @@ namespace Atom
 			{
 				auto& rigidbody2D = deserializedEntity.AddComponent<Component::Rigidbody2D>();
 
-				rigidbody2D.Type = Utils::Rigidbody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
+				rigidbody2D.BodyType = Utils::AtomPhysicsBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
 				rigidbody2D.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+				rigidbody2D.AffectedByGravity = rigidbody2DComponent["AffectedByGravity"] ? rigidbody2DComponent["AffectedByGravity"].as<bool>() : true;
+				rigidbody2D.GravityScale = rigidbody2DComponent["GravityScale"] ? rigidbody2DComponent["GravityScale"].as<float>() : 1.0f;
 			}
 
 			auto boxCollider2DComponent = entity["BoxCollider2D"];

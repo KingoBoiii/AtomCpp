@@ -4,8 +4,6 @@
 
 #include "entt.hpp"
 
-class b2World;
-
 namespace Atom
 {
 
@@ -16,6 +14,8 @@ namespace Atom
 	public:
 		Scene();
 		~Scene();
+
+		void OnRigidbody2DComponent(entt::registry& registry, entt::entity e);
 
 		static Scene* Copy(Scene* other);
 
@@ -58,8 +58,6 @@ namespace Atom
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
-
-		b2World* m_PhysicsWorld = nullptr;
 
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;

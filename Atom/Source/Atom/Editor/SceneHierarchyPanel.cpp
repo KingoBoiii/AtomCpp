@@ -2,6 +2,8 @@
 #include "SceneHierarchyPanel.h"
 #include "Atom/Scene/Components.h"
 
+#include "Atom/Physics/2D/Physics2DBodyTypes.h"
+
 #include "Atom/Scripting/ScriptEngine.h"
 #include "Atom/Scripting/ScriptCache.h"
 
@@ -155,7 +157,7 @@ namespace Atom
 			}
 
 			// Right-click on blank space
-			if(ImGui::BeginPopupContextWindow(0, 1))
+			if(ImGui::BeginPopupContextWindow("Create", 1))
 			{
 				if(ImGui::MenuItem("Create Empty Entity"))
 				{
@@ -222,7 +224,7 @@ namespace Atom
 		}
 
 		bool entityDeleted = false;
-		if(ImGui::BeginPopupContextItem())
+		if(ImGui::BeginPopupContextItem("Delete"))
 		{
 			if(ImGui::MenuItem("Delete Entity"))
 			{
@@ -593,7 +595,7 @@ namespace Atom
 	void SceneHierarchyPanel::DrawRigidbody2DComponent(Component::Rigidbody2D& component)
 	{
 		const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
-		const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+		const char* currentBodyTypeString = bodyTypeStrings[(int)component.BodyType];
 		if(ImGui::BeginCombo("Body Type", currentBodyTypeString))
 		{
 			for(int i = 0; i < 3; i++)
@@ -602,7 +604,7 @@ namespace Atom
 				if(ImGui::Selectable(bodyTypeStrings[i], isSelected))
 				{
 					currentBodyTypeString = bodyTypeStrings[i];
-					component.Type = (Component::Rigidbody2D::BodyType)i;
+					component.BodyType = (PhysicsBodyType)i;
 				}
 
 				if(isSelected)
@@ -615,6 +617,11 @@ namespace Atom
 		}
 
 		ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		ImGui::Checkbox("Affected by gravity", &component.AffectedByGravity);
+		if (component.AffectedByGravity) 
+		{
+			ImGui::DragFloat("Gravity Scale", &component.GravityScale, 0.1f, 0.0f, 1.0f);
+		}
 	}
 
 	void SceneHierarchyPanel::DrawBoxCollider2DComponent(Component::BoxCollider2D& component)

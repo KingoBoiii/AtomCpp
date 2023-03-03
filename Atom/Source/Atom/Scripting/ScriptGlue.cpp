@@ -74,8 +74,10 @@ namespace Atom
 
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPhysicsBodyType);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPhysicsBodyType);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetLinearVelocity);
-		
+
 		AT_ADD_INTERNAL_CALL(TextRenderer_GetTextString);
 		AT_ADD_INTERNAL_CALL(TextRenderer_SetTextString);
 		AT_ADD_INTERNAL_CALL(TextRenderer_GetKerning);
@@ -115,6 +117,7 @@ namespace Atom
 
 			// TODO: We can only destroy entities at the end of the frame!
 			// - Make a queue of entities to destroy and destroy them at the end of the frame
+			AT_CORE_CRITICAL("Scene_DestroyEntity is not implemented!");
 		}
 
 		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId)
@@ -176,7 +179,7 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 
 			std::string entityName = entity.GetComponent<Component::Identifier>().Name;
-			
+
 			*outName = ScriptUtils::UTF8ToMonoString(entityName);
 		}
 
@@ -237,7 +240,7 @@ namespace Atom
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
-			
+
 			entity.GetComponent<Component::BasicRenderer>().Color = *color;
 		}
 
@@ -266,6 +269,30 @@ namespace Atom
 			Physics2D::SetTransform(*position, entity);
 		}
 
+		void Rigidbody2D_GetPhysicsBodyType(UUID uuid, PhysicsBodyType* outPhysicsBodyType)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
+			*outPhysicsBodyType = rb2d.BodyType;
+		}
+
+		void Rigidbody2D_SetPhysicsBodyType(UUID uuid, PhysicsBodyType physicsBodyType)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
+			rb2d.BodyType = physicsBodyType;
+
+			Physics2D::SetPhysicsBodyType(entity, rb2d.BodyType);
+		}
+
 		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
@@ -286,7 +313,7 @@ namespace Atom
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
-			
+
 			std::string text = entity.GetComponent<Component::TextRenderer>().Text;
 			*outText = ScriptUtils::UTF8ToMonoString(text);
 		}
@@ -381,26 +408,26 @@ namespace Atom
 			std::string messageStr(cStr);
 			mono_free(cStr);
 
-			switch(level)
+			switch (level)
 			{
-				case LogLevel::Trace:
-					AT_TRACE(messageStr);
-					break;
-				case LogLevel::Debug:
-					AT_INFO(messageStr);
-					break;
-				case LogLevel::Info:
-					AT_INFO(messageStr);
-					break;
-				case LogLevel::Warn:
-					AT_WARN(messageStr);
-					break;
-				case LogLevel::Error:
-					AT_ERROR(messageStr);
-					break;
-				case LogLevel::Critical:
-					AT_CRITICAL(messageStr);
-					break;
+			case LogLevel::Trace:
+				AT_TRACE(messageStr);
+				break;
+			case LogLevel::Debug:
+				AT_INFO(messageStr);
+				break;
+			case LogLevel::Info:
+				AT_INFO(messageStr);
+				break;
+			case LogLevel::Warn:
+				AT_WARN(messageStr);
+				break;
+			case LogLevel::Error:
+				AT_ERROR(messageStr);
+				break;
+			case LogLevel::Critical:
+				AT_CRITICAL(messageStr);
+				break;
 			}
 		}
 

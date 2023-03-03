@@ -1,6 +1,7 @@
 #pragma once
 #include "Atom/Core/UUID.h"
 #include "Atom/Core/Input/Input.h"
+#include "Atom/Physics/2D/Physics2DBodyTypes.h"
 
 extern "C" {
 	typedef struct _MonoString MonoString;
@@ -63,6 +64,9 @@ namespace Atom
 
 		void Rigidbody2D_GetPosition(UUID uuid, glm::vec2* outPosition);
 		void Rigidbody2D_SetPosition(UUID uuid, glm::vec2* position);
+
+		void Rigidbody2D_GetPhysicsBodyType(UUID uuid, PhysicsBodyType* outPhysicsBodyType);
+		void Rigidbody2D_SetPhysicsBodyType(UUID uuid, PhysicsBodyType physicsBodyType);
 
 		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity);
 

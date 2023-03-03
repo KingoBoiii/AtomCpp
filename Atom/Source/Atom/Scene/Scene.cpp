@@ -10,20 +10,49 @@
 
 namespace Atom
 {
-	
+
+#if 0
+	static void OnAddRigidbody2DComponent(entt::registry& registry, entt::entity e, Scene* scene)
+	{
+		AT_CORE_TRACE("Added Rigidbody2D Component at Scene runtime!");
+		Physics2D::CreatePhysicsBody({ e, scene });
+	}
+
+	void Scene::OnRigidbody2DComponent(entt::registry& registry, entt::entity e)
+	{
+		Physics2D::CreatePhysicsBody({ e, this });
+	}
+#endif
+
+	static void Test(entt::registry& registry, entt::entity entity) 
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene) {
+			return;
+		}
+
+		Physics2D::CreatePhysicsBody({ entity, scene });
+	}
+
 	Scene::Scene()
 	{
+		// TODO: Move to OnRuntimeStart
+		//m_Registry.on_construct<Component::Rigidbody2D>().connect<&Scene::OnRigidbody2DComponent>();
+		m_Registry.on_construct<Component::Rigidbody2D>().connect<&Test>();
 	}
 
 	Scene::~Scene()
 	{
+		// TODO: Move to OnRuntimeStop
+		//m_Registry.on_construct<Component::Rigidbody2D>().disconnect<&OnAddRigidbody2DComponent>();
+		m_Registry.on_construct<Component::Rigidbody2D>().disconnect<&Test>();
 	}
 
 	template<typename TComponent>
 	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
 	{
 		auto view = src.view<TComponent>();
-		for(auto e : view)
+		for (auto e : view)
 		{
 			UUID uuid = src.get<Component::Identifier>(e).ID;
 			AT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
@@ -37,7 +66,7 @@ namespace Atom
 	template<typename TComponent>
 	static void CopyComponentIfExists(Entity dst, Entity src)
 	{
-		if(src.HasComponent<TComponent>())
+		if (src.HasComponent<TComponent>())
 		{
 			dst.AddOrReplaceComponent<TComponent>(src.GetComponent<TComponent>());
 		}
@@ -57,7 +86,7 @@ namespace Atom
 
 		// Creat entities in new scene
 		auto identifierView = srcSceneRegistry.view<Component::Identifier>();
-		for(auto e : identifierView)
+		for (auto e : identifierView)
 		{
 			UUID uuid = srcSceneRegistry.get<Component::Identifier>(e).ID;
 			const auto& name = srcSceneRegistry.get<Component::Identifier>(e).Name;
@@ -120,7 +149,7 @@ namespace Atom
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
-		if(m_ViewportWidth == width && m_ViewportHeight == height)
+		if (m_ViewportWidth == width && m_ViewportHeight == height)
 		{
 			return;
 		}
@@ -130,10 +159,10 @@ namespace Atom
 
 		// Resize our non-FixedAspectRatio cameras
 		auto view = m_Registry.view<Component::Camera>();
-		for(auto entity : view)
+		for (auto entity : view)
 		{
 			auto& cameraComponent = view.get<Component::Camera>(entity);
-			if(!cameraComponent.FixedAspectRatio)
+			if (!cameraComponent.FixedAspectRatio)
 			{
 				cameraComponent.SceneCamera.SetViewportSize(width, height);
 			}
@@ -146,7 +175,7 @@ namespace Atom
 
 		{
 			auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
-			for(auto entity : group)
+			for (auto entity : group)
 			{
 				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
@@ -156,17 +185,17 @@ namespace Atom
 
 		{
 			auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
-			for(auto entity : view)
+			for (auto entity : view)
 			{
 				auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(entity);
 
 				Renderer2D::DrawCircle(transform.GetTransform(), circleRenderer.Color, circleRenderer.Thickness, circleRenderer.Fade, (int32_t)entity);
 			}
 		}
-		
+
 		{
 			auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
-			for(auto entity : view)
+			for (auto entity : view)
 			{
 				auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(entity);
 
@@ -187,7 +216,7 @@ namespace Atom
 			Physics2D::OnRuntimeStart();
 
 			auto view = m_Registry.view<Component::Rigidbody2D>();
-			for(auto e : view)
+			for (auto e : view)
 			{
 				Entity entity{ e, this };
 				Physics2D::CreatePhysicsBody(entity);
@@ -199,7 +228,7 @@ namespace Atom
 			ScriptEngine::OnRuntimeStart(this);
 
 			auto view = m_Registry.view<Component::Script>();
-			for(auto e : view)
+			for (auto e : view)
 			{
 				Entity entity{ e, this };
 				ScriptEngine::OnCreateEntity(entity);
@@ -220,7 +249,7 @@ namespace Atom
 		{
 			// TODO: Maybe call OnDestroyEntity?
 			auto view = m_Registry.view<Component::Script>();
-			for(auto e : view)
+			for (auto e : view)
 			{
 				Entity entity{ e, this };
 				ScriptEngine::OnDestroyEntity(entity);
@@ -232,12 +261,12 @@ namespace Atom
 
 	void Scene::OnRuntimeUpdate(float deltaTime)
 	{
-		if(!m_IsPaused || m_StepFrames-- > 0)
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			// Script 
 			{
 				auto view = m_Registry.view<Component::Script>();
-				for(auto e : view)
+				for (auto e : view)
 				{
 					Entity entity{ e, this };
 					ScriptEngine::OnUpdateEntity(entity, deltaTime);
@@ -248,7 +277,7 @@ namespace Atom
 			{
 				Physics2D::Step(deltaTime);
 				auto view = m_Registry.view<Component::Rigidbody2D>();
-				for(auto e : view)
+				for (auto e : view)
 				{
 					Entity entity{ e, this };
 
@@ -263,11 +292,11 @@ namespace Atom
 			glm::mat4 cameraTransform;
 			{
 				auto view = m_Registry.view<Component::Transform, Component::Camera>();
-				for(auto entity : view)
+				for (auto entity : view)
 				{
 					auto [transform, camera] = view.get<Component::Transform, Component::Camera>(entity);
 
-					if(camera.Primary)
+					if (camera.Primary)
 					{
 						mainCamera = &camera.SceneCamera;
 						cameraTransform = transform.GetTransform();
@@ -276,13 +305,13 @@ namespace Atom
 				}
 			}
 
-			if(mainCamera)
+			if (mainCamera)
 			{
 				Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 				{
 					auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
-					for(auto entity : group)
+					for (auto entity : group)
 					{
 						auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
@@ -292,7 +321,7 @@ namespace Atom
 
 				{
 					auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
-					for(auto e : view)
+					for (auto e : view)
 					{
 						auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(e);
 
@@ -302,7 +331,7 @@ namespace Atom
 
 				{
 					auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
-					for(auto e : view)
+					for (auto e : view)
 					{
 						auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(e);
 
@@ -323,7 +352,7 @@ namespace Atom
 			Physics2D::OnRuntimeStart();
 
 			auto view = m_Registry.view<Component::Rigidbody2D>();
-			for(auto e : view)
+			for (auto e : view)
 			{
 				Entity entity{ e, this };
 				Physics2D::CreatePhysicsBody(entity);
@@ -341,13 +370,13 @@ namespace Atom
 
 	void Scene::OnSimulationUpdate(float deltaTime, EditorCamera& editorCamera)
 	{
-		if(!m_IsPaused || m_StepFrames-- > 0)
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			// Physics 2D
 			{
 				Physics2D::Step(deltaTime);
 				auto view = m_Registry.view<Component::Rigidbody2D>();
-				for(auto e : view)
+				for (auto e : view)
 				{
 					Entity entity{ e, this };
 
@@ -361,7 +390,7 @@ namespace Atom
 
 		{
 			auto group = m_Registry.group<Component::Transform>(entt::get<Component::BasicRenderer>);
-			for(auto entity : group)
+			for (auto entity : group)
 			{
 				auto [transform, basic] = group.get<Component::Transform, Component::BasicRenderer>(entity);
 
@@ -370,7 +399,7 @@ namespace Atom
 
 			{
 				auto view = m_Registry.view<Component::Transform, Component::CircleRenderer>();
-				for(auto entity : view)
+				for (auto entity : view)
 				{
 					auto [transform, circleRenderer] = view.get<Component::Transform, Component::CircleRenderer>(entity);
 
@@ -380,7 +409,7 @@ namespace Atom
 
 			{
 				auto view = m_Registry.view<Component::Transform, Component::TextRenderer>();
-				for(auto entity : view)
+				for (auto entity : view)
 				{
 					auto [transform, textRenderer] = view.get<Component::Transform, Component::TextRenderer>(entity);
 
@@ -396,10 +425,10 @@ namespace Atom
 	Entity Scene::FindEntityByName(std::string_view name)
 	{
 		auto view = m_Registry.view<Component::Identifier>();
-		for(auto entity : view)
+		for (auto entity : view)
 		{
 			const auto& identifier = view.get<Component::Identifier>(entity);
-			if(identifier.Name == name)
+			if (identifier.Name == name)
 			{
 				return Entity{ entity, this };
 			}
@@ -409,7 +438,7 @@ namespace Atom
 
 	Entity Scene::GetEntityByUUID(UUID uuid)
 	{
-		if(m_EntityMap.find(uuid) != m_EntityMap.end())
+		if (m_EntityMap.find(uuid) != m_EntityMap.end())
 		{
 			return { m_EntityMap[uuid], this };
 		}
@@ -419,10 +448,10 @@ namespace Atom
 	Entity Scene::GetPrimaryCameraEntity()
 	{
 		auto view = m_Registry.view<Component::Camera>();
-		for(auto entity : view)
+		for (auto entity : view)
 		{
 			const auto& camera = view.get<Component::Camera>(entity);
-			if(camera.Primary)
+			if (camera.Primary)
 			{
 				return Entity{ entity, this };
 			}
