@@ -1,0 +1,50 @@
+Scene: Untitled
+Entities:
+  - Entity: 3306752636040425415
+    Identifier:
+      Name: Player
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderer:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+    Script:
+      ClassName: Sandbox.Examples.CatchGame.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 500
+    Rigidbody2D:
+      BodyType: Dynamic
+      FixedRotation: false
+      AffectedByGravity: false
+      GravityScale: 1
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 1616103297462218909
+    Identifier:
+      Name: Camera
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
