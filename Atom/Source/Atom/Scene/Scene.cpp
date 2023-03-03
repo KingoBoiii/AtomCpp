@@ -128,6 +128,8 @@ namespace Atom
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		Physics2D::DestroyPhysicsBody(entity);
+
 		m_EntityMap.erase(entity.GetUUID());
 		m_Registry.destroy(entity);
 	}

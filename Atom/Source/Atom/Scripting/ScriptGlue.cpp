@@ -134,10 +134,15 @@ namespace Atom
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(entityId);
+			AT_CORE_ASSERT(entity);
 
 			// TODO: We can only destroy entities at the end of the frame!
 			// - Make a queue of entities to destroy and destroy them at the end of the frame
-			AT_CORE_CRITICAL("Scene_DestroyEntity is not implemented!");
+			scene->SubmitToPostRuntimeUpdateQueue([scene, entity]() {
+				scene->DestroyEntity(entity);
+			});
+			//AT_CORE_CRITICAL("Scene_DestroyEntity is not implemented!");
 		}
 
 		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId)
