@@ -343,6 +343,23 @@ namespace Atom
 				Renderer2D::EndScene();
 			}
 		}
+
+		ExecutePostRuntimeUpdateQueue();
+	}
+
+	void Scene::SubmitToPostRuntimeUpdateQueue(const std::function<void()>& function)
+	{
+		m_PostRuntimeUpdateQueue.emplace_back(function);
+	}
+
+	void Scene::ExecutePostRuntimeUpdateQueue()
+	{
+		for (auto& function : m_PostRuntimeUpdateQueue)
+		{
+			function();
+		}
+
+		m_PostRuntimeUpdateQueue.clear();
 	}
 
 	void Scene::OnSimulationStart()

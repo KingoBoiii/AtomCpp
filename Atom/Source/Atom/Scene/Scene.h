@@ -34,6 +34,9 @@ namespace Atom
 		void OnRuntimeStop();
 		void OnRuntimeUpdate(float deltaTime);
 
+		void SubmitToPostRuntimeUpdateQueue(const std::function<void()>& function);
+		void ExecutePostRuntimeUpdateQueue();
+
 		void OnSimulationStart();
 		void OnSimulationStop();
 		void OnSimulationUpdate(float deltaTime, EditorCamera& editorCamera);
@@ -59,6 +62,8 @@ namespace Atom
 	private:
 		entt::registry m_Registry;
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
+
+		std::vector<std::function<void()>> m_PostRuntimeUpdateQueue;
 
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
