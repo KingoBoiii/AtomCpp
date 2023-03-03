@@ -65,7 +65,7 @@
     <Compile Include="Source\Atom\Scene\Entity.cs" />
     <Compile Include="Source\Atom\Scene\Scene.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\Vector3.cs" />
+    <Compile Include="Source\Atom\Math\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
