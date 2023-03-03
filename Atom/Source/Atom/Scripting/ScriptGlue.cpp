@@ -58,6 +58,7 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Scene_CreateEntity);
 		AT_ADD_INTERNAL_CALL(Scene_DestroyEntity);
 		AT_ADD_INTERNAL_CALL(Scene_FindEntityByName);
+		AT_ADD_INTERNAL_CALL(Scene_IsEntityValid);
 
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
 		AT_ADD_INTERNAL_CALL(Entity_AddComponent);
@@ -127,6 +128,14 @@ namespace Atom
 
 			Entity entity = scene->FindEntityByName(ScriptUtils::MonoStringToUTF8(name));
 			*outEntityId = entity.GetUUID();
+		}
+
+		bool Scene_IsEntityValid(UUID entityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			return scene->IsEntityValid(entityId);
 		}
 
 #pragma endregion

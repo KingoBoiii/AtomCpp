@@ -4,6 +4,7 @@
 
 #include "entt.hpp"
 
+
 namespace Atom
 {
 
@@ -41,6 +42,8 @@ namespace Atom
 		Entity GetEntityByUUID(UUID uuid);
 		Entity GetPrimaryCameraEntity();
 
+		bool IsEntityValid(Entity entity) const;
+		bool IsEntityValid(UUID entityId) const;
 		bool IsRunning() const { return m_IsRunning; }
 		bool IsPaused() const { return m_IsPaused; }
 

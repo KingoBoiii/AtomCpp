@@ -27,6 +27,7 @@ namespace Atom
 		void Scene_CreateEntity(MonoString* name, UUID* outEntityId);
 		void Scene_DestroyEntity(UUID entityId);
 		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId);
+		bool Scene_IsEntityValid(UUID entityId);
 
 #pragma endregion
 		

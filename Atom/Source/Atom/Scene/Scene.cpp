@@ -24,7 +24,7 @@ namespace Atom
 	}
 #endif
 
-	static void Test(entt::registry& registry, entt::entity entity) 
+	static void Test(entt::registry& registry, entt::entity entity)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
 		if (!scene) {
@@ -457,6 +457,24 @@ namespace Atom
 			}
 		}
 		return {};
+	}
+
+	bool Scene::IsEntityValid(Entity entity) const
+	{
+		UUID entityId = entity.GetUUID();
+		return IsEntityValid(entityId);
+	}
+
+	bool Scene::IsEntityValid(UUID entityId) const
+	{
+		auto iterator = m_EntityMap.find(entityId);
+		if (iterator == m_EntityMap.end())
+		{
+			return false;
+		}
+
+		entt::entity enttEntity = m_EntityMap.at(entityId);
+		return m_Registry.valid(enttEntity);
 	}
 
 	void Scene::Step(int frames)
