@@ -1,5 +1,5 @@
 Project:
   Name: Sandbox
-  StartScene: Scenes\TextComponent.atsc
+  StartScene: Scenes\TopDown2DTest.atsc
   AssetDirectory: Assets
   ScriptModulePath: Cache/Scripts/Binaries
