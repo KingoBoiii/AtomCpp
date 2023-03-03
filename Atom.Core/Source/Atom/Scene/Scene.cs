@@ -23,6 +23,11 @@
                 return;
             }
 
+            if(IsEntityValid(entity))
+            {
+                return;
+            }
+
             ulong entityId = entity.Id;
             InternalCalls.Scene_DestroyEntity(ref entityId);
         }
@@ -31,6 +36,11 @@
         {
             InternalCalls.Scene_FindEntityByName(name, out var entityId);
             return new Entity(entityId);
+        }
+
+        public static bool IsEntityValid(Entity entity)
+        {
+            return InternalCalls.Scene_IsEntityValid(entity.Id);
         }
         
     }

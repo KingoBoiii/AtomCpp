@@ -14,9 +14,11 @@ namespace Atom
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Scene_DestroyEntity(ref ulong entityId);
 
-
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Scene_FindEntityByName(string name, out ulong entityId);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool Scene_IsEntityValid(ulong entityId);
 
         #endregion
 
