@@ -10,7 +10,7 @@ namespace Atom
         /// <summary>
         /// Sets a seed
         /// </summary>
-        /// <param name="seed"></param>
+        /// <param name="seed">Integer between <see cref="int.MinValue"/> and <see cref="int.MaxValue"/></param>
         public static void SetSeed(int seed)
         {
             s_Random = new System.Random(seed);
