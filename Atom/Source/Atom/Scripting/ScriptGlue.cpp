@@ -53,6 +53,9 @@ namespace Atom
 
 	void ScriptGlue::RegisterInternalCalls()
 	{
+		AT_ADD_INTERNAL_CALL(Scene_CreateEntity);
+		AT_ADD_INTERNAL_CALL(Scene_DestroyEntity);
+
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
 		AT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		AT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
@@ -90,6 +93,29 @@ namespace Atom
 
 	namespace InternalCalls
 	{
+
+#pragma region Scene
+
+		void Scene_CreateEntity(MonoString* name, UUID* outEntityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			Entity entity = scene->CreateEntity(ScriptUtils::MonoStringToUTF8(name));
+			*outEntityId = entity.GetUUID();
+		}
+
+		void Scene_DestroyEntity(UUID entityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			// TODO: We can only destroy entities at the end of the frame!
+			// - Make a queue of entities to destroy and destroy them at the end of the frame
+		}
+
+#pragma endregion
+
 
 #pragma region Entity
 

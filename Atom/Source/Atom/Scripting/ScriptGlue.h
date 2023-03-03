@@ -20,6 +20,14 @@ namespace Atom
 
 	namespace InternalCalls
 	{
+
+#pragma region Scene
+
+		void Scene_CreateEntity(MonoString* name, UUID* outEntityId);
+		void Scene_DestroyEntity(UUID entityId);
+
+#pragma endregion
+
 		
 #pragma region Entity
 
