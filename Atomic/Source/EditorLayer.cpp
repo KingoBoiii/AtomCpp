@@ -689,6 +689,8 @@ namespace Atom
 
 	void EditorLayer::SaveScene()
 	{
+		AT_CORE_INFO("Saving active scene at {}", m_EditorScenePath);
+
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Serialize(m_EditorScenePath.string());
 	}
