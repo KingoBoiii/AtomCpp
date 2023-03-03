@@ -110,14 +110,7 @@ namespace Atom
 
         public Entity FindEntityByName(string name)
         {
-            InternalCalls.Entity_FindEntityByName(name, out var entityId);
-
-            if (entityId == 0)
-            {
-                return default;
-            }
-
-            return new Entity(entityId);
+            return Scene.FindEntityByName(name);
         }
 
         public T As<T>() where T : Entity, new()

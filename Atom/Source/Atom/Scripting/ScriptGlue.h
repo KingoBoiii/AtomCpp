@@ -25,6 +25,7 @@ namespace Atom
 
 		void Scene_CreateEntity(MonoString* name, UUID* outEntityId);
 		void Scene_DestroyEntity(UUID entityId);
+		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId);
 
 #pragma endregion
 
@@ -32,8 +33,6 @@ namespace Atom
 #pragma region Entity
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
-
-		void Entity_FindEntityByName(MonoString* name, UUID* uuid);
 
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject);
 

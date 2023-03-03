@@ -114,6 +114,15 @@ namespace Atom
 			// - Make a queue of entities to destroy and destroy them at the end of the frame
 		}
 
+		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			Entity entity = scene->FindEntityByName(ScriptUtils::MonoStringToUTF8(name));
+			*outEntityId = entity.GetUUID();
+		}
+
 #pragma endregion
 
 
@@ -131,24 +140,7 @@ namespace Atom
 
 			return s_EntityHasComponentFuncs.at(managedType)(entity);
 		}
-
-		void Entity_FindEntityByName(MonoString* name, UUID* uuid)
-		{
-			char* nameCStr = mono_string_to_utf8(name);
-
-			Scene* scene = ScriptEngine::GetSceneContext();
-			AT_CORE_ASSERT(scene);
-			Entity entity = scene->FindEntityByName(nameCStr);
-			mono_free(nameCStr);
-
-			if(!entity)
-			{
-				*uuid = 0;
-			}
-
-			*uuid = entity.GetUUID();
-		}
-
+		
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject)
 		{
 			MonoObject* managedObject = ScriptEngine::GetManagedInstance(uuid);

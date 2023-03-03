@@ -6,14 +6,25 @@ namespace Atom
 
     internal static class InternalCalls
     {
+        #region Scene
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_CreateEntity(string name, out ulong entityId);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_DestroyEntity(ref ulong entityId);
+
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_FindEntityByName(string name, out ulong entityId);
+
+        #endregion
+
         #region Entity
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Entity_HasComponent(ulong entityId, Type componentType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Entity_FindEntityByName(string name, out ulong entityId);
-
+        
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Entity_GetScriptInstance(ulong entityId, out object instance);
 

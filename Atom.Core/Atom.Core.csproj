@@ -61,6 +61,7 @@
     <Compile Include="Source\Atom\Scene\Components\TextRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\Entity.cs" />
+    <Compile Include="Source\Atom\Scene\Scene.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\Vector3.cs" />
   </ItemGroup>
