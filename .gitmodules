@@ -20,6 +20,3 @@
 [submodule "Atom/Vendor/Box2D"]
 	path = Atom/Vendor/Box2D
 	url = https://github.com/cpp-engine-forks/box2d.git
-[submodule "Atom/Vendor/msdf-atlas-gen"]
-	path = Atom/Vendor/msdf-atlas-gen
-	url = https://github.com/cpp-engine-forks/msdf-atlas-gen.git
