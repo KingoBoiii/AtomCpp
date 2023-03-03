@@ -522,67 +522,6 @@ namespace Atom
 #undef AT_SCRIPT_FIELD_TYPE_CASE
 				}
 			}
-
-#if 0
-			bool scriptClassExists = false;
-			if(scriptClassExists)
-			{
-				ScriptClass* entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-				const auto& fields = entityClass->GetFields();
-
-				auto& entityFields = ScriptEngine::GetScriptFieldMap(m_SelectedEntity);
-
-				for(const auto& [name, field] : fields)
-				{
-					// Field has been set in editor
-					if(entityFields.find(name) != entityFields.end())
-					{
-						ScriptFieldInstance& scriptField = entityFields.at(name);
-
-						if(field.Type == ScriptFieldType::Float)
-						{
-							float data = scriptField.GetValue<float>();
-							if(ImGui::DragFloat(name.c_str(), &data))
-							{
-								scriptField.SetValue(data);
-							}
-						}
-						if(field.Type == ScriptFieldType::Int)
-						{
-							int32_t data = scriptField.GetValue<int32_t>();
-							if(ImGui::DragInt(name.c_str(), &data))
-							{
-								scriptField.SetValue(data);
-							}
-						}
-					}
-					else
-					{
-						// Field has not been set in editor - display control to set it maybe
-						if(field.Type == ScriptFieldType::Float)
-						{
-							float data = 0.0f;
-							if(ImGui::DragFloat(name.c_str(), &data))
-							{
-								ScriptFieldInstance fieldInstance = entityFields[name];
-								fieldInstance.Field = field;
-								fieldInstance.SetValue(data);
-							}
-						}
-						if(field.Type == ScriptFieldType::Int)
-						{
-							int32_t data = 0.0f;
-							if(ImGui::DragInt(name.c_str(), &data))
-							{
-								ScriptFieldInstance fieldInstance = entityFields[name];
-								fieldInstance.Field = field;
-								fieldInstance.SetValue(data);
-							}
-						}
-					}
-				}
-			}
-#endif
 		}
 
 
