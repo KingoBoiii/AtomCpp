@@ -32,6 +32,7 @@ namespace Atom
 #pragma region Entity
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
+		void Entity_AddComponent(UUID uuid, MonoReflectionType* monoReflectionType);
 
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject);
 

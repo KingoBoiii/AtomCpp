@@ -80,6 +80,19 @@ namespace Atom
 
         #endregion
 
+        public TComponent AddComponent<TComponent>() where TComponent : ComponentBase, new()
+        {
+            var componentType = typeof(TComponent);
+            InternalCalls.Entity_AddComponent(Id, componentType);
+
+            if(_componentCache.ContainsKey(componentType))
+            {
+                return GetComponent<TComponent>();
+            }
+
+            return new TComponent { Entity = this };
+        }
+
         public bool HasComponent<TComponent>() where TComponent : ComponentBase
         {
             var componentType = typeof(TComponent);

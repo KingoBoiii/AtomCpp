@@ -15,6 +15,7 @@ namespace Atom
 {
 
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
+	static std::unordered_map<MonoType*, std::function<void(Entity)>> s_EntityAddComponentFuncs;
 
 #define AT_ADD_INTERNAL_CALL(icall) mono_add_internal_call("Atom.InternalCalls::"#icall, (void*)InternalCalls::icall)
 
@@ -29,21 +30,22 @@ namespace Atom
 
 		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage);
 		//MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
-		if(!managedType)
+		if (!managedType)
 		{
 			AT_CORE_ERROR("Could not find managed component type: {}", managedTypeName);
 			return;
 		}
 		s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
+		s_EntityAddComponentFuncs[managedType] = [](Entity entity) { entity.AddComponent<Component>(); };
 	}
 
 	template<typename... Component>
 	static void RegisterComponent(ComponentGroup<Component...>)
 	{
 		([]()
-		{
-			RegisterComponent<Component>();
-		}(), ...);
+			{
+				RegisterComponent<Component>();
+			}(), ...);
 	}
 
 	void ScriptGlue::RegisterComponents()
@@ -58,6 +60,7 @@ namespace Atom
 		AT_ADD_INTERNAL_CALL(Scene_FindEntityByName);
 
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
+		AT_ADD_INTERNAL_CALL(Entity_AddComponent);
 		AT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		AT_ADD_INTERNAL_CALL(Identifier_GetName);
@@ -140,7 +143,20 @@ namespace Atom
 
 			return s_EntityHasComponentFuncs.at(managedType)(entity);
 		}
-		
+
+		void Entity_AddComponent(UUID uuid, MonoReflectionType* monoReflectionType)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			MonoType* managedType = mono_reflection_type_get_type(monoReflectionType);
+			AT_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end(), "Entity_AddComponent: No function registered for this type!");
+
+			return s_EntityAddComponentFuncs.at(managedType)(entity);
+		}
+
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject)
 		{
 			MonoObject* managedObject = ScriptEngine::GetManagedInstance(uuid);
