@@ -26,13 +26,7 @@ namespace Sandbox.TopDown2DTest
             renderer.Color = new Color(1.0f, 0.0f, 1.0f, 1.0f);
 
 #if true
-            var enemyCollider = enemy.AddComponent<BoxCollider2D>();
-            //enemyCollider.AddOnCollision2DEnterCallback((entity) =>
-            //{
-            //    Log.Info("kgjfdogd");
-            //    Scene.DestroyEntity(entity);
-            //});
-
+            enemy.AddComponent<BoxCollider2D>();
             var enemyrb2d = enemy.AddComponent<Rigidbody2D>();
             enemyrb2d.BodyType = RigidbodyType.Dynamic;
 #endif
