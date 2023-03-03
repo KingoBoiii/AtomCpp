@@ -23,13 +23,13 @@
                 return;
             }
 
-            if(IsEntityValid(entity))
+            if(!IsEntityValid(entity))
             {
                 return;
             }
 
             ulong entityId = entity.Id;
-            InternalCalls.Scene_DestroyEntity(ref entityId);
+            InternalCalls.Scene_DestroyEntity(entityId);
         }
 
         public static Entity FindEntityByName(string name)
