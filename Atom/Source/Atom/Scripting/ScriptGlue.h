@@ -28,7 +28,6 @@ namespace Atom
 		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId);
 
 #pragma endregion
-
 		
 #pragma region Entity
 
