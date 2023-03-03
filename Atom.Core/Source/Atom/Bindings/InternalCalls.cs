@@ -72,6 +72,12 @@ namespace Atom
         internal static extern void Rigidbody2D_SetPosition(ulong entityId, ref Vector2 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_GetPhysicsBodyType(ulong entityId, out RigidbodyType rigidbodyType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_SetPhysicsBodyType(ulong entityId, RigidbodyType rigidbodyType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Rigidbody2D_SetLinearVelocity(ulong entityId, ref Vector2 velocity);
 
         #endregion
