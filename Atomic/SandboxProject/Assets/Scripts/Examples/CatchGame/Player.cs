@@ -27,7 +27,6 @@ namespace Sandbox.Examples.CatchGame
                 velocity.X += Speed * deltaTime;
             }
 
-            Log.Info("Velocity: {0}", velocity);
             m_Rigidbody.SetLinearVelocity(velocity);
         }
     }
