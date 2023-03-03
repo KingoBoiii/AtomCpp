@@ -1,65 +1,22 @@
 Scene: Untitled
 Entities:
-  - Entity: 17996773953004586713
-    Identifier:
-      Name: Camera
-    Transform:
-      Position: [0, 0, 0.100000001]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Camera:
-      SceneCamera:
-        ProjectionType: 1
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 15
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
-  - Entity: 17936792938577051256
-    Identifier:
-      Name: Wall Left
-    Transform:
-      Position: [-9.5, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 10, 1]
-    BasicRenderer:
-      Color: [1, 1, 1, 1]
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: true
-      AffectedByGravity: true
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 10031778329720265322
+  - Entity: 3306752636040425415
     Identifier:
       Name: Player
     Transform:
-      Position: [-6.9206953, 2.63518715, 1.90734806e-06]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CircleRenderer:
-      Color: [1, 0, 0, 1]
+      Color: [1, 1, 1, 1]
       Thickness: 1
       Fade: 0.00499999989
     Script:
-      ClassName: Sandbox.TopDown2DTest.Player
+      ClassName: Sandbox.Examples.CatchGame.Player
       ScriptFields:
-        - Name: m_Speed
+        - Name: Speed
           Type: Float
-          Data: 0.057500001
-        - Name: m_Time
-          Type: Float
-          Data: 0
+          Data: 500
     Rigidbody2D:
       BodyType: Dynamic
       FixedRotation: false
@@ -73,69 +30,21 @@ Entities:
       Friction: 0.200000003
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 1156731509787658719
+  - Entity: 1616103297462218909
     Identifier:
-      Name: Wall Top
+      Name: Camera
     Transform:
-      Position: [0, 5, 0]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [18, 1, 1]
-    BasicRenderer:
-      Color: [1, 1, 1, 1]
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: true
-      AffectedByGravity: true
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 1183899870260772087
-    Identifier:
-      Name: Wall Right
-    Transform:
-      Position: [9.5, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 10, 1]
-    BasicRenderer:
-      Color: [1, 1, 1, 1]
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: true
-      AffectedByGravity: true
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 3890364137701878896
-    Identifier:
-      Name: Wall Bottom
-    Transform:
-      Position: [0, -5, 0]
-      Rotation: [0, 0, 0]
-      Scale: [18, 1, 1]
-    BasicRenderer:
-      Color: [1, 1, 1, 1]
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: true
-      AffectedByGravity: true
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false

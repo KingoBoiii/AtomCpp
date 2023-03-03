@@ -18,10 +18,12 @@ namespace Sandbox.TopDown2DTest
             var collider = GetComponent<BoxCollider2D>();
             collider.AddOnCollision2DEnterCallback((entity) =>
             {
+                Log.Info("Entity {0} ({1}) collided with Player!", entity.Name, entity.Id);
                 Scene.DestroyEntity(entity);
             });
 
             Entity enemy = Scene.CreateEntity("Enemy");
+            Log.Info("Create enemy (ID: {0})", enemy.Id);
             var renderer = enemy.AddComponent<BasicRenderer>();
             renderer.Color = new Color(1.0f, 0.0f, 1.0f, 1.0f);
 
