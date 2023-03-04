@@ -1,4 +1,5 @@
 #pragma once
+#include "Atom/Physics/2D/Physics2DBodyTypes.h"
 
 class b2Body;
 
@@ -26,7 +27,9 @@ namespace Atom
 		static void OnRuntimeUpdate(Entity entity);
 
 		static void CreatePhysicsBody(Entity entity);
+		static void DestroyPhysicsBody(Entity entity);
 		
+		static void SetPhysicsBodyType(Entity entity, PhysicsBodyType physicsBodyType);
 		static void SetLinearVelocity(const glm::vec2& velocity, Entity entity);
 
 		static void SetTransform(const glm::vec2& position, Entity entity);

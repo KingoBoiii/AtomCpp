@@ -3,6 +3,8 @@
 #include "ScriptEngine.h"
 #include "ScriptUtils.h"
 
+#include "Atom/Core/Application.h"
+
 #include "Atom/Physics/2D/Physics2D.h"
 
 #include "Atom/Scene/Scene.h"
@@ -15,6 +17,7 @@ namespace Atom
 {
 
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
+	static std::unordered_map<MonoType*, std::function<void(Entity)>> s_EntityAddComponentFuncs;
 
 #define AT_ADD_INTERNAL_CALL(icall) mono_add_internal_call("Atom.InternalCalls::"#icall, (void*)InternalCalls::icall)
 
@@ -29,21 +32,22 @@ namespace Atom
 
 		MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyInfo()->AssemblyImage);
 		//MonoType* managedType = mono_reflection_type_from_name(managedTypeName.data(), ScriptEngine::GetCoreAssemblyImage());
-		if(!managedType)
+		if (!managedType)
 		{
 			AT_CORE_ERROR("Could not find managed component type: {}", managedTypeName);
 			return;
 		}
 		s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
+		s_EntityAddComponentFuncs[managedType] = [](Entity entity) { entity.AddComponent<Component>(); };
 	}
 
 	template<typename... Component>
 	static void RegisterComponent(ComponentGroup<Component...>)
 	{
 		([]()
-		{
-			RegisterComponent<Component>();
-		}(), ...);
+			{
+				RegisterComponent<Component>();
+			}(), ...);
 	}
 
 	void ScriptGlue::RegisterComponents()
@@ -53,8 +57,16 @@ namespace Atom
 
 	void ScriptGlue::RegisterInternalCalls()
 	{
+		AT_ADD_INTERNAL_CALL(Application_GetWidth);
+		AT_ADD_INTERNAL_CALL(Application_GetHeight);
+
+		AT_ADD_INTERNAL_CALL(Scene_CreateEntity);
+		AT_ADD_INTERNAL_CALL(Scene_DestroyEntity);
+		AT_ADD_INTERNAL_CALL(Scene_FindEntityByName);
+		AT_ADD_INTERNAL_CALL(Scene_IsEntityValid);
+
 		AT_ADD_INTERNAL_CALL(Entity_HasComponent);
-		AT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		AT_ADD_INTERNAL_CALL(Entity_AddComponent);
 		AT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		AT_ADD_INTERNAL_CALL(Identifier_GetName);
@@ -68,8 +80,10 @@ namespace Atom
 
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPosition);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPosition);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_GetPhysicsBodyType);
+		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetPhysicsBodyType);
 		AT_ADD_INTERNAL_CALL(Rigidbody2D_SetLinearVelocity);
-		
+
 		AT_ADD_INTERNAL_CALL(TextRenderer_GetTextString);
 		AT_ADD_INTERNAL_CALL(TextRenderer_SetTextString);
 		AT_ADD_INTERNAL_CALL(TextRenderer_GetKerning);
@@ -91,6 +105,66 @@ namespace Atom
 	namespace InternalCalls
 	{
 
+#pragma region Application
+
+		void Application_GetWidth(uint32_t* outWidth)
+		{
+			*outWidth = Application::Get().GetWindow()->GetWidth();
+		}
+
+		void Application_GetHeight(uint32_t* outHeight)
+		{
+			*outHeight = Application::Get().GetWindow()->GetHeight();
+		}
+
+#pragma endregion
+
+#pragma region Scene
+
+		void Scene_CreateEntity(MonoString* name, UUID* outEntityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			Entity entity = scene->CreateEntity(ScriptUtils::MonoStringToUTF8(name));
+			*outEntityId = entity.GetUUID();
+		}
+
+		void Scene_DestroyEntity(UUID entityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(entityId);
+			AT_CORE_ASSERT(entity);
+
+			// TODO: We can only destroy entities at the end of the frame!
+			// - Make a queue of entities to destroy and destroy them at the end of the frame
+			scene->SubmitToPostRuntimeUpdateQueue([scene, entity]() {
+				scene->DestroyEntity(entity);
+			});
+			//AT_CORE_CRITICAL("Scene_DestroyEntity is not implemented!");
+		}
+
+		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			Entity entity = scene->FindEntityByName(ScriptUtils::MonoStringToUTF8(name));
+			*outEntityId = entity.GetUUID();
+		}
+
+		bool Scene_IsEntityValid(UUID entityId)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+
+			return scene->IsEntityValid(entityId);
+		}
+
+#pragma endregion
+
+
 #pragma region Entity
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType)
@@ -106,21 +180,17 @@ namespace Atom
 			return s_EntityHasComponentFuncs.at(managedType)(entity);
 		}
 
-		void Entity_FindEntityByName(MonoString* name, UUID* uuid)
+		void Entity_AddComponent(UUID uuid, MonoReflectionType* monoReflectionType)
 		{
-			char* nameCStr = mono_string_to_utf8(name);
-
 			Scene* scene = ScriptEngine::GetSceneContext();
 			AT_CORE_ASSERT(scene);
-			Entity entity = scene->FindEntityByName(nameCStr);
-			mono_free(nameCStr);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
 
-			if(!entity)
-			{
-				*uuid = 0;
-			}
+			MonoType* managedType = mono_reflection_type_get_type(monoReflectionType);
+			AT_CORE_ASSERT(s_EntityHasComponentFuncs.find(managedType) != s_EntityHasComponentFuncs.end(), "Entity_AddComponent: No function registered for this type!");
 
-			*uuid = entity.GetUUID();
+			return s_EntityAddComponentFuncs.at(managedType)(entity);
 		}
 
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject)
@@ -142,7 +212,7 @@ namespace Atom
 			AT_CORE_ASSERT(entity);
 
 			std::string entityName = entity.GetComponent<Component::Identifier>().Name;
-			
+
 			*outName = ScriptUtils::UTF8ToMonoString(entityName);
 		}
 
@@ -203,7 +273,7 @@ namespace Atom
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
-			
+
 			entity.GetComponent<Component::BasicRenderer>().Color = *color;
 		}
 
@@ -232,6 +302,30 @@ namespace Atom
 			Physics2D::SetTransform(*position, entity);
 		}
 
+		void Rigidbody2D_GetPhysicsBodyType(UUID uuid, PhysicsBodyType* outPhysicsBodyType)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
+			*outPhysicsBodyType = rb2d.BodyType;
+		}
+
+		void Rigidbody2D_SetPhysicsBodyType(UUID uuid, PhysicsBodyType physicsBodyType)
+		{
+			Scene* scene = ScriptEngine::GetSceneContext();
+			AT_CORE_ASSERT(scene);
+			Entity entity = scene->GetEntityByUUID(uuid);
+			AT_CORE_ASSERT(entity);
+
+			auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
+			rb2d.BodyType = physicsBodyType;
+
+			Physics2D::SetPhysicsBodyType(entity, rb2d.BodyType);
+		}
+
 		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity)
 		{
 			Scene* scene = ScriptEngine::GetSceneContext();
@@ -252,7 +346,7 @@ namespace Atom
 			AT_CORE_ASSERT(scene);
 			Entity entity = scene->GetEntityByUUID(uuid);
 			AT_CORE_ASSERT(entity);
-			
+
 			std::string text = entity.GetComponent<Component::TextRenderer>().Text;
 			*outText = ScriptUtils::UTF8ToMonoString(text);
 		}
@@ -347,26 +441,26 @@ namespace Atom
 			std::string messageStr(cStr);
 			mono_free(cStr);
 
-			switch(level)
+			switch (level)
 			{
-				case LogLevel::Trace:
-					AT_TRACE(messageStr);
-					break;
-				case LogLevel::Debug:
-					AT_INFO(messageStr);
-					break;
-				case LogLevel::Info:
-					AT_INFO(messageStr);
-					break;
-				case LogLevel::Warn:
-					AT_WARN(messageStr);
-					break;
-				case LogLevel::Error:
-					AT_ERROR(messageStr);
-					break;
-				case LogLevel::Critical:
-					AT_CRITICAL(messageStr);
-					break;
+			case LogLevel::Trace:
+				AT_TRACE(messageStr);
+				break;
+			case LogLevel::Debug:
+				AT_INFO(messageStr);
+				break;
+			case LogLevel::Info:
+				AT_INFO(messageStr);
+				break;
+			case LogLevel::Warn:
+				AT_WARN(messageStr);
+				break;
+			case LogLevel::Error:
+				AT_ERROR(messageStr);
+				break;
+			case LogLevel::Critical:
+				AT_CRITICAL(messageStr);
+				break;
 			}
 		}
 

@@ -6,13 +6,39 @@ namespace Atom
 
     internal static class InternalCalls
     {
+        #region Application
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_GetWidth(out uint width);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Application_GetHeight(out uint height);
+
+        #endregion
+
+        #region Scene
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_CreateEntity(string name, out ulong entityId);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_DestroyEntity(ulong entityId);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Scene_FindEntityByName(string name, out ulong entityId);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern bool Scene_IsEntityValid(ulong entityId);
+
+        #endregion
+
         #region Entity
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern bool Entity_HasComponent(ulong entityId, Type componentType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        internal static extern void Entity_FindEntityByName(string name, out ulong entityId);
+        internal static extern void Entity_AddComponent(ulong entityId, Type componentType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Entity_GetScriptInstance(ulong entityId, out object instance);
@@ -56,6 +82,12 @@ namespace Atom
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Rigidbody2D_SetPosition(ulong entityId, ref Vector2 position);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_GetPhysicsBodyType(ulong entityId, out RigidbodyType rigidbodyType);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void Rigidbody2D_SetPhysicsBodyType(ulong entityId, RigidbodyType rigidbodyType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void Rigidbody2D_SetLinearVelocity(ulong entityId, ref Vector2 velocity);

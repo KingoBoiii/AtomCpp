@@ -47,10 +47,12 @@
     <Compile Include="Source\Atom\Attributes\VisibleInEditorAttribute.cs" />
     <Compile Include="Source\Atom\Bindings\InternalCalls.cs" />
     <Compile Include="Source\Atom\Bindings\NativeComponentAttribute.cs" />
+    <Compile Include="Source\Atom\Core\Application.cs" />
     <Compile Include="Source\Atom\Core\FormatUtils.cs" />
     <Compile Include="Source\Atom\Core\Input.cs" />
     <Compile Include="Source\Atom\Core\KeyCodes.cs" />
     <Compile Include="Source\Atom\Core\Log.cs" />
+    <Compile Include="Source\Atom\Core\Random.cs" />
     <Compile Include="Source\Atom\Graphics\Color.cs" />
     <Compile Include="Source\Atom\Math\Vector2.cs" />
     <Compile Include="Source\Atom\Scene\ComponentBase.cs" />
@@ -61,8 +63,9 @@
     <Compile Include="Source\Atom\Scene\Components\TextRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\Transform.cs" />
     <Compile Include="Source\Atom\Scene\Entity.cs" />
+    <Compile Include="Source\Atom\Scene\Scene.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\Vector3.cs" />
+    <Compile Include="Source\Atom\Math\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

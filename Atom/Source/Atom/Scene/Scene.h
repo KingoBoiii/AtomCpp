@@ -4,7 +4,6 @@
 
 #include "entt.hpp"
 
-class b2World;
 
 namespace Atom
 {
@@ -16,6 +15,8 @@ namespace Atom
 	public:
 		Scene();
 		~Scene();
+
+		void OnRigidbody2DComponent(entt::registry& registry, entt::entity e);
 
 		static Scene* Copy(Scene* other);
 
@@ -33,6 +34,9 @@ namespace Atom
 		void OnRuntimeStop();
 		void OnRuntimeUpdate(float deltaTime);
 
+		void SubmitToPostRuntimeUpdateQueue(const std::function<void()>& function);
+		void ExecutePostRuntimeUpdateQueue();
+
 		void OnSimulationStart();
 		void OnSimulationStop();
 		void OnSimulationUpdate(float deltaTime, EditorCamera& editorCamera);
@@ -41,6 +45,8 @@ namespace Atom
 		Entity GetEntityByUUID(UUID uuid);
 		Entity GetPrimaryCameraEntity();
 
+		bool IsEntityValid(Entity entity) const;
+		bool IsEntityValid(UUID entityId) const;
 		bool IsRunning() const { return m_IsRunning; }
 		bool IsPaused() const { return m_IsPaused; }
 
@@ -57,9 +63,9 @@ namespace Atom
 		entt::registry m_Registry;
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 
-		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+		std::vector<std::function<void()>> m_PostRuntimeUpdateQueue;
 
-		b2World* m_PhysicsWorld = nullptr;
+		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;

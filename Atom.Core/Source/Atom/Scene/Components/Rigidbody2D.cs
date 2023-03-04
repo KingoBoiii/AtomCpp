@@ -2,7 +2,14 @@
 
 namespace Atom
 {
-    
+
+    public enum RigidbodyType
+    {
+        Static = 0,
+        Dynamic = 1,
+        Kinematic = 2
+    }
+
     [NativeComponent("Atom::Rigidbody2D")]
     public class Rigidbody2D : ComponentBase
     {
@@ -16,6 +23,19 @@ namespace Atom
             set
             {
                 InternalCalls.Rigidbody2D_SetPosition(Entity.Id, ref value);
+            }
+        }
+
+        public RigidbodyType BodyType
+        {
+            get
+            {
+                InternalCalls.Rigidbody2D_GetPhysicsBodyType(Entity.Id, out var rigidbodyType);
+                return rigidbodyType;
+            }
+            set
+            {
+                InternalCalls.Rigidbody2D_SetPhysicsBodyType(Entity.Id, value);
             }
         }
 

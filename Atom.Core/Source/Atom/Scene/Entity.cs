@@ -80,6 +80,19 @@ namespace Atom
 
         #endregion
 
+        public TComponent AddComponent<TComponent>() where TComponent : ComponentBase, new()
+        {
+            var componentType = typeof(TComponent);
+            InternalCalls.Entity_AddComponent(Id, componentType);
+
+            if(_componentCache.ContainsKey(componentType))
+            {
+                return GetComponent<TComponent>();
+            }
+
+            return new TComponent { Entity = this };
+        }
+
         public bool HasComponent<TComponent>() where TComponent : ComponentBase
         {
             var componentType = typeof(TComponent);
@@ -110,14 +123,7 @@ namespace Atom
 
         public Entity FindEntityByName(string name)
         {
-            InternalCalls.Entity_FindEntityByName(name, out var entityId);
-
-            if (entityId == 0)
-            {
-                return default;
-            }
-
-            return new Entity(entityId);
+            return Scene.FindEntityByName(name);
         }
 
         public T As<T>() where T : Entity, new()

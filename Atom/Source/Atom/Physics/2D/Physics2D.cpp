@@ -18,7 +18,7 @@ namespace Atom
 		template<typename ColliderComponent>
 		static void CreatePhysicsFixtures(Entity entity, Component::Transform& transform)
 		{
-			if(entity.HasComponent<ColliderComponent>())
+			if (entity.HasComponent<ColliderComponent>())
 			{
 				auto& collider = entity.GetComponent<ColliderComponent>();
 
@@ -39,17 +39,16 @@ namespace Atom
 				b2Fixture* fixture = body->CreateFixture(&fixtureDef);
 #endif
 				s_PhysicsData->EntityPhysicsFixtures[entity.GetUUID()] = fixture;
-				collider.RuntimeFixture = fixture;
 			}
 		}
 
-		static b2BodyType AtomBodyTypeToBox2D(Component::Rigidbody2D::BodyType bodyType)
+		static b2BodyType AtomPhysicsBodyTypeToBox2D(PhysicsBodyType physicsBodyType)
 		{
-			switch(bodyType)
+			switch (physicsBodyType)
 			{
-				case Atom::Component::Rigidbody2D::BodyType::Static:	return b2_staticBody;
-				case Atom::Component::Rigidbody2D::BodyType::Dynamic:	return b2_dynamicBody;
-				case Atom::Component::Rigidbody2D::BodyType::Kinematic: return b2_kinematicBody;
+			case PhysicsBodyType::Static:	return b2_staticBody;
+			case PhysicsBodyType::Dynamic:	return b2_dynamicBody;
+			case PhysicsBodyType::Kinematic: return b2_kinematicBody;
 			}
 
 			AT_CORE_ASSERT(false, "Unknown body type!");
@@ -98,6 +97,7 @@ namespace Atom
 	{
 		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
 
+		//s_PhysicsData->World = new b2World({ 0.0f, 0.0f });
 		s_PhysicsData->World = new b2World({ 0.0f, -9.81f });
 		s_PhysicsData->World->SetContactListener(new ContactListener());
 	}
@@ -106,6 +106,9 @@ namespace Atom
 	{
 		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
 
+		s_PhysicsData->EntityPhysicsBodies.clear();
+		s_PhysicsData->EntityPhysicsFixtures.clear();
+
 		s_PhysicsData->World->SetContactListener(nullptr);
 		delete s_PhysicsData->World;
 		s_PhysicsData->World = nullptr;
@@ -113,10 +116,12 @@ namespace Atom
 
 	void Physics2D::OnRuntimeUpdate(Entity entity)
 	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
 		auto& transform = entity.GetComponent<Component::Transform>();
 		auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
 
-		b2Body* body = s_PhysicsData->EntityPhysicsBodies[entity.GetUUID()]; // (b2Body*)rb2d.RuntimeBody;
+		b2Body* body = s_PhysicsData->EntityPhysicsBodies[entity.GetUUID()];
 		const auto& position = body->GetPosition();
 
 		transform.Position.x = position.x;
@@ -126,39 +131,84 @@ namespace Atom
 
 	void Physics2D::CreatePhysicsBody(Entity entity)
 	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
 		auto& transform = entity.GetComponent<Component::Transform>();
 		auto& rb2d = entity.GetComponent<Component::Rigidbody2D>();
 
+		if (s_PhysicsData->EntityPhysicsBodies.find(entity.GetUUID()) != s_PhysicsData->EntityPhysicsBodies.end())
+		{
+			return;
+		}
+
 		b2BodyDef bodyDef{};
-		bodyDef.type = Utils::AtomBodyTypeToBox2D(rb2d.Type);
+		bodyDef.type = Utils::AtomPhysicsBodyTypeToBox2D(rb2d.BodyType);
 		bodyDef.fixedRotation = rb2d.FixedRotation;
 		bodyDef.position.Set(transform.Position.x, transform.Position.y);
 		bodyDef.angle = transform.Rotation.z;
+		bodyDef.gravityScale = rb2d.AffectedByGravity ? rb2d.GravityScale : 0.0f;
 		bodyDef.userData.pointer = (uintptr_t)entity.GetUUID();
 
 		b2Body* body = s_PhysicsData->World->CreateBody(&bodyDef);
 		body->SetFixedRotation(rb2d.FixedRotation);
 
 		s_PhysicsData->EntityPhysicsBodies[entity.GetUUID()] = body;
-		rb2d.RuntimeBody = body;
 
 		Utils::CreatePhysicsFixtures<Component::BoxCollider2D>(entity, transform);
 	}
 
+	void Physics2D::DestroyPhysicsBody(Entity entity)
+	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
+		UUID entityId = entity.GetUUID();
+		auto iterator = s_PhysicsData->EntityPhysicsBodies.find(entityId);
+		if (iterator == s_PhysicsData->EntityPhysicsBodies.end()) 
+		{
+			return;
+		}
+
+		b2Body* physicsBody = iterator->second;
+
+		s_PhysicsData->World->DestroyBody(physicsBody);
+	}
+
+	void Physics2D::SetPhysicsBodyType(Entity entity, PhysicsBodyType physicsBodyType)
+	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
+		UUID entityId = entity.GetUUID();
+		auto iterator = s_PhysicsData->EntityPhysicsBodies.find(entityId);
+		if (iterator == s_PhysicsData->EntityPhysicsBodies.end())
+		{
+			AT_CORE_WARN("Entity {} ({}) doesn't have a physics body", entity.GetName(), entityId);
+			return;
+		}
+
+		b2Body* body = iterator->second;
+		body->SetType(Utils::AtomPhysicsBodyTypeToBox2D(physicsBodyType));
+	}
+
 	void Physics2D::SetLinearVelocity(const glm::vec2& velocity, Entity entity)
 	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
 		b2Body* body = GetBox2DBody(entity);
 		body->SetLinearVelocity({ velocity.x, velocity.y });
 	}
 
 	void Physics2D::SetTransform(const glm::vec2& position, Entity entity)
 	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
 		b2Body* body = GetBox2DBody(entity);
 		body->SetTransform({ position.x, position.y }, body->GetAngle());
 	}
 
 	glm::vec2 Physics2D::GetTransform(Entity entity)
 	{
+		AT_CORE_ASSERT(s_PhysicsData->Initialized, "Physics2D is not initialized!");
+
 		b2Body* body = GetBox2DBody(entity);
 		const auto& position = body->GetPosition();
 		return { position.x, position.y };

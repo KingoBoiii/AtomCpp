@@ -11,7 +11,7 @@ namespace Atom
 #define BLENDING_TEST
 
 	DX11Renderer::DX11Renderer(Window* window)
-		: m_Window(window), m_Viewport({ 0.0f, 0.0f, 1280.0f, 720.0f, 0.0f, 1.0f })
+		: m_Window(window), m_Viewport({ 0.0f, 0.0f, (float)window->GetWidth(), (float)window->GetHeight(), 0.0f, 1.0f})
 	{
 		m_SwapChain = static_cast<DX11SwapChain*>(m_Window->GetSwapChain());
 

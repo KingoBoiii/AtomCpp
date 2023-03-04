@@ -1,6 +1,7 @@
 #pragma once
 #include "Atom/Core/UUID.h"
 #include "Atom/Core/Input/Input.h"
+#include "Atom/Physics/2D/Physics2DBodyTypes.h"
 
 extern "C" {
 	typedef struct _MonoString MonoString;
@@ -20,12 +21,27 @@ namespace Atom
 
 	namespace InternalCalls
 	{
+
+#pragma region Application
+
+		void Application_GetWidth(uint32_t* outWidth);
+		void Application_GetHeight(uint32_t* outHeight);
+
+#pragma endregion
+
+#pragma region Scene
+
+		void Scene_CreateEntity(MonoString* name, UUID* outEntityId);
+		void Scene_DestroyEntity(UUID entityId);
+		void Scene_FindEntityByName(MonoString* name, UUID* outEntityId);
+		bool Scene_IsEntityValid(UUID entityId);
+
+#pragma endregion
 		
 #pragma region Entity
 
 		bool Entity_HasComponent(UUID uuid, MonoReflectionType* monoReflectionType);
-
-		void Entity_FindEntityByName(MonoString* name, UUID* uuid);
+		void Entity_AddComponent(UUID uuid, MonoReflectionType* monoReflectionType);
 
 		void Entity_GetScriptInstance(UUID uuid, MonoObject** monoObject);
 
@@ -56,6 +72,9 @@ namespace Atom
 
 		void Rigidbody2D_GetPosition(UUID uuid, glm::vec2* outPosition);
 		void Rigidbody2D_SetPosition(UUID uuid, glm::vec2* position);
+
+		void Rigidbody2D_GetPhysicsBodyType(UUID uuid, PhysicsBodyType* outPhysicsBodyType);
+		void Rigidbody2D_SetPhysicsBodyType(UUID uuid, PhysicsBodyType physicsBodyType);
 
 		void Rigidbody2D_SetLinearVelocity(UUID uuid, glm::vec2* velocity);
 
