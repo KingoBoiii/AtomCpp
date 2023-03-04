@@ -38,11 +38,56 @@ namespace Atom
 	static ImFont* s_TestFont = nullptr;
 	static ImFont* s_TestFont1 = nullptr;
 
+	class SceneBase
+	{
+	public:
+		virtual void Start() = 0;
+		virtual void Stop() = 0;
+		virtual void Update(float deltaTime) = 0;
+	};
+
+	class EditorScene : public SceneBase {
+	public:
+		virtual void Start() override {
+			AT_CORE_WARN("EditorScene::Start");
+		}
+		virtual void Stop() override {
+			AT_CORE_WARN("EditorScene::Stop");
+		}
+		virtual void Update(float deltaTime) override {
+			AT_CORE_WARN("EditorScene::Update");
+		}
+	};
+
+	class RuntimeScene : public SceneBase
+	{
+	public:
+		virtual void Start() override {
+			AT_CORE_INFO("RuntimeScene::Start");
+		}
+		virtual void Stop() override {
+			AT_CORE_INFO("RuntimeScene::Stop");
+		}
+		virtual void Update(float deltaTime) override {
+			AT_CORE_INFO("RuntimeScene::Update");
+		}
+	};
+
 	void EditorLayer::OnAttach()
 	{
 		memset(s_ProjectNameBuffer, 0, MAX_PROJECT_NAME_LENGTH);
 		memset(s_OpenProjectFilePathBuffer, 0, MAX_PROJECT_FILEPATH_LENGTH);
 		memset(s_NewProjectFilePathBuffer, 0, MAX_PROJECT_FILEPATH_LENGTH);
+
+		SceneBase* scene = new RuntimeScene();
+		scene->Start();
+		scene->Update(0.033f);
+		scene->Stop();
+
+		scene = new EditorScene();
+		scene->Start();
+		scene->Update(0.033f);
+		scene->Stop();
 
 		s_TestFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Bold.ttf", 36.0f);
 		s_TestFont1 = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Bold.ttf", 20.0f);
