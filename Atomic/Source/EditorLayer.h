@@ -6,6 +6,8 @@
 #include "Panels/ProjectExplorer.h"
 #include <Atom/Editor/EditorPanels.h>
 
+#include "Modals/NewProjectModal.h"
+
 struct ImGuiPayload;
 
 namespace Atom
@@ -29,12 +31,10 @@ namespace Atom
 		void DrawTopMenuBar();
 		void UI_Toolbar();
 
-		void UI_ShowNewProjectDialog();
-
 		void OnViewportDragDropTarget(const ImGuiPayload* payload);
 	private: // Project commands
 		void NewProject();
-		void CreateProject(const std::filesystem::path& projectPath);
+		void CreateProject(const std::filesystem::path& projectPath, const std::string& projectName);
 		void OpenProject();
 		void OpenProject(const std::filesystem::path& filepath);
 		void SaveProject();
@@ -63,8 +63,6 @@ namespace Atom
 		Scene* m_ActiveScene = nullptr;
 		Scene* m_EditorScene = nullptr;
 
-		bool m_ShowNewProjectDialog = false;
-
 		Framebuffer* m_Framebuffer = nullptr;
 		EditorCamera m_EditorCamera;
 
@@ -77,6 +75,9 @@ namespace Atom
 		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
 		ProjectExplorer* m_ProjectExplorer = nullptr;
 		ProjectSettingsPanel* m_ProjectSettingsPanel = nullptr;
+
+		// Modals
+		NewProjectModal* m_NewProjectModal = nullptr;
 
 		enum class SceneState
 		{

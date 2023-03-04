@@ -3,6 +3,8 @@
 #include <Atom/Utils/PlatformUtils.h>
 #include <Atom/ImGui/ImGuiUtillities.h>
 #include <Atom/ImGui/ImGuiStyle.h>
+#include <Atom/ImGui/UICore.h>
+#include <Atom/Project/ProjectSerializer.h>
 #include <Atom/Editor/EditorResources.h>
 #include <Atom/Scripting/ScriptEngine.h>
 #include <Atom/Renderer/Font.h>
@@ -13,7 +15,6 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "ImGuizmo.h"
-#include <Atom/Project/ProjectSerializer.h>
 
 #include <shellapi.h>
 
@@ -26,17 +27,7 @@ namespace Atom
 #define ATOM_PROJECT_FILE_EXTENSIONS "atpr"
 #define ATOM_PROJECT_FILE_DIALOG_FILTER "Atom Project (*.atpr)\0*.atpr\0"
 
-#define MAX_PROJECT_NAME_LENGTH 255
-#define MAX_PROJECT_FILEPATH_LENGTH 512
-
-	static char* s_ProjectNameBuffer = new char[MAX_PROJECT_NAME_LENGTH];
-	static char* s_OpenProjectFilePathBuffer = new char[MAX_PROJECT_FILEPATH_LENGTH];
-	static char* s_NewProjectFilePathBuffer = new char[MAX_PROJECT_FILEPATH_LENGTH];
-
 	static Font* s_Font;
-
-	static ImFont* s_TestFont = nullptr;
-	static ImFont* s_TestFont1 = nullptr;
 
 	class SceneBase
 	{
@@ -75,10 +66,6 @@ namespace Atom
 
 	void EditorLayer::OnAttach()
 	{
-		memset(s_ProjectNameBuffer, 0, MAX_PROJECT_NAME_LENGTH);
-		memset(s_OpenProjectFilePathBuffer, 0, MAX_PROJECT_FILEPATH_LENGTH);
-		memset(s_NewProjectFilePathBuffer, 0, MAX_PROJECT_FILEPATH_LENGTH);
-
 		SceneBase* scene = new RuntimeScene();
 		scene->Start();
 		scene->Update(0.033f);
@@ -88,9 +75,6 @@ namespace Atom
 		scene->Start();
 		scene->Update(0.033f);
 		scene->Stop();
-
-		s_TestFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Bold.ttf", 36.0f);
-		s_TestFont1 = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/OpenSans-Bold.ttf", 20.0f);
 
 		//Font font("C:\\Windows\\Fonts\\Arial.ttf");
 		//s_Font = new Font("Resources/Fonts/OpenSans/OpenSans-Regular.ttf");
@@ -118,6 +102,8 @@ namespace Atom
 		m_ProjectExplorer = new ProjectExplorer();
 		m_ProjectSettingsPanel = new ProjectSettingsPanel();
 
+		m_NewProjectModal = new NewProjectModal("New Project", AT_BIND_EVENT_FN(EditorLayer::CreateProject));
+
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
 		m_Viewport->SetDragDropCallback(AT_BIND_EVENT_FN(EditorLayer::OnViewportDragDropTarget));
@@ -129,6 +115,8 @@ namespace Atom
 	{
 		EditorResources::Shutdown();
 		delete m_ActiveScene;
+
+		delete m_NewProjectModal;
 	}
 
 	void EditorLayer::OnUpdate(float deltaTime)
@@ -137,7 +125,7 @@ namespace Atom
 		m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 
 		FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
-		if(m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
+		if (m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
 		{
 			m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 			m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
@@ -150,12 +138,12 @@ namespace Atom
 
 		m_Framebuffer->ClearAttachment(1, -1);
 
-		switch(m_SceneState)
+		switch (m_SceneState)
 		{
-			case Atom::EditorLayer::SceneState::Edit:		m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
-			case Atom::EditorLayer::SceneState::Simulate:	m_ActiveScene->OnSimulationUpdate(deltaTime, m_EditorCamera); break;
-			case Atom::EditorLayer::SceneState::Play:		m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
-			default: break;
+		case Atom::EditorLayer::SceneState::Edit:		m_ActiveScene->OnEditorUpdate(deltaTime, m_EditorCamera); break;
+		case Atom::EditorLayer::SceneState::Simulate:	m_ActiveScene->OnSimulationUpdate(deltaTime, m_EditorCamera); break;
+		case Atom::EditorLayer::SceneState::Play:		m_ActiveScene->OnRuntimeUpdate(deltaTime); break;
+		default: break;
 		}
 
 		m_Framebuffer->Unbind();
@@ -168,7 +156,7 @@ namespace Atom
 		int mouseX = static_cast<int>(mx);
 		int mouseY = static_cast<int>(my);
 
-		if(mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize1.x && mouseY < (int)viewportSize1.y)
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize1.x && mouseY < (int)viewportSize1.y)
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene);
@@ -188,6 +176,8 @@ namespace Atom
 		m_ProjectExplorer->OnImGuiRender(isOpen);
 		m_ProjectSettingsPanel->OnImGuiRender(isOpen);
 
+		m_NewProjectModal->DrawUI();
+
 		UI_Toolbar();
 
 		ImGui::Begin("Settings");
@@ -203,11 +193,6 @@ namespace Atom
 		ImGui::ShowDemoWindow(&opened);
 #endif
 
-		if(m_ShowNewProjectDialog)
-		{
-			UI_ShowNewProjectDialog();
-		}
-
 		ImGui::End();
 	}
 
@@ -222,70 +207,70 @@ namespace Atom
 
 	void EditorLayer::DrawTopMenuBar()
 	{
-		if(ImGui::BeginMenuBar())
+		if (ImGui::BeginMenuBar())
 		{
-			if(ImGui::BeginMenu("File"))
+			if (ImGui::BeginMenu("File"))
 			{
-				if(ImGui::MenuItem("New Project", "Ctrl+N"))
+				if (ImGui::MenuItem("New Project", "Ctrl+N"))
 				{
 					NewProject();
 				}
-				if(ImGui::MenuItem("Open Project...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
 				{
 					OpenProject();
 				}
-				if(ImGui::MenuItem("Save Project", "Ctrl+S"))
+				if (ImGui::MenuItem("Save Project", "Ctrl+S"))
 				{
 					SaveProject();
 				}
-				if(ImGui::MenuItem("Save Project As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save Project As...", "Ctrl+Shift+S"))
 				{
 					SaveProjectAs();
 				}
 
 				ImGui::Separator();
 
-				if(ImGui::MenuItem("New", "Ctrl+N"))
+				if (ImGui::MenuItem("New", "Ctrl+N"))
 				{
 					NewScene();
 				}
-				if(ImGui::MenuItem("Open...", "Ctrl+O"))
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				{
 					OpenScene();
 				}
-				if(ImGui::MenuItem("Save", "Ctrl+S"))
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
 				{
 					SaveScene();
 				}
-				if(ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 				{
 					SaveSceneAs();
 				}
 
 				ImGui::Separator();
 
-				if(ImGui::MenuItem("Restart (W.I.P.)"))
+				if (ImGui::MenuItem("Restart (W.I.P.)"))
 				{
 					// TODO: Fix Swap Chain!
 
 					AT_CORE_ASSERT("SwapChain failing! - TODO: FIX!!");
 					Application::Get().Restart();
 				}
-				if(ImGui::MenuItem("Close"))
+				if (ImGui::MenuItem("Close"))
 				{
 					Application::Get().Close();
 				}
 				ImGui::EndMenu();
 			}
 
-			if(ImGui::BeginMenu("Script"))
+			if (ImGui::BeginMenu("Script"))
 			{
-				if(ImGui::MenuItem("Reload Assembly"))
+				if (ImGui::MenuItem("Reload Assembly"))
 				{
 					ScriptEngine::ReloadAssembly();
 				}
 
-				if(ImGui::MenuItem("Open C# Solution"))
+				if (ImGui::MenuItem("Open C# Solution"))
 				{
 					static std::filesystem::path s_ProjectSolutionPath = Project::GetProjectDirectory() / std::filesystem::path(Project::GetProjectName() + ".sln");
 
@@ -295,7 +280,7 @@ namespace Atom
 					ShellExecute(NULL, L"open", absolutePath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 				}
 
-				if(ImGui::MenuItem("Regenerate C# Solution"))
+				if (ImGui::MenuItem("Regenerate C# Solution"))
 				{
 					std::string s_BatchFilePath = Project::GetProjectDirectory().string();
 
@@ -336,59 +321,59 @@ namespace Atom
 		bool hasSimulateButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
 		bool hasPauseButton = m_SceneState != SceneState::Edit;
 
-		if(hasPlayButton)
+		if (hasPlayButton)
 		{
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? EditorResources::PlayIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if (ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
-				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 				{
 					OnScenePlay();
 				}
-				else if(m_SceneState == SceneState::Play)
+				else if (m_SceneState == SceneState::Play)
 				{
 					OnSceneStop();
 				}
 			}
 		}
-		if(hasSimulateButton)
+		if (hasSimulateButton)
 		{
-			if(hasPlayButton)
+			if (hasPlayButton)
 			{
 				ImGui::SameLine();
 			}
 
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorResources::SimulateIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if (ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
-				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
 				{
 					OnSceneSimulate();
 				}
-				else if(m_SceneState == SceneState::Simulate)
+				else if (m_SceneState == SceneState::Simulate)
 				{
 					OnSceneStop();
 				}
 			}
 		}
-		if(hasPauseButton)
+		if (hasPauseButton)
 		{
 			bool isPaused = m_ActiveScene->IsPaused();
 			ImGui::SameLine();
 			{
 				Texture2D* icon = EditorResources::PauseIcon;
-				if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+				if (ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 				{
 					m_ActiveScene->SetPaused(!isPaused);
 				}
 			}
 
-			if(isPaused)
+			if (isPaused)
 			{
 				ImGui::SameLine();
 				{
 					Texture2D* icon = EditorResources::StepIcon;
-					if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+					if (ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 					{
 						m_ActiveScene->Step(1);
 					}
@@ -402,87 +387,9 @@ namespace Atom
 		ImGui::PopStyleVar(2);
 	}
 
-	void EditorLayer::UI_ShowNewProjectDialog()
-	{
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		ImGui::SetNextWindowSize(ImVec2{ 600.0f, 0.0f });
-
-		ImGui::OpenPopup("New Project");
-
-		if(ImGui::BeginPopupModal("New Project", &m_ShowNewProjectDialog, ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			static float frameRounding = 5.5f;
-
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 8.0f));
-
-			// Project Name
-			{
-				UI::ScopedStyle framePadding(ImGuiStyleVar_FramePadding, ImVec2(10, 7));
-				UI::ScopedStyle frameRounding(ImGuiStyleVar_FrameRounding, frameRounding);
-
-				UI::ScopedFont projectNameFont(s_TestFont);
-
-				ImGui::SetNextItemWidth(-1);
-				ImGui::InputTextWithHint("##new_project_name", "Project Name", s_ProjectNameBuffer, MAX_PROJECT_NAME_LENGTH);
-			}
-
-			// Project Location 
-			{
-				UI::ScopedStyle framePadding(ImGuiStyleVar_FramePadding, ImVec2(10, 7));
-				UI::ScopedStyle frameRounding(ImGuiStyleVar_FrameRounding, frameRounding);
-
-				UI::ScopedFont projectLocationFont(s_TestFont1);
-
-				ImVec2 label_size = ImGui::CalcTextSize("...", NULL, true);
-				auto& style = ImGui::GetStyle();
-				ImVec2 button_size = ImGui::CalcItemSize(ImVec2(0, 0), label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
-
-				ImGui::SetNextItemWidth(600.0f - button_size.x - style.FramePadding.x * 2.0f - style.ItemInnerSpacing.x - 1);
-				ImGui::InputTextWithHint("##new_project_location", "Project Location", s_NewProjectFilePathBuffer, MAX_PROJECT_FILEPATH_LENGTH);
-
-				ImGui::SameLine();
-
-				if(ImGui::Button("..."))
-				{
-					std::filesystem::path result = FileDialogs::OpenFolderDialog();
-					memcpy(s_NewProjectFilePathBuffer, result.string().data(), result.string().length());
-				}
-			}
-
-			ImGui::PopStyleVar();
-
-			std::string fullProjectPath = strlen(s_NewProjectFilePathBuffer) > 0 ? std::string(s_NewProjectFilePathBuffer) + "/" + std::string(s_ProjectNameBuffer) : "";
-			ImGui::Text("Full Project Path: %s", fullProjectPath.c_str());
-
-			ImGui::Separator();
-
-			{
-				UI::ScopedStyle framePadding(ImGuiStyleVar_FramePadding, ImVec2(10, 7));
-				UI::ScopedFont font(s_TestFont1);
-
-				if(ImGui::Button("Create"))
-				{
-					CreateProject(fullProjectPath);
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::SameLine();
-
-				if(ImGui::Button("Cancel"))
-				{
-					memset(s_NewProjectFilePathBuffer, 0, MAX_PROJECT_FILEPATH_LENGTH);
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			ImGui::EndPopup();
-		}
-	}
-
 	void EditorLayer::OnViewportDragDropTarget(const ImGuiPayload* payload)
 	{
-		if(!payload)
+		if (!payload)
 		{
 			return;
 		}
@@ -494,23 +401,22 @@ namespace Atom
 
 	void EditorLayer::NewProject()
 	{
-		m_ShowNewProjectDialog = true;
-		ImGui::OpenPopup("New Project");
+		m_NewProjectModal->Open();
 	}
 
 	static void ReplaceToken(std::string& str, const char* token, const std::string& value)
 	{
 		size_t pos = 0;
-		while((pos = str.find(token, pos)) != std::string::npos)
+		while ((pos = str.find(token, pos)) != std::string::npos)
 		{
 			str.replace(pos, strlen(token), value);
 			pos += strlen(token);
 		}
 	}
 
-	void EditorLayer::CreateProject(const std::filesystem::path& projectPath)
+	void EditorLayer::CreateProject(const std::filesystem::path& projectPath, const std::string& projectName)
 	{
-		if(!std::filesystem::exists(projectPath))
+		if (!std::filesystem::exists(projectPath))
 		{
 			std::filesystem::create_directory(projectPath);
 		}
@@ -519,7 +425,7 @@ namespace Atom
 		std::filesystem::path atomRootDirectory = std::filesystem::absolute("./Resources").parent_path().string();
 		std::string atomRootDirectoryString = atomRootDirectory.string();
 
-		if(atomRootDirectory.stem().string() == "Atomic")
+		if (atomRootDirectory.stem().string() == "Atomic")
 		{
 			atomRootDirectoryString = atomRootDirectory.parent_path().string();
 		}
@@ -535,14 +441,14 @@ namespace Atom
 			stream.close();
 
 			std::string str = ss.str();
-			ReplaceToken(str, "$$PROJECT_NAME$$", s_ProjectNameBuffer);
+			ReplaceToken(str, "$$PROJECT_NAME$$", projectName);
 
 			std::ofstream ostream(projectPath / "premake5.lua");
 			ostream << str;
 			ostream.close();
 		}
 
-		std::string newProjectFileName = std::string(fmt::format("{}.{}", s_ProjectNameBuffer, ATOM_PROJECT_FILE_EXTENSIONS));
+		std::string newProjectFileName = std::string(fmt::format("{}.{}", projectName, ATOM_PROJECT_FILE_EXTENSIONS));
 		// Project file
 		{
 			std::ifstream stream(projectPath / fmt::format("{}.{}", "Project", ATOM_PROJECT_FILE_EXTENSIONS));
@@ -552,7 +458,7 @@ namespace Atom
 			stream.close();
 
 			std::string str = ss.str();
-			ReplaceToken(str, "$$PROJECT_NAME$$", s_ProjectNameBuffer);
+			ReplaceToken(str, "$$PROJECT_NAME$$", projectName);
 
 			std::ofstream ostream(projectPath / fmt::format("{}.{}", "Project", ATOM_PROJECT_FILE_EXTENSIONS));
 			ostream << str;
@@ -575,14 +481,12 @@ namespace Atom
 		}
 
 		OpenProject(projectPath / newProjectFileName);
-
-		m_ShowNewProjectDialog = false;
 	}
 
 	void EditorLayer::OpenProject()
 	{
 		std::string filepath = FileDialogs::OpenFile(ATOM_PROJECT_FILE_DIALOG_FILTER);
-		if(filepath.empty())
+		if (filepath.empty())
 		{
 			return;
 		}
@@ -592,7 +496,7 @@ namespace Atom
 
 	void EditorLayer::OpenProject(const std::filesystem::path& filepath)
 	{
-		if(Project::GetActiveProject())
+		if (Project::GetActiveProject())
 		{
 			CloseProject();
 		}
@@ -600,7 +504,7 @@ namespace Atom
 		Project* newProject = new Project();
 
 		ProjectSerializer serializer(newProject);
-		if(!serializer.Deserialize(filepath))
+		if (!serializer.Deserialize(filepath))
 		{
 			AT_CORE_ERROR("Failed to load project at projectPath: {0}", filepath.string());
 			return;
@@ -613,7 +517,7 @@ namespace Atom
 		m_ScriptEngineInspectorPanel->OnProjectChanged(Project::GetActiveProject());
 		m_ProjectExplorer->OnProjectChanged(Project::GetActiveProject());
 
-		if(!Project::GetActiveProject()->GetConfig().StartScene.empty())
+		if (!Project::GetActiveProject()->GetConfig().StartScene.empty())
 		{
 			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
 			OpenScene(startScenePath);
@@ -634,7 +538,7 @@ namespace Atom
 	void EditorLayer::SaveProjectAs()
 	{
 		std::string filepath = FileDialogs::SaveFile(ATOM_PROJECT_FILE_DIALOG_FILTER);
-		if(filepath.empty())
+		if (filepath.empty())
 		{
 			return;
 		}
@@ -646,7 +550,7 @@ namespace Atom
 
 	void EditorLayer::SaveProject(const std::filesystem::path& filepath)
 	{
-		if(!Project::GetActiveProject())
+		if (!Project::GetActiveProject())
 		{
 			AT_CORE_WARN("Cannot save project - No project loaded");
 			return;
@@ -654,7 +558,7 @@ namespace Atom
 
 		ProjectSerializer serializer(Project::GetActiveProject());
 		const std::filesystem::path& projectFilepath = Project::GetProjectDirectory() / Project::GetProjectFileName();
-		if(!serializer.Serialize(projectFilepath))
+		if (!serializer.Serialize(projectFilepath))
 		{
 			AT_CORE_ERROR("Failed to save project at projectPath: {0}", projectFilepath.string());
 			return;
@@ -668,7 +572,7 @@ namespace Atom
 		//ScriptEngine::UnloadAppAssembly();
 		ScriptEngine::SetSceneContext(nullptr);
 
-		if(unloadProject)
+		if (unloadProject)
 		{
 			Project::SetActiveProject(nullptr);
 		}
@@ -694,7 +598,7 @@ namespace Atom
 	void EditorLayer::OpenScene()
 	{
 		std::string filepath = FileDialogs::OpenFile(ATOM_SCENE_FILE_DIALOG_FILTER);
-		if(filepath.empty())
+		if (filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled open file dialog!");
 			return;
@@ -705,12 +609,12 @@ namespace Atom
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		if(m_SceneState != SceneState::Edit)
+		if (m_SceneState != SceneState::Edit)
 		{
 			OnSceneStop();
 		}
 
-		if(path.extension().string() != fmt::format(".{}", ATOM_SCENE_FILE_EXTENSIONS))
+		if (path.extension().string() != fmt::format(".{}", ATOM_SCENE_FILE_EXTENSIONS))
 		{
 			AT_CORE_WARN("Could not load {0} - not a scene file", path.filename().string());
 			return;
@@ -743,7 +647,7 @@ namespace Atom
 	void EditorLayer::SaveSceneAs()
 	{
 		std::string filepath = FileDialogs::SaveFile(ATOM_SCENE_FILE_DIALOG_FILTER);
-		if(filepath.empty())
+		if (filepath.empty())
 		{
 			AT_CORE_WARN("Cancelled save file dialog!");
 			return;
@@ -770,11 +674,11 @@ namespace Atom
 		AT_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
 		m_HoveredEntity = {};
 
-		if(m_SceneState == SceneState::Play)
+		if (m_SceneState == SceneState::Play)
 		{
 			m_ActiveScene->OnRuntimeStop();
 		}
-		else if(m_SceneState == SceneState::Simulate)
+		else if (m_SceneState == SceneState::Simulate)
 		{
 			m_ActiveScene->OnSimulationStop();
 		}
@@ -793,7 +697,7 @@ namespace Atom
 	{
 		m_HoveredEntity = {};
 
-		if(m_SceneState == SceneState::Play)
+		if (m_SceneState == SceneState::Play)
 		{
 			OnSceneStop();
 		}
@@ -808,7 +712,7 @@ namespace Atom
 
 	void EditorLayer::OnScenePause()
 	{
-		if(m_SceneState == SceneState::Edit)
+		if (m_SceneState == SceneState::Edit)
 		{
 			return;
 		}
@@ -818,13 +722,13 @@ namespace Atom
 
 	void EditorLayer::OnDuplicateEntity()
 	{
-		if(m_SceneState != SceneState::Edit)
+		if (m_SceneState != SceneState::Edit)
 		{
 			return;
 		}
 
 		Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
-		if(selectedEntity)
+		if (selectedEntity)
 		{
 			m_EditorScene->DuplicateEntity(selectedEntity);
 		}
@@ -833,7 +737,7 @@ namespace Atom
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
 		// Shortcuts
-		if(e.GetRepeatCount() > 0)
+		if (e.GetRepeatCount() > 0)
 		{
 			return false;
 		}
@@ -841,63 +745,63 @@ namespace Atom
 		bool control = Input::IsKeyDown(Key::LeftControl) || Atom::Input::IsKeyDown(Key::RightControl);
 		bool shift = Input::IsKeyDown(Key::LeftShift) || Input::IsKeyDown(Key::RightShift);
 
-		switch(e.GetKeyCode())
+		switch (e.GetKeyCode())
 		{
 			// Gizmo shortcuts
-			case Key::Q:
-				m_Viewport->SetGizmoType(-1);
-				break;
-			case Key::W:
-				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::TRANSLATE);
-				break;
-			case Key::E:
-				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::ROTATE);
-				break;
-			case Key::R:
-				m_Viewport->SetGizmoType(ImGuizmo::OPERATION::SCALE);
-				break;
+		case Key::Q:
+			m_Viewport->SetGizmoType(-1);
+			break;
+		case Key::W:
+			m_Viewport->SetGizmoType(ImGuizmo::OPERATION::TRANSLATE);
+			break;
+		case Key::E:
+			m_Viewport->SetGizmoType(ImGuizmo::OPERATION::ROTATE);
+			break;
+		case Key::R:
+			m_Viewport->SetGizmoType(ImGuizmo::OPERATION::SCALE);
+			break;
 
 			// Entity shortcuts
-			case Key::D:
+		case Key::D:
+		{
+			if (control)
 			{
-				if(control)
-				{
-					OnDuplicateEntity();
-				}
-			} break;
+				OnDuplicateEntity();
+			}
+		} break;
 
-			// Scene shortcuts
-			case Key::N:
+		// Scene shortcuts
+		case Key::N:
+		{
+			if (control)
 			{
-				if(control)
-				{
-					NewScene();
-				}
-			} break;
-			case Key::O:
+				NewScene();
+			}
+		} break;
+		case Key::O:
+		{
+			if (control)
 			{
-				if(control)
-				{
-					OpenScene();
-				}
-			} break;
-			case Key::S:
+				OpenScene();
+			}
+		} break;
+		case Key::S:
+		{
+			if (control)
 			{
-				if(control)
-				{
-					SaveScene();
-					break;
+				SaveScene();
+				break;
 
-				}
+			}
 
-				if(control && shift)
-				{
-					SaveSceneAs();
-				}
-			} break;
+			if (control && shift)
+			{
+				SaveSceneAs();
+			}
+		} break;
 		}
 
-		if(m_SceneState == SceneState::Play)
+		if (m_SceneState == SceneState::Play)
 		{
 			m_Viewport->SetGizmoType(-1);
 		}
@@ -907,9 +811,9 @@ namespace Atom
 
 	bool EditorLayer::OnMouseButtonPressed(Atom::MouseButtonPressedEvent& e)
 	{
-		if(e.GetMouseButton() == MouseButton::Left)
+		if (e.GetMouseButton() == MouseButton::Left)
 		{
-			if(m_Viewport->m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt))
+			if (m_Viewport->m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyDown(Key::LeftAlt))
 			{
 				m_SceneHierarchyPanel->SetSelectedEntity(m_HoveredEntity);
 			}
