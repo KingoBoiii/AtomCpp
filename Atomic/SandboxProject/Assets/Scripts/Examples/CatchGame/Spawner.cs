@@ -6,7 +6,7 @@ namespace Sandbox.Examples.CatchGame
     internal class Spawner : Entity
     {
         [VisibleInEditor] private int XSpawnRange = 5;
-        [VisibleInEditor] private float TimeBetweenSpawns = 10.0f;
+        [VisibleInEditor] private float TimeBetweenSpawns = 0.3f;
         [VisibleInEditor] private float m_CurrentTime = 0.0f;
 
         private static int m_EnemyIndex = 0;

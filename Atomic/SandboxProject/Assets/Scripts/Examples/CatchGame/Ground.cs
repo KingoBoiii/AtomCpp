@@ -5,7 +5,10 @@ namespace Sandbox.Examples.CatchGame
 
     internal class Ground : Entity
     {
+        [VisibleInEditor] private int Lives = 3;
+
         private BoxCollider2D m_Collider;
+        private TextRenderer m_LivesTextRenderer;
 
         protected override void Start()
         {
@@ -18,8 +21,19 @@ namespace Sandbox.Examples.CatchGame
                 }
 
                 Scene.DestroyEntity(entity);
-                Log.Info("Enemy ({0}, {1}) hit the ground", entity.Name, entity.Id);
+
+                Lives--;
+                UpdateLivesText();
+                //Log.Info("Enemy ({0}, {1}) hit the ground", entity.Name, entity.Id);
             });
+
+            var livesTextEntity = FindEntityByName("LivesText");
+            m_LivesTextRenderer = livesTextEntity.GetComponent<TextRenderer>();
+        }
+
+        private void UpdateLivesText()
+        {
+            m_LivesTextRenderer.Text = $"Lives: {Lives}";
         }
     }
 
