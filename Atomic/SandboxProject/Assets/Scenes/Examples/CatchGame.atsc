@@ -1,66 +1,33 @@
 Scene: Untitled
 Entities:
-  - Entity: 8507570427829255741
+  - Entity: 14591686971892034272
     Identifier:
-      Name: ScoreText
+      Name: Ground
     Transform:
-      Position: [-6.18014479, -4.25, 0.00999999978]
+      Position: [0, -6, 0]
       Rotation: [0, 0, 0]
-      Scale: [2, 2, 1]
-    TextRenderer:
-      Text: "Score: 0"
-      Color: [1, 1, 1, 1]
-      Kerning: 0
-      LineSpacing: 0
-  - Entity: 10678873308648438901
-    Identifier:
-      Name: LivesText
-    Transform:
-      Position: [1.15999997, -4.24716473, 0.00999999978]
-      Rotation: [0, 0, 0]
-      Scale: [2, 2, 1]
-    TextRenderer:
-      Text: "Lives: 3"
-      Color: [1, 1, 1, 1]
-      Kerning: 0
-      LineSpacing: 0
-  - Entity: 10179670491935892670
-    Identifier:
-      Name: Spawner
-    Transform:
-      Position: [0, 6, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [20, 6, 1]
+    BasicRenderer:
+      Color: [0.216216207, 0.216216207, 0.216216207, 1]
     Script:
-      ClassName: Sandbox.Examples.CatchGame.Spawner
+      ClassName: Sandbox.Examples.CatchGame.Ground
       ScriptFields:
-        - Name: XSpawnRange
+        - Name: Lives
           Type: Int
-          Data: 5
-        - Name: TimeBetweenSpawns
-          Type: Float
-          Data: 0.300000012
-        - Name: m_CurrentTime
-          Type: Float
-          Data: 0
-  - Entity: 1616103297462218909
-    Identifier:
-      Name: Camera
-    Transform:
-      Position: [0, 0, 0.100000001]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Camera:
-      SceneCamera:
-        ProjectionType: 1
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-      Primary: true
-      FixedAspectRatio: false
+          Data: 3
+    Rigidbody2D:
+      BodyType: Static
+      FixedRotation: false
+      AffectedByGravity: false
+      GravityScale: 1
+    BoxCollider2D:
+      Offset: [0, 0]
+      Size: [1, 1]
+      IsTrigger: false
+      Density: 1
+      Friction: 0.200000003
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 3306752636040425415
     Identifier:
       Name: Player
@@ -94,31 +61,64 @@ Entities:
       Friction: 0.200000003
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 14591686971892034272
+  - Entity: 1616103297462218909
     Identifier:
-      Name: Ground
+      Name: Camera
     Transform:
-      Position: [0, -6, 0]
+      Position: [0, 0, 0.100000001]
       Rotation: [0, 0, 0]
-      Scale: [20, 6, 1]
-    BasicRenderer:
-      Color: [0.216216207, 0.216216207, 0.216216207, 1]
+      Scale: [1, 1, 1]
+    Camera:
+      SceneCamera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 10179670491935892670
+    Identifier:
+      Name: Spawner
+    Transform:
+      Position: [0, 6, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
     Script:
-      ClassName: Sandbox.Examples.CatchGame.Ground
+      ClassName: Sandbox.Examples.CatchGame.Spawner
       ScriptFields:
-        - Name: Lives
+        - Name: XSpawnRange
           Type: Int
-          Data: 3
-    Rigidbody2D:
-      BodyType: Static
-      FixedRotation: false
-      AffectedByGravity: false
-      GravityScale: 1
-    BoxCollider2D:
-      Offset: [0, 0]
-      Size: [1, 1]
-      IsTrigger: false
-      Density: 1
-      Friction: 0.200000003
-      Restitution: 0
-      RestitutionThreshold: 0.5
+          Data: 5
+        - Name: TimeBetweenSpawns
+          Type: Float
+          Data: 1
+        - Name: m_CurrentTime
+          Type: Float
+          Data: 0
+  - Entity: 10678873308648438901
+    Identifier:
+      Name: LivesText
+    Transform:
+      Position: [1.15999997, -4.24716473, 0.00999999978]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 1]
+    TextRenderer:
+      Text: "Lives: 3"
+      Color: [1, 1, 1, 1]
+      Kerning: 0
+      LineSpacing: 0
+  - Entity: 8507570427829255741
+    Identifier:
+      Name: ScoreText
+    Transform:
+      Position: [-6.18014479, -4.25, 0.00999999978]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 1]
+    TextRenderer:
+      Text: "Score: 0"
+      Color: [1, 1, 1, 1]
+      Kerning: 0
+      LineSpacing: 0
