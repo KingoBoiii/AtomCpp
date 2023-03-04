@@ -262,6 +262,7 @@ namespace Atom
 								AT_CASE_SERIALIZE_FIELD(ManagedFieldType::Bool, bool);
 								AT_CASE_SERIALIZE_FIELD(ManagedFieldType::Char, char);
 								AT_CASE_SERIALIZE_FIELD(ManagedFieldType::Float, float);
+								AT_CASE_SERIALIZE_FIELD(ManagedFieldType::Int, int);
 								default: AT_CORE_ASSERT(false, "Unknown field type - TODO: Add the field type you want to serialize"); break;
 							}
 							
@@ -475,6 +476,7 @@ namespace Atom
 								AT_CASE_DESERIALIZE_FIELD(ManagedFieldType::Bool, bool);
 								AT_CASE_DESERIALIZE_FIELD(ManagedFieldType::Char, char);
 								AT_CASE_DESERIALIZE_FIELD(ManagedFieldType::Float, float);
+								AT_CASE_DESERIALIZE_FIELD(ManagedFieldType::Int, int);
 								default: AT_CORE_ASSERT(false, "Unknown field type - TODO: Add the field type you want to deserialize"); break;
 							}
 
