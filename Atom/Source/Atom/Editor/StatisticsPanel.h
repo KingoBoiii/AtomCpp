@@ -8,7 +8,7 @@ namespace Atom
 	class StatisticsPanel : public EditorPanel
 	{
 	public:
-		virtual void OnImGuiRender(bool& isOpen) override;
+		virtual void DrawUI(bool& isOpen) override;
 	private:
 		void DrawRendererStatistics();
 	};

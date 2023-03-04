@@ -11,7 +11,7 @@ namespace Atom
 	public:
 		virtual ~EditorPanel() = default;
 
-		virtual void OnImGuiRender(bool& isOpen) = 0;
+		virtual void DrawUI(bool& isOpen) = 0;
 		virtual void SetSceneContext(Scene* scene) { }
 		virtual void OnProjectChanged(Project* project) { }
 	};

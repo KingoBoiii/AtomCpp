@@ -136,7 +136,7 @@ namespace Atom
 		SetSceneContext(scene);
 	}
 
-	void SceneHierarchyPanel::OnImGuiRender(bool& isOpen)
+	void SceneHierarchyPanel::DrawUI(bool& isOpen)
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Scene Hierarchy", &isOpen);

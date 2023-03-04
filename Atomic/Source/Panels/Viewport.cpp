@@ -16,7 +16,7 @@ namespace Atom
 	{
 	}
 
-	void Viewport::OnImGuiRender(bool& isOpen)
+	void Viewport::DrawUI(bool& isOpen)
 	{
 		static bool opened = true;
 

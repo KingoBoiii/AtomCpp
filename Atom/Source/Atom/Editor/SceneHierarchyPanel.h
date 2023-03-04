@@ -12,7 +12,7 @@ namespace Atom
 		SceneHierarchyPanel() = default;
 		SceneHierarchyPanel(Scene* scene);
 
-		virtual void OnImGuiRender(bool& isOpen) override;
+		virtual void DrawUI(bool& isOpen) override;
 		virtual void SetSceneContext(Scene* scene) override;
 
 		void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }

@@ -169,12 +169,12 @@ namespace Atom
 		DrawTopMenuBar();
 
 		static bool isOpen = true;
-		m_Viewport->OnImGuiRender(isOpen);
-		m_SceneHierarchyPanel->OnImGuiRender(isOpen);
-		m_StatisticsPanel->OnImGuiRender(isOpen);
-		m_ScriptEngineInspectorPanel->OnImGuiRender(isOpen);
-		m_ProjectExplorer->OnImGuiRender(isOpen);
-		m_ProjectSettingsPanel->OnImGuiRender(isOpen);
+		m_Viewport->DrawUI(isOpen);
+		m_SceneHierarchyPanel->DrawUI(isOpen);
+		m_StatisticsPanel->DrawUI(isOpen);
+		m_ScriptEngineInspectorPanel->DrawUI(isOpen);
+		m_ProjectExplorer->DrawUI(isOpen);
+		m_ProjectSettingsPanel->DrawUI(isOpen);
 
 		m_NewProjectModal->DrawUI();
 

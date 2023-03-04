@@ -9,7 +9,7 @@ namespace Atom
 
 #define ATOM_SCENE_DRAG_DROP_TARGET_TYPE "PROJECT_EXPLORER_ITEM_SCENE"
 
-	void ProjectSettingsPanel::OnImGuiRender(bool& isOpen)
+	void ProjectSettingsPanel::DrawUI(bool& isOpen)
 	{
 
 		ImGui::Begin("Project Settings", &isOpen);

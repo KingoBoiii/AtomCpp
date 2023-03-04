@@ -22,7 +22,7 @@ namespace Atom
 	{
 	}
 
-	void ProjectExplorer::OnImGuiRender(bool& isOpen)
+	void ProjectExplorer::DrawUI(bool& isOpen)
 	{
 		static float padding = 16.0f;
 		static float thumbnailSize = 128.0f;

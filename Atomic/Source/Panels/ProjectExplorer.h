@@ -11,7 +11,7 @@ namespace Atom
 		ProjectExplorer();
 		~ProjectExplorer() = default;
 
-		virtual void OnImGuiRender(bool& isOpen) override;
+		virtual void DrawUI(bool& isOpen) override;
 		virtual void OnProjectChanged(Project* project) override;
 	private:
 		void DrawAssetDirectoryTree();

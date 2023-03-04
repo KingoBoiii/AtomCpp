@@ -8,7 +8,7 @@
 namespace Atom
 {
 
-	void StatisticsPanel::OnImGuiRender(bool& isOpen)
+	void StatisticsPanel::DrawUI(bool& isOpen)
 	{
 		ImGui::Begin("Statistics", &isOpen);
 

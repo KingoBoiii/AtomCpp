@@ -10,7 +10,7 @@ namespace Atom
 
 	static std::vector<AssemblyMetadata> s_LoadedAssembliesMetadata;
 
-	void ScriptEngineInspectorPanel::OnImGuiRender(bool& isOpen)
+	void ScriptEngineInspectorPanel::DrawUI(bool& isOpen)
 	{
 		ImGui::Begin("Script Engine Inspector", &isOpen);
 

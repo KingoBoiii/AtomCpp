@@ -15,7 +15,7 @@ namespace Atom
 		Viewport() = default;
 		Viewport(Framebuffer* framebuffer, EditorCamera* editorCamera, SceneHierarchyPanel* sceneHierarchyPanel);
 
-		virtual void OnImGuiRender(bool& isOpen) override;
+		virtual void DrawUI(bool& isOpen) override;
 		virtual void SetSceneContext(Atom::Scene* scene) override;
 
 		void SetDragDropCallback(std::function<void(const ImGuiPayload*)> callback) { m_DragDropCallback = callback; }
