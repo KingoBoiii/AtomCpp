@@ -1,7 +1,7 @@
 #include "ATPCH.h"
-#include "UICore.h"
-
 #include <imgui.h>
+
+#include "UICore.h"
 
 namespace Atom::UI
 {
@@ -33,6 +33,26 @@ namespace Atom::UI
 	{
 		ImGui::PopID();
 		s_UIContextID--;
+	}
+
+	bool BeginStaticModal(const std::string& title, const glm::vec2& size, const glm::vec2& center)
+	{
+		ImGui::SetNextWindowPos({ center.x, center.y }, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowSize(ImVec2(size.x, size.y));
+
+		static constexpr ImGuiWindowFlags staticModalFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize;
+		bool opened = ImGui::BeginPopupModal(title.c_str(), nullptr, staticModalFlags);
+		if (opened)
+		{
+			PushID();
+		}
+		return opened;
+	}
+
+	void EndStaticModal()
+	{
+		PopID();
+		ImGui::EndPopup();
 	}
 
 	void BeginPropertyGrid(uint32_t columns)
