@@ -20,7 +20,6 @@ namespace Atom
 
 		ReleaseCOM(m_RenderTargetView);
 		ReleaseCOM(m_DepthStencilView);
-		ReleaseCOM(m_DepthStencilBuffer);
 	}
 
 	void DX11SwapChain::Initialize()
@@ -46,7 +45,6 @@ namespace Atom
 
 			ReleaseCOM(m_RenderTargetView);
 			ReleaseCOM(m_DepthStencilView);
-			ReleaseCOM(m_DepthStencilBuffer);
 		}
 
 		DX11RendererContext& context = DX11RendererContext::Get();
@@ -135,7 +133,8 @@ namespace Atom
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 
-		HRESULT hr = device->CreateTexture2D(&desc, NULL, &m_DepthStencilBuffer);
+		ID3D11Texture2D* depthStencilBuffer = nullptr;
+		HRESULT hr = device->CreateTexture2D(&desc, NULL, &depthStencilBuffer);
 		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create depth stencil buffer!");
 
 		// Create the depth stencil view.
@@ -144,7 +143,7 @@ namespace Atom
 		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Texture2D.MipSlice = 0;
 
-		hr = device->CreateDepthStencilView(m_DepthStencilBuffer, &dsvDesc, &m_DepthStencilView);
+		hr = device->CreateDepthStencilView(depthStencilBuffer, &dsvDesc, &m_DepthStencilView);
 		AT_CORE_ASSERT(SUCCEEDED(hr), "failed to create Depth Stencil View");
 	}
 

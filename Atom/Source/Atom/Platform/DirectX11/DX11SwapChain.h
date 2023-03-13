@@ -28,7 +28,6 @@ namespace Atom
 		IDXGISwapChain* m_SwapChain = nullptr;
 		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
 		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
-		ID3D11Texture2D* m_DepthStencilBuffer = nullptr;
 
 		friend class DX11Renderer;
 	};
