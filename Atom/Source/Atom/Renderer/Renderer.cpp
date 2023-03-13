@@ -36,7 +36,6 @@ namespace Atom
 		s_Renderer = CreateRenderer(window);
 		s_Renderer->Initialize();
 
-
 		s_RendererData = new RendererData();
 
 		s_RendererData->ShaderLibrary = ShaderLibrary::Create();
