@@ -9,7 +9,7 @@
 #include "UniformBuffer.h"
 #include "Shader.h"
 
-#include "MSDFData.h"
+#include "Font/MSDFData.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

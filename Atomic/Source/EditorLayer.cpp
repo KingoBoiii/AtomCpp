@@ -5,7 +5,7 @@
 #include <Atom/ImGui/ImGuiStyle.h>
 #include <Atom/Editor/EditorResources.h>
 #include <Atom/Scripting/ScriptEngine.h>
-#include <Atom/Renderer/Font.h>
+#include <Atom/Renderer/Font/Font.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

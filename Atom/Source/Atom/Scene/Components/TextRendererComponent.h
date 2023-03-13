@@ -1,5 +1,5 @@
 #pragma once
-#include "Atom/Renderer/Font.h"
+#include "Atom/Renderer/Font/Font.h"
 
 #include <string>
 
