@@ -9,7 +9,7 @@ namespace Atom
 	class DX11Framebuffer : public Framebuffer
 	{
 	public:
-		DX11Framebuffer(const FramebufferSpecification& framebufferOptions);
+		DX11Framebuffer(const FramebufferSpecification& specification);
 		virtual ~DX11Framebuffer();
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
