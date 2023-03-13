@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	Framebuffer* Framebuffer::Create(const FramebufferOptions& framebufferOptions)
+	Framebuffer* Framebuffer::Create(const FramebufferSpecification& specification)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11Framebuffer(framebufferOptions);
+			case RendererAPI::DirectX11:	return new DX11Framebuffer(specification);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;

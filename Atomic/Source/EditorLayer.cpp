@@ -100,9 +100,10 @@ namespace Atom
 
 		Window* window = Application::Get().GetWindow();
 
-		Atom::FramebufferOptions framebufferOptions{ };
+		Atom::FramebufferSpecification framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
-		framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
+		framebufferOptions.Attachments = { TextureFormat::RGBA, TextureFormat::RedInteger, TextureFormat::Depth24Stencil8 };
+		//framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
 		framebufferOptions.Width = window->GetWidth();
 		framebufferOptions.Height = window->GetHeight();
 		m_Framebuffer = Framebuffer::Create(framebufferOptions);
@@ -136,7 +137,7 @@ namespace Atom
 		const glm::vec2& viewportSize = m_Viewport->GetViewportSize();
 		m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 
-		FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
+		FramebufferSpecification framebufferOptions = m_Framebuffer->GetOptions();
 		if(m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
 		{
 			m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
