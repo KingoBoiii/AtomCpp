@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	Shader* Shader::Create(const ShaderOptions& shaderOptions)
+	Shader* Shader::Create(const ShaderSpecification& specification)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11Shader(shaderOptions);
+			case RendererAPI::DirectX11:	return new DX11Shader(specification);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;

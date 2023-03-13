@@ -5,7 +5,7 @@
 namespace Atom
 {
 
-	struct ShaderOptions
+	struct ShaderSpecification
 	{
 		std::filesystem::path Filepath;
 
@@ -19,7 +19,7 @@ namespace Atom
 	class Shader
 	{
 	public:
-		static Shader* Create(const ShaderOptions& shaderOptions);
+		static Shader* Create(const ShaderSpecification& specification);
 	public:
 		virtual void Bind() const = 0;
 

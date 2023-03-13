@@ -7,7 +7,7 @@ void SandboxLayer::OnAttach()
 {
 	Atom::Window* window = Atom::Application::Get().GetWindow();
 	
-	Atom::ShaderOptions shaderOptions{ };
+	Atom::ShaderSpecification shaderOptions{ };
 	shaderOptions.Filepath = "Assets/Shaders/BasicCamera.shader";
 	shaderOptions.VertexShaderEntryPoint = "VSMain";
 	shaderOptions.VertexShaderTarget = "vs_5_0";

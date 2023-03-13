@@ -9,7 +9,7 @@ namespace Atom
 	class DX11Shader : public Shader
 	{
 	public:
-		DX11Shader(const ShaderOptions& shaderOptions);
+		DX11Shader(const ShaderSpecification& shaderOptions);
 		~DX11Shader();
 
 		virtual void Bind() const override;
@@ -21,7 +21,7 @@ namespace Atom
 
 		void GetNameByFilepath(const std::string& filepath);
 	private:
-		ShaderOptions m_Options;
+		ShaderSpecification m_Specification;
 		std::string m_Name;
 
 		ID3D11Device* m_Device = nullptr;
