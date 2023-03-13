@@ -5,7 +5,7 @@
 #include <Atom/ImGui/ImGuiStyle.h>
 #include <Atom/Editor/EditorResources.h>
 #include <Atom/Scripting/ScriptEngine.h>
-#include <Atom/Renderer/Font.h>
+#include <Atom/Renderer/Font/Font.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -100,9 +100,10 @@ namespace Atom
 
 		Window* window = Application::Get().GetWindow();
 
-		Atom::FramebufferOptions framebufferOptions{ };
+		Atom::FramebufferSpecification framebufferOptions{ };
 		framebufferOptions.ClearColor = new float[4] { 0.15f, 0.15f, 0.15f, 1.0f };
-		framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
+		framebufferOptions.Attachments = { TextureFormat::RGBA, TextureFormat::RedInteger, TextureFormat::Depth24Stencil8 };
+		//framebufferOptions.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
 		framebufferOptions.Width = window->GetWidth();
 		framebufferOptions.Height = window->GetHeight();
 		m_Framebuffer = Framebuffer::Create(framebufferOptions);
@@ -136,7 +137,7 @@ namespace Atom
 		const glm::vec2& viewportSize = m_Viewport->GetViewportSize();
 		m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 
-		FramebufferOptions framebufferOptions = m_Framebuffer->GetOptions();
+		FramebufferSpecification framebufferOptions = m_Framebuffer->GetOptions();
 		if(m_Viewport->GetViewportSize().x > 0.0f && m_Viewport->GetViewportSize().y > 0.0f && (framebufferOptions.Width != m_Viewport->GetViewportSize().x || framebufferOptions.Height != m_Viewport->GetViewportSize().y))
 		{
 			m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
@@ -194,7 +195,7 @@ namespace Atom
 
 		ImGui::Text("Hovered Entity: %s", m_HoveredEntity ? m_HoveredEntity.GetName().c_str() : "None");
 
-		ImGui::Image(s_Font->GetAtlasTexture()->GetTexture(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+		ImGui::Image(s_Font->GetAtlasTexture()->GetTextureHandle(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
 		ImGui::End();
 
@@ -339,7 +340,7 @@ namespace Atom
 		if(hasPlayButton)
 		{
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? EditorResources::PlayIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
 				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 				{
@@ -359,7 +360,7 @@ namespace Atom
 			}
 
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorResources::SimulateIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
 				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
 				{
@@ -377,7 +378,7 @@ namespace Atom
 			ImGui::SameLine();
 			{
 				Texture2D* icon = EditorResources::PauseIcon;
-				if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+				if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 				{
 					m_ActiveScene->SetPaused(!isPaused);
 				}
@@ -388,7 +389,7 @@ namespace Atom
 				ImGui::SameLine();
 				{
 					Texture2D* icon = EditorResources::StepIcon;
-					if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+					if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 					{
 						m_ActiveScene->Step(1);
 					}

@@ -5,15 +5,15 @@
 namespace Atom
 {
 
-	DX11Shader::DX11Shader(const ShaderOptions& shaderOptions)
-		: m_Options(shaderOptions)
+	DX11Shader::DX11Shader(const ShaderSpecification& specification)
+		: m_Specification(specification)
 	{
 		DX11RendererContext& context = DX11RendererContext::Get();
 		m_Device = context.m_Device;
 		m_DeviceContext = context.m_DeviceContext;
 
 		Invalidate();
-		GetNameByFilepath(shaderOptions.Filepath.string());
+		GetNameByFilepath(m_Specification.Filepath.string());
 	}
 
 	DX11Shader::~DX11Shader()
@@ -31,8 +31,8 @@ namespace Atom
 
 	void DX11Shader::Invalidate()
 	{
-		m_VertexSourceBlob = CompileShader(m_Options.VertexShaderEntryPoint.c_str(), m_Options.VertexShaderTarget.c_str());
-		ID3DBlob* pixelShaderBlob = CompileShader(m_Options.PixelShaderEntryPoint.c_str(), m_Options.PixelShaderTarget.c_str());
+		m_VertexSourceBlob = CompileShader(m_Specification.VertexShaderEntryPoint.c_str(), m_Specification.VertexShaderTarget.c_str());
+		ID3DBlob* pixelShaderBlob = CompileShader(m_Specification.PixelShaderEntryPoint.c_str(), m_Specification.PixelShaderTarget.c_str());
 
 		// Create vertex shader
 		HRESULT hr = m_Device->CreateVertexShader(
@@ -61,7 +61,7 @@ namespace Atom
 		ID3DBlob* errorBlob = nullptr;
 
 		HRESULT hr = D3DCompileFromFile(
-			m_Options.Filepath.c_str(),
+			m_Specification.Filepath.c_str(),
 			nullptr,
 			nullptr,
 			entryPoint,

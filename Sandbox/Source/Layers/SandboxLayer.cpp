@@ -7,7 +7,7 @@ void SandboxLayer::OnAttach()
 {
 	Atom::Window* window = Atom::Application::Get().GetWindow();
 	
-	Atom::ShaderOptions shaderOptions{ };
+	Atom::ShaderSpecification shaderOptions{ };
 	shaderOptions.Filepath = "Assets/Shaders/BasicCamera.shader";
 	shaderOptions.VertexShaderEntryPoint = "VSMain";
 	shaderOptions.VertexShaderTarget = "vs_5_0";
@@ -15,14 +15,14 @@ void SandboxLayer::OnAttach()
 	shaderOptions.PixelShaderTarget = "ps_5_0";
 	Atom::Shader* shader = Atom::Shader::Create(shaderOptions);
 
-	Atom::PipelineOptions pipelineOptions{ };
+	Atom::PipelineSpecification pipelineOptions{ };
 	pipelineOptions.Shader = shader;
 	pipelineOptions.InputLayout = {
 		{ Atom::ShaderDataType::Float3, "POSITION" }
 	};
 	m_Pipeline = Atom::Pipeline::Create(pipelineOptions);
 
-	Atom::VertexBufferOptions vertexBufferOptions{ };
+	Atom::VertexBufferSpecification vertexBufferOptions{ };
 	vertexBufferOptions.Vertices = new float[4 * 3]
 	{
 		0.5f, 0.5f, 0.0f,  // top right

@@ -99,6 +99,9 @@ namespace Atom
 
 	Win32Window::~Win32Window()
 	{
+		delete m_RendererContext;
+		delete m_SwapChain;
+
 		DestroyWindow(m_WindowHandle);
 		UnregisterClassW(s_ClassName, m_HInstance);
 

@@ -9,7 +9,7 @@
 #include "UniformBuffer.h"
 #include "Shader.h"
 
-#include "MSDFData.h"
+#include "Font/MSDFData.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -22,7 +22,7 @@ namespace Atom
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
-		
+
 		//Editor Only!
 		int32_t EntityId;
 	};
@@ -48,7 +48,7 @@ namespace Atom
 		//Editor Only!
 		int32_t EntityId;
 	};
-	
+
 	template<typename T>
 	struct Renderer2DPipeline
 	{
@@ -130,7 +130,10 @@ namespace Atom
 			offset += 4;
 		}
 
-		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(quadIndices, s_Renderer2DData.MaxIndices);
+		IndexBufferSpecification indexBufferSpecification{ };
+		indexBufferSpecification.Indices = quadIndices;
+		indexBufferSpecification.IndexCount = s_Renderer2DData.MaxIndices;
+		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(indexBufferSpecification);
 
 		CreateQuadPipeline();
 		CreateCirclePipeline();
@@ -361,7 +364,7 @@ namespace Atom
 
 	void Renderer2D::CreateQuadPipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },
@@ -372,15 +375,17 @@ namespace Atom
 
 		s_Renderer2DData.QuadVertexBufferBase = new QuadVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 
 	void Renderer2D::CreateCirclePipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "WORLD_POSITION" },
 			{ ShaderDataType::Float3, "LOCAL_POSITION" },
@@ -394,15 +399,17 @@ namespace Atom
 
 		s_Renderer2DData.CircleVertexBufferBase = new CircleVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.CircleVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 
 	void Renderer2D::CreateTextPipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },
@@ -414,9 +421,11 @@ namespace Atom
 
 		s_Renderer2DData.TextVertexBufferBase = new TextVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.TextVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 

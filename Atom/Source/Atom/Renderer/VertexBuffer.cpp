@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	VertexBuffer* VertexBuffer::Create(const VertexBufferOptions& vertexBufferOptions)
+	VertexBuffer* VertexBuffer::Create(const VertexBufferSpecification& specification)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11VertexBuffer(vertexBufferOptions);
+			case RendererAPI::DirectX11:	return new DX11VertexBuffer(specification);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;

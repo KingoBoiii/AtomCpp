@@ -17,7 +17,7 @@ namespace Atom
 
 	Shader* ShaderLibrary::Load(const std::string& filepath)
 	{
-		Atom::ShaderOptions shaderOptions{ };
+		Atom::ShaderSpecification shaderOptions{ };
 		shaderOptions.Filepath = filepath;
 		shaderOptions.VertexShaderEntryPoint = "VSMain";
 		shaderOptions.VertexShaderTarget = "vs_5_0";
@@ -32,7 +32,7 @@ namespace Atom
 
 	Shader* ShaderLibrary::Load(const std::string& name, const std::string& filepath)
 	{
-		Atom::ShaderOptions shaderOptions{ };
+		Atom::ShaderSpecification shaderOptions{ };
 		shaderOptions.Filepath = filepath;
 		shaderOptions.VertexShaderEntryPoint = "VSMain";
 		shaderOptions.VertexShaderTarget = "vs_5_0";

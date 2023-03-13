@@ -2,11 +2,13 @@
 #include "DX11VertexBuffer.h"
 #include "DX11RendererContext.h"
 
+#include "DirectX11Utils.h"
+
 namespace Atom
 {
 
-	DX11VertexBuffer::DX11VertexBuffer(const VertexBufferOptions& vertexBufferOptions)
-		: m_Options(vertexBufferOptions)
+	DX11VertexBuffer::DX11VertexBuffer(const VertexBufferSpecification& specification)
+		: m_Specification(specification)
 	{
 		DX11RendererContext& context = DX11RendererContext::Get();
 
@@ -34,23 +36,23 @@ namespace Atom
 
 	void DX11VertexBuffer::Bind() const
 	{
-		m_DeviceContext->IASetVertexBuffers(0, 1, &m_Buffer, &m_Options.Stride, &m_Options.Offset);
+		m_DeviceContext->IASetVertexBuffers(0, 1, &m_Buffer, &m_Specification.Stride, &m_Specification.Offset);
 	}
 
 	void DX11VertexBuffer::Invalidate()
 	{
 		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = m_Options.Size;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDesc.Usage = Utils::AtomUsageToD3D11(m_Specification.Usage);
+		bufferDesc.ByteWidth = m_Specification.Size;
+		bufferDesc.BindFlags = Utils::AtomBindFlagsToD3D11(m_Specification.BindFlags);
+		bufferDesc.CPUAccessFlags = Utils::AtomCPUAccessToD3D11(m_Specification.CPUAccess);
 		bufferDesc.MiscFlags = 0;
-		bufferDesc.StructureByteStride = 0;
+		bufferDesc.StructureByteStride = m_Specification.Stride;
 
-		if(m_Options.Vertices)
+		if(m_Specification.Vertices)
 		{
 			D3D11_SUBRESOURCE_DATA subResourceData = {};
-			subResourceData.pSysMem = m_Options.Vertices;
+			subResourceData.pSysMem = m_Specification.Vertices;
 			subResourceData.SysMemPitch = 0;
 			subResourceData.SysMemSlicePitch = 0;
 

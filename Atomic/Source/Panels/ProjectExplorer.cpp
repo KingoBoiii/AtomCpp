@@ -75,7 +75,7 @@ namespace Atom
 				ImGui::PushID(filenameString.c_str());
 				Texture2D* icon = directoryEntry.is_directory() ? EditorResources::DirectoryIcon : EditorResources::FileIcon;
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-				ImGui::ImageButton((ImTextureID)icon->GetTexture(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+				ImGui::ImageButton((ImTextureID)icon->GetTextureHandle(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
 				if(ImGui::BeginDragDropSource())
 				{

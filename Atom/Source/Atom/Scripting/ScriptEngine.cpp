@@ -100,7 +100,7 @@ namespace Atom
 			AT_CORE_ERROR("[ScriptEngine] Failed to load app assembly!");
 			return false;
 		}
-		
+
 		AT_CORE_INFO("[ScriptEngine] Successfully loaded app assembly from: {0}", Project::GetScriptModuleFilepath());
 
 		ScriptCache::CacheAssemblyClasses(s_ScriptEngineData->AppAssemblyInfo);
@@ -141,7 +141,7 @@ namespace Atom
 			AT_CORE_ERROR("[ScriptEngine] Cannot find managed instance for entity: {0}", entity.GetName());
 			return;
 		}
-		
+
 		MonoObject* entityInstance = s_ScriptEngineData->EntityManagedInstances[entity.GetUUID()];
 		ScriptCache::InvokeEntityStart(entityInstance);
 	}
@@ -293,6 +293,12 @@ namespace Atom
 
 		mono_jit_cleanup(s_ScriptEngineData->RootDomain);
 		s_ScriptEngineData->RootDomain = nullptr;
+
+		//if(s_ScriptEngineData->Config.EnableDebugging)
+		//{
+		//	mono_debug_domain_unload(s_ScriptEngineData->RootDomain);
+		//	mono_debug_cleanup();
+		//}
 	}
 
 	void ScriptEngine::InstantiateEntityInstances()

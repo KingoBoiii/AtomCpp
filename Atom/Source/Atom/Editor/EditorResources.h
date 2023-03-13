@@ -43,7 +43,7 @@ namespace Atom
 			ReleasePtr(StepIcon);
 		}
 	private:
-		static Texture2D* LoadTexture(const std::filesystem::path& relativePath, const Texture2DOptions& textureOptions = Texture2DOptions())
+		static Texture2D* LoadTexture(const std::filesystem::path& relativePath, const Texture2DSpecification& textureOptions = Texture2DSpecification())
 		{
 			std::filesystem::path path = std::filesystem::path("Resources") / "Editor" / relativePath;
 

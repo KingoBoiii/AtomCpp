@@ -41,8 +41,8 @@ namespace Atom
 
 	}
 
-	DX11Pipeline::DX11Pipeline(const PipelineOptions& pipelineOptions)
-		: m_Options(pipelineOptions)
+	DX11Pipeline::DX11Pipeline(const PipelineSpecification& specification)
+		: m_Specification(specification)
 	{
 		DX11RendererContext& context = DX11RendererContext::Get();
 
@@ -63,9 +63,9 @@ namespace Atom
 
 	void DX11Pipeline::Bind() const
 	{
-		m_Options.Shader->Bind();
+		m_Specification.Shader->Bind();
 
-		m_DeviceContext->IASetPrimitiveTopology(Utils::AtomPrimitiveTopologyToDirectX(m_Options.PrimitiveTopology));
+		m_DeviceContext->IASetPrimitiveTopology(Utils::AtomPrimitiveTopologyToDirectX(m_Specification.PrimitiveTopology));
 		m_DeviceContext->IASetInputLayout(m_InputLayout);
 		m_DeviceContext->RSSetState(m_RasterizerState);
 	}
@@ -78,7 +78,7 @@ namespace Atom
 
 	void DX11Pipeline::CreateInputLayout()
 	{
-		std::vector<BufferElement> layout = m_Options.InputLayout.GetElements();
+		std::vector<BufferElement> layout = m_Specification.InputLayout.GetElements();
 		D3D11_INPUT_ELEMENT_DESC* desc = new D3D11_INPUT_ELEMENT_DESC[layout.size()];
 		for(uint32_t i = 0; i < layout.size(); i++)
 		{
@@ -86,7 +86,7 @@ namespace Atom
 			desc[i] = { element.Name.c_str(), 0, Utils::AtomShaderTypeToDirectX(element.Type), 0, (uint32_t)element.Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
 
-		DX11Shader* shader = reinterpret_cast<DX11Shader*>(m_Options.Shader);
+		DX11Shader* shader = reinterpret_cast<DX11Shader*>(m_Specification.Shader);
 
 		HRESULT hr = m_Device->CreateInputLayout(desc, layout.size(), shader->m_VertexSourceBlob->GetBufferPointer(), shader->m_VertexSourceBlob->GetBufferSize(), &m_InputLayout);
 		AT_CORE_ASSERT(SUCCEEDED(hr));
@@ -95,7 +95,7 @@ namespace Atom
 	void DX11Pipeline::CreateRasterizerState()
 	{
 		D3D11_RASTERIZER_DESC desc{};
-		desc.FillMode = m_Options.Wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
+		desc.FillMode = m_Specification.Wireframe ? D3D11_FILL_WIREFRAME : D3D11_FILL_SOLID;
 		desc.CullMode = D3D11_CULL_NONE;
 		desc.FrontCounterClockwise = true;
 		desc.DepthClipEnable = true;
