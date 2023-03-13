@@ -10,7 +10,9 @@ namespace Atom::UI
 	void PushID();
 	void PopID();
 	
-	void BeginPropertyGrid(uint32_t columns = 2);
+	void BeginPropertyGrid(uint32_t columns = 2, bool border = false);
 	void EndPropertyGrid();
+
+	void PropertyGridText(const std::string& label, const std::string& value);
 
 }

@@ -35,12 +35,12 @@ namespace Atom::UI
 		s_UIContextID--;
 	}
 
-	void BeginPropertyGrid(uint32_t columns)
+	void BeginPropertyGrid(uint32_t columns, bool border)
 	{
 		PushID();
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.0f, 8.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 4.0f));
-		ImGui::Columns(columns);
+		ImGui::Columns(columns, (const char*)0, border);
 	}
 
 	void EndPropertyGrid()
@@ -49,6 +49,14 @@ namespace Atom::UI
 		ImGui::PopStyleVar(2); // ItemSpacing, FramePadding
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 18.0f);
 		PopID();
+	}
+
+	void PropertyGridText(const std::string& label, const std::string& value)
+	{
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+		ImGui::Text("%s", value.c_str());
+		ImGui::NextColumn();
 	}
 
 }

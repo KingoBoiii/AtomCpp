@@ -118,6 +118,7 @@ namespace Atom
 		m_ScriptEngineInspectorPanel = new ScriptEngineInspectorPanel();
 		m_ProjectExplorer = new ProjectExplorer();
 		m_ProjectSettingsPanel = new ProjectSettingsPanel();
+		m_AssetManagerPanel = new AssetManagerPanel();
 
 		m_Viewport = new Viewport(m_Framebuffer, &m_EditorCamera, m_SceneHierarchyPanel);
 		m_Viewport->SetSceneContext(m_ActiveScene);
@@ -188,6 +189,7 @@ namespace Atom
 		m_ScriptEngineInspectorPanel->OnImGuiRender(isOpen);
 		m_ProjectExplorer->OnImGuiRender(isOpen);
 		m_ProjectSettingsPanel->OnImGuiRender(isOpen);
+		m_AssetManagerPanel->OnImGuiRender(isOpen);
 
 		UI_Toolbar();
 

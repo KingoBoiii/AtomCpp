@@ -77,6 +77,7 @@ namespace Atom
 		ScriptEngineInspectorPanel* m_ScriptEngineInspectorPanel = nullptr;
 		ProjectExplorer* m_ProjectExplorer = nullptr;
 		ProjectSettingsPanel* m_ProjectSettingsPanel = nullptr;
+		AssetManagerPanel* m_AssetManagerPanel = nullptr;
 
 		enum class SceneState
 		{
