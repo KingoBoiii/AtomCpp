@@ -128,7 +128,7 @@ namespace Atom
 		stagingTextureSpec.Width = m_Specification.Width;
 		stagingTextureSpec.Height = m_Specification.Height;
 		stagingTextureSpec.Format = m_ColorAttachments[attachmentIndex].TextureFormat;
-		stagingTextureSpec.Usage = TextureUsage::Staging;
+		stagingTextureSpec.Usage = Usage::Staging;
 		stagingTextureSpec.CPUAccess = CPUAccess::Read;
 		stagingTextureSpec.BindFlags = BindFlags::None;
 
@@ -203,7 +203,7 @@ namespace Atom
 		colorAttachmentSpec.SampleCount = 1;
 		colorAttachmentSpec.SampleQuality = 0;
 		colorAttachmentSpec.Format = colorAttachmentOptions.TextureFormat;
-		colorAttachmentSpec.Usage = TextureUsage::Default;
+		colorAttachmentSpec.Usage = Usage::Default;
 		colorAttachmentSpec.BindFlags = BindFlags::ShaderResource | BindFlags::RenderTarget;
 
 		m_ColorAttachmentTextures[index] = new DX11Texture2D(colorAttachmentSpec);
@@ -227,7 +227,7 @@ namespace Atom
 		depthStencilAttachmentSpec.SampleCount = 1;
 		depthStencilAttachmentSpec.SampleQuality = 0;
 		depthStencilAttachmentSpec.Format = depthStencilAttachmentOptions.TextureFormat;
-		depthStencilAttachmentSpec.Usage = TextureUsage::Default;
+		depthStencilAttachmentSpec.Usage = Usage::Default;
 		depthStencilAttachmentSpec.BindFlags = BindFlags::DepthStencil;
 
 		DX11Texture2D* depthStencilTextureBuffer = new DX11Texture2D(depthStencilAttachmentSpec);

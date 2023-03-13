@@ -40,14 +40,14 @@ namespace Atom
 			return D3D11_TEXTURE_ADDRESS_WRAP;
 		}
 
-		static D3D11_USAGE AtomTextureUsageToD3D11(TextureUsage usage)
+		static D3D11_USAGE AtomTextureUsageToD3D11(Usage usage)
 		{
 			switch(usage)
 			{
-				case Atom::TextureUsage::Static:		return D3D11_USAGE_DEFAULT;
-				case Atom::TextureUsage::Dynamic:		return D3D11_USAGE_DYNAMIC;
-				case Atom::TextureUsage::Staging:		return D3D11_USAGE_STAGING;
-				case Atom::TextureUsage::None:
+				case Usage::Static:						return D3D11_USAGE_DEFAULT;
+				case Usage::Dynamic:					return D3D11_USAGE_DYNAMIC;
+				case Usage::Staging:					return D3D11_USAGE_STAGING;
+				case Usage::None:
 				default: break;
 			}
 

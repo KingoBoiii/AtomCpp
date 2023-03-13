@@ -106,7 +106,7 @@ namespace Atom
 
 	void DX11Texture2D::CreateShaderResourceView()
 	{
-		if(m_Specification.BindFlags == BindFlags::DepthStencil || m_Specification.Usage == TextureUsage::Staging)
+		if(m_Specification.BindFlags == BindFlags::DepthStencil || m_Specification.Usage == Usage::Staging)
 		{
 			return;
 		}
@@ -125,7 +125,7 @@ namespace Atom
 
 	void DX11Texture2D::CreateSamplerState()
 	{
-		if(m_Specification.BindFlags == BindFlags::DepthStencil || m_Specification.Usage == TextureUsage::Staging)
+		if(m_Specification.BindFlags == BindFlags::DepthStencil || m_Specification.Usage == Usage::Staging)
 		{
 			return;
 		}

@@ -1,4 +1,5 @@
 #pragma once
+#include "Usage.h"
 #include "BindFlags.h"
 #include "CPUAccess.h"
 
@@ -38,15 +39,6 @@ namespace Atom
 		RedGreenBlueAlpha = RGBA
 	};
 
-	enum class TextureUsage
-	{
-		None = 0,
-		Static,
-		Default = Static,
-		Dynamic,
-		Staging
-	};
-
 	struct Texture2DSpecification
 	{
 		uint32_t Width = 1;
@@ -64,9 +56,9 @@ namespace Atom
 		TextureFilter MinFilter = TextureFilter::Linear;
 		TextureFilter MagFilter = TextureFilter::Linear;
 		TextureWrap WrapMode = TextureWrap::Repeat;
-		TextureUsage Usage = TextureUsage::Default;
 		
 		// TODO: Figure out where these should be
+		Usage Usage = Usage::Default;
 		CPUAccess CPUAccess = CPUAccess::None;
 		BindFlags BindFlags = BindFlags::ShaderResource;
 	};
