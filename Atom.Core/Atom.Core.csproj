@@ -55,6 +55,7 @@
     <Compile Include="Source\Atom\Core\Random.cs" />
     <Compile Include="Source\Atom\Graphics\Color.cs" />
     <Compile Include="Source\Atom\Math\Vector2.cs" />
+    <Compile Include="Source\Atom\Math\Vector3.cs" />
     <Compile Include="Source\Atom\Scene\ComponentBase.cs" />
     <Compile Include="Source\Atom\Scene\Components\BasicRenderer.cs" />
     <Compile Include="Source\Atom\Scene\Components\BoxCollider2D.cs" />
@@ -65,7 +66,6 @@
     <Compile Include="Source\Atom\Scene\Entity.cs" />
     <Compile Include="Source\Atom\Scene\Scene.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\Atom\Math\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
