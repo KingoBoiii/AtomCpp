@@ -194,7 +194,7 @@ namespace Atom
 
 		ImGui::Text("Hovered Entity: %s", m_HoveredEntity ? m_HoveredEntity.GetName().c_str() : "None");
 
-		ImGui::Image(s_Font->GetAtlasTexture()->GetTexture(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+		ImGui::Image(s_Font->GetAtlasTexture()->GetTextureHandle(), { 512, 512 }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
 		ImGui::End();
 
@@ -339,7 +339,7 @@ namespace Atom
 		if(hasPlayButton)
 		{
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? EditorResources::PlayIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
 				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
 				{
@@ -359,7 +359,7 @@ namespace Atom
 			}
 
 			Texture2D* icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? EditorResources::SimulateIcon : EditorResources::StopIcon;
-			if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+			if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 			{
 				if(m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
 				{
@@ -377,7 +377,7 @@ namespace Atom
 			ImGui::SameLine();
 			{
 				Texture2D* icon = EditorResources::PauseIcon;
-				if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+				if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 				{
 					m_ActiveScene->SetPaused(!isPaused);
 				}
@@ -388,7 +388,7 @@ namespace Atom
 				ImGui::SameLine();
 				{
 					Texture2D* icon = EditorResources::StepIcon;
-					if(ImGui::ImageButton(icon->GetTexture(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
+					if(ImGui::ImageButton(icon->GetTextureHandle(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, 0))
 					{
 						m_ActiveScene->Step(1);
 					}

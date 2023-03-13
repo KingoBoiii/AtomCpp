@@ -24,7 +24,10 @@ namespace Atom
 
 		msdfgen::BitmapConstRef<T, N> bitmap = (msdfgen::BitmapConstRef<T, N>)generator.atlasStorage();
 
-		Texture2D* texture = Texture2D::Create(width, height);
+		Texture2DSpecification spec;
+		spec.Width = width;
+		spec.Height = height;
+		Texture2D* texture = Texture2D::Create(spec);
 		texture->SetData((void*)bitmap.pixels);
 		return texture;
 	}
