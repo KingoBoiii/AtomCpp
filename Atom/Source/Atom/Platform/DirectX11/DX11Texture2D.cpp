@@ -80,7 +80,7 @@ namespace Atom
 		desc.Format = Utils::AtomTextureFormatToDXGI(m_Specification.Format);
 		desc.SampleDesc.Count = m_Specification.SampleCount;
 		desc.SampleDesc.Quality = m_Specification.SampleQuality;
-		desc.Usage = Utils::AtomTextureUsageToD3D11(m_Specification.Usage);
+		desc.Usage = Utils::AtomUsageToD3D11(m_Specification.Usage);
 		desc.BindFlags = Utils::AtomBindFlagsToD3D11(m_Specification.BindFlags);
 		desc.CPUAccessFlags = Utils::AtomCPUAccessToD3D11(m_Specification.CPUAccess);
 		desc.MiscFlags = m_Specification.GenerateMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;

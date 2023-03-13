@@ -40,7 +40,7 @@ namespace Atom
 			return D3D11_TEXTURE_ADDRESS_WRAP;
 		}
 
-		static D3D11_USAGE AtomTextureUsageToD3D11(Usage usage)
+		static D3D11_USAGE AtomUsageToD3D11(Usage usage)
 		{
 			switch(usage)
 			{
