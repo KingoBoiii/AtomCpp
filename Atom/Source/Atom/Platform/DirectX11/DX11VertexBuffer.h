@@ -9,7 +9,7 @@ namespace Atom
 	class DX11VertexBuffer : public VertexBuffer
 	{
 	public:
-		DX11VertexBuffer(const VertexBufferOptions& vertexBufferOptions);
+		DX11VertexBuffer(const VertexBufferSpecification& vertexBufferOptions);
 		virtual ~DX11VertexBuffer();
 
 		virtual void SetData(void* vertices, uint32_t size) override;
@@ -18,7 +18,7 @@ namespace Atom
 	private:
 		void Invalidate();
 	private:
-		VertexBufferOptions m_Options;
+		VertexBufferSpecification m_Specification;
 
 		ID3D11Device* m_Device = nullptr;
 		ID3D11DeviceContext* m_DeviceContext = nullptr;

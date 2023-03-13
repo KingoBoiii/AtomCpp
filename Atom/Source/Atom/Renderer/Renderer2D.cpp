@@ -372,7 +372,7 @@ namespace Atom
 
 		s_Renderer2DData.QuadVertexBufferBase = new QuadVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
 		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
@@ -394,7 +394,7 @@ namespace Atom
 
 		s_Renderer2DData.CircleVertexBufferBase = new CircleVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
 		s_Renderer2DData.CircleVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
@@ -414,7 +414,7 @@ namespace Atom
 
 		s_Renderer2DData.TextVertexBufferBase = new TextVertex[s_Renderer2DData.MaxVertices];
 
-		VertexBufferOptions vertexBufferOptions{ };
+		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
 		s_Renderer2DData.TextVertexBuffer = VertexBuffer::Create(vertexBufferOptions);

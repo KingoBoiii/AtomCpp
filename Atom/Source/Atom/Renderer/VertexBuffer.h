@@ -3,7 +3,7 @@
 namespace Atom
 {
 	
-	struct VertexBufferOptions
+	struct VertexBufferSpecification
 	{
 		uint32_t Size;
 		void* Vertices = nullptr;
@@ -14,7 +14,7 @@ namespace Atom
 	class VertexBuffer
 	{
 	public:
-		static VertexBuffer* Create(const VertexBufferOptions& vertexBufferOptions);
+		static VertexBuffer* Create(const VertexBufferSpecification& specification);
 	public:
 		virtual void SetData(void* vertices, uint32_t size) = 0;
 
