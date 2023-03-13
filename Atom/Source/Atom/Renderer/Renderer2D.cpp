@@ -364,7 +364,7 @@ namespace Atom
 
 	void Renderer2D::CreateQuadPipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },
@@ -385,7 +385,7 @@ namespace Atom
 
 	void Renderer2D::CreateCirclePipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "WORLD_POSITION" },
 			{ ShaderDataType::Float3, "LOCAL_POSITION" },
@@ -409,7 +409,7 @@ namespace Atom
 
 	void Renderer2D::CreateTextPipeline()
 	{
-		PipelineOptions pipelineOptions{ };
+		PipelineSpecification pipelineOptions{ };
 		pipelineOptions.InputLayout = {
 			{ ShaderDataType::Float3, "POSITION" },
 			{ ShaderDataType::Float4, "COLOR" },

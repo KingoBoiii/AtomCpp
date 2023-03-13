@@ -15,7 +15,7 @@ void SandboxLayer::OnAttach()
 	shaderOptions.PixelShaderTarget = "ps_5_0";
 	Atom::Shader* shader = Atom::Shader::Create(shaderOptions);
 
-	Atom::PipelineOptions pipelineOptions{ };
+	Atom::PipelineSpecification pipelineOptions{ };
 	pipelineOptions.Shader = shader;
 	pipelineOptions.InputLayout = {
 		{ Atom::ShaderDataType::Float3, "POSITION" }

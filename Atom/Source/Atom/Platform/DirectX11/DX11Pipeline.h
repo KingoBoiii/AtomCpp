@@ -9,7 +9,7 @@ namespace Atom
 	class DX11Pipeline : public Pipeline
 	{
 	public:
-		DX11Pipeline(const PipelineOptions& pipelineOptions);
+		DX11Pipeline(const PipelineSpecification& specification);
 		virtual ~DX11Pipeline();
 
 		virtual void Bind() const override;
@@ -18,7 +18,7 @@ namespace Atom
 		void CreateInputLayout();
 		void CreateRasterizerState();
 	private:
-		PipelineOptions m_Options;
+		PipelineSpecification m_Specification;
 
 		ID3D11Device* m_Device = nullptr;
 		ID3D11DeviceContext* m_DeviceContext = nullptr;

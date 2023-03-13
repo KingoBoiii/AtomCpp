@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	Pipeline* Pipeline::Create(const PipelineOptions& pipelineOptions)
+	Pipeline* Pipeline::Create(const PipelineSpecification& specification)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11Pipeline(pipelineOptions);
+			case RendererAPI::DirectX11:	return new DX11Pipeline(specification);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;

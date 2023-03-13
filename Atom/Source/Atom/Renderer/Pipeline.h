@@ -13,7 +13,7 @@ namespace Atom
 		Triangles
 	};
 
-	struct PipelineOptions
+	struct PipelineSpecification
 	{
 		Shader* Shader;
 		BufferLayout InputLayout;
@@ -24,7 +24,7 @@ namespace Atom
 	class Pipeline
 	{
 	public:
-		static Pipeline* Create(const PipelineOptions& pipelineOptions);
+		static Pipeline* Create(const PipelineSpecification& specification);
 	public:
 		virtual void Bind() const = 0;
 	};
