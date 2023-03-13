@@ -11,7 +11,7 @@ namespace Atom
 #define BLENDING_TEST
 
 	DX11Renderer::DX11Renderer(Window* window)
-		: m_Window(window), m_Viewport({ 0.0f, 0.0f, (float)window->GetWidth(), (float)window->GetHeight(), 0.0f, 1.0f})
+		: m_Window(window), m_Viewport({ 0.0f, 0.0f, (float)window->GetWidth(), (float)window->GetHeight(), 0.0f, 1.0f })
 	{
 		m_SwapChain = static_cast<DX11SwapChain*>(m_Window->GetSwapChain());
 
@@ -43,7 +43,7 @@ namespace Atom
 
 		m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState, NULL);
 		m_DeviceContext->OMSetBlendState(m_BlendState, NULL, 0xffffffff);
-		
+
 		m_DeviceContext->RSSetViewports(1, &m_Viewport);
 	}
 
@@ -67,7 +67,7 @@ namespace Atom
 		pipeline->Bind();
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		
+
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
@@ -89,8 +89,11 @@ namespace Atom
 	void DX11Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
 		SetD3D11Viewport(x, y, width, height);
-		
-		m_SwapChain->Resize(width, height);
+
+		if(m_SwapChain)
+		{
+			m_SwapChain->Resize(width, height);
+		}
 	}
 
 	void DX11Renderer::CreateBlendState()
@@ -117,7 +120,7 @@ namespace Atom
 
 		HRESULT hr = m_Device->CreateBlendState(&blendStateDesc, &m_BlendState);
 		AT_CORE_ASSERT(SUCCEEDED(hr), "Failed to create Blend State");
-	}
+}
 
 	void DX11Renderer::CreateDepthStencilState()
 	{

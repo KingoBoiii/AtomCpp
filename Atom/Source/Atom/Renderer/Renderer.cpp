@@ -53,6 +53,8 @@ namespace Atom
 		Renderer2D::Shutdown();
 
 		s_Renderer->Shutdown();
+		delete s_Renderer;
+		s_Renderer = nullptr;
 	}
 
 	void Renderer::BeginFrame()
