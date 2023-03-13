@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Atom/Asset/AssetManager.h"
+
 namespace Atom
 {
 
@@ -78,7 +80,7 @@ namespace Atom
 			return s_ActiveProject->m_Config.ProjectDirectory / ATOM_PROJECT_CACHE_DIRECTORY;
 		}
 
-		static void SetActiveProject(Project* project) { s_ActiveProject = project; }
+		static void SetActiveProject(Project* project) { s_ActiveProject = project; AssetManager::Initialize(); }
 		static Project* GetActiveProject() { return s_ActiveProject; }
 
 		ProjectConfig& GetConfig() { return m_Config; }
