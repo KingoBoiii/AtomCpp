@@ -9,7 +9,7 @@ namespace Atom
 
 	Window* WindowFactory::Create(const WindowOptions& windowOptions)
 	{
-#if defined(AT_PLATFORM_WINDOWS)
+#ifdef AT_PLATFORM_WINDOWS
 		return new Win32Window(windowOptions);
 #else
 		return new GlfwWindow(windowOptions);
