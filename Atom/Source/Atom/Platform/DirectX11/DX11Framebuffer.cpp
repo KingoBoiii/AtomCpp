@@ -55,7 +55,7 @@ namespace Atom
 		for(size_t i = 0; i < m_ColorAttachmentRenderTargets.size(); i++)
 		{
 			ReleaseCOM(m_ColorAttachmentRenderTargets[i]);
-	}
+		}
 		for(size_t i = 0; i < m_ColorAttachmentViews.size(); i++)
 		{
 			ReleaseCOM(m_ColorAttachmentViews[i]);
@@ -63,7 +63,7 @@ namespace Atom
 
 		m_Device = nullptr;
 		m_DeviceContext = nullptr;
-}
+	}
 
 	void DX11Framebuffer::Resize(uint32_t width, uint32_t height)
 	{
@@ -99,6 +99,11 @@ namespace Atom
 		for(size_t i = 0; i < m_ColorAttachmentViews.size(); i++)
 		{
 			ReleaseCOM(m_ColorAttachmentViews[i]);
+		}
+
+		for(size_t i = 0; i < m_ColorAttachmentTextures.size(); i++)
+		{
+			ReleaseCOM(((DX11Texture2D*)m_ColorAttachmentTextures[i])->m_ShaderResourceView);
 		}
 
 		m_DeviceContext->OMGetRenderTargets(1, &m_OldRenderTargetView, &m_OldDepthStencilView);
@@ -185,7 +190,7 @@ namespace Atom
 			for(size_t i = 0; i < m_ColorAttachments.size(); i++)
 			{
 				CreateColorAttachment(i, m_ColorAttachments[i]);
-	}
+			}
 		}
 
 		if(m_DepthAttachment.TextureFormat != TextureFormat::None)
