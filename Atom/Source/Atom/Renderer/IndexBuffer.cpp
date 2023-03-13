@@ -7,11 +7,11 @@
 namespace Atom
 {
 
-	IndexBuffer* IndexBuffer::Create(void* indices, uint32_t count)
+	IndexBuffer* IndexBuffer::Create(const IndexBufferSpecification& specification)
 	{
 		switch(Renderer::Current())
 		{
-			case RendererAPI::DirectX11:	return new DX11IndexBuffer(indices, count);
+			case RendererAPI::DirectX11:	return new DX11IndexBuffer(specification);
 			case RendererAPI::OpenGL:
 			case RendererAPI::Unknown:
 			default: break;

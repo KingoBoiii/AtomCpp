@@ -22,7 +22,7 @@ namespace Atom
 	{
 		glm::vec3 Position;
 		glm::vec4 Color;
-		
+
 		//Editor Only!
 		int32_t EntityId;
 	};
@@ -48,7 +48,7 @@ namespace Atom
 		//Editor Only!
 		int32_t EntityId;
 	};
-	
+
 	template<typename T>
 	struct Renderer2DPipeline
 	{
@@ -130,7 +130,10 @@ namespace Atom
 			offset += 4;
 		}
 
-		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(quadIndices, s_Renderer2DData.MaxIndices);
+		IndexBufferSpecification indexBufferSpecification{ };
+		indexBufferSpecification.Indices = quadIndices;
+		indexBufferSpecification.IndexCount = s_Renderer2DData.MaxIndices;
+		s_Renderer2DData.QuadIndexBuffer = IndexBuffer::Create(indexBufferSpecification);
 
 		CreateQuadPipeline();
 		CreateCirclePipeline();
