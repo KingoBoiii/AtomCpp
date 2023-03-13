@@ -2,6 +2,8 @@
 #include "DX11VertexBuffer.h"
 #include "DX11RendererContext.h"
 
+#include "DirectX11Utils.h"
+
 namespace Atom
 {
 
@@ -40,12 +42,12 @@ namespace Atom
 	void DX11VertexBuffer::Invalidate()
 	{
 		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.Usage = Utils::AtomUsageToD3D11(m_Specification.Usage);
 		bufferDesc.ByteWidth = m_Specification.Size;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDesc.BindFlags = Utils::AtomBindFlagsToD3D11(m_Specification.BindFlags);
+		bufferDesc.CPUAccessFlags = Utils::AtomCPUAccessToD3D11(m_Specification.CPUAccess);
 		bufferDesc.MiscFlags = 0;
-		bufferDesc.StructureByteStride = 0;
+		bufferDesc.StructureByteStride = m_Specification.Stride;
 
 		if(m_Specification.Vertices)
 		{

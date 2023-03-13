@@ -375,6 +375,8 @@ namespace Atom
 		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.QuadVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 
@@ -397,6 +399,8 @@ namespace Atom
 		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.CircleVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 
@@ -417,6 +421,8 @@ namespace Atom
 		VertexBufferSpecification vertexBufferOptions{ };
 		vertexBufferOptions.Size = s_Renderer2DData.MaxVertices;
 		vertexBufferOptions.Stride = pipelineOptions.InputLayout.GetStride();
+		vertexBufferOptions.Usage = Usage::Dynamic;
+		vertexBufferOptions.CPUAccess = CPUAccess::Write;
 		s_Renderer2DData.TextVertexBuffer = VertexBuffer::Create(vertexBufferOptions);
 	}
 

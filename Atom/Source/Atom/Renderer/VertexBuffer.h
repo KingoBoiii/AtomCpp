@@ -1,4 +1,7 @@
 #pragma once
+#include "Flags/BindFlags.h"
+#include "Flags/CPUAccess.h"
+#include "Flags/Usage.h"
 
 namespace Atom
 {
@@ -9,6 +12,10 @@ namespace Atom
 		void* Vertices = nullptr;
 		uint32_t Stride;
 		uint32_t Offset;
+
+		Usage Usage = Usage::Default;
+		CPUAccess CPUAccess = CPUAccess::None;
+		const BindFlags BindFlags = BindFlags::VertexBuffer;
 	};
 
 	class VertexBuffer
