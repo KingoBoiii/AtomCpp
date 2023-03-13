@@ -1,7 +1,7 @@
 #pragma once
-#include "Usage.h"
-#include "BindFlags.h"
-#include "CPUAccess.h"
+#include "Flags/Usage.h"
+#include "Flags/BindFlags.h"
+#include "Flags/CPUAccess.h"
 
 namespace Atom
 {
