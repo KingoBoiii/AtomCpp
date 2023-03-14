@@ -219,6 +219,7 @@ namespace Atom
 		m_EditorCamera.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(AT_BIND_EVENT_FN(EditorLayer::OnWindowClose));
 		dispatcher.Dispatch<KeyPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(AT_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
@@ -666,6 +667,8 @@ namespace Atom
 
 	void EditorLayer::CloseProject(bool unloadProject)
 	{
+		AssetManager::Shutdown();
+		
 		SaveProject();
 
 		//ScriptEngine::UnloadAppAssembly();
@@ -831,6 +834,12 @@ namespace Atom
 		{
 			m_EditorScene->DuplicateEntity(selectedEntity);
 		}
+	}
+
+	bool EditorLayer::OnWindowClose(Atom::WindowCloseEvent& e)
+	{
+		CloseProject();
+		return true;
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)

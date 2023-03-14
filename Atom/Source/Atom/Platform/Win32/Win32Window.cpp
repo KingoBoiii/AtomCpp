@@ -82,6 +82,9 @@ namespace Atom
 			{
 				WindowCloseEvent e;
 				s_Window->m_WindowData.EventCallback(e);
+			} break;
+			case WM_DESTROY:
+			{
 				PostQuitMessage(0);
 			} break;
 			default: result = DefWindowProc(hWnd, message, wParam, lParam); break;
@@ -102,8 +105,8 @@ namespace Atom
 		delete m_RendererContext;
 		delete m_SwapChain;
 
-		DestroyWindow(m_WindowHandle);
-		UnregisterClassW(s_ClassName, m_HInstance);
+		//DestroyWindow(m_WindowHandle);
+		//UnregisterClassW(s_ClassName, m_HInstance);
 
 		s_Window = nullptr;
 	}

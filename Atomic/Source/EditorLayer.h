@@ -55,6 +55,7 @@ namespace Atom
 
 		void OnDuplicateEntity();
 	private: // Events
+		bool OnWindowClose(Atom::WindowCloseEvent& e);
 		bool OnKeyPressed(Atom::KeyPressedEvent& e);
 		bool OnMouseButtonPressed(Atom::MouseButtonPressedEvent& e);
 	private:

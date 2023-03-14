@@ -1,6 +1,7 @@
 #include "ATPCH.h"
 #include "AssetManager.h"
 #include "AssetExtensions.h"
+#include "Registry/AssetRegistrySerializer.h"
 
 #include "AssetMetadata.h"
 
@@ -28,19 +29,42 @@ namespace Atom
 			assetMetadata.Filepath = currentPath;
 
 			s_AssetRegistry[assetMetadata.Handle] = assetMetadata;
-#if 0
-			AT_CORE_TRACE("Asset {}", currentPath.filename().stem().string());
-			AT_CORE_TRACE("- Handle: {}", assetMetadata.Handle);
-			AT_CORE_TRACE("- Type: {}", Utils::AssetTypeToString(assetMetadata.Type));
-			AT_CORE_TRACE("- Filepath: {}", assetMetadata.Filepath.string());
-#endif
 		}
+
+		LoadAssetRegistry();
 
 		AT_CORE_INFO("[AssetManager] Loaded {0} asset entries", s_AssetRegistry.Count());
 	}
 
 	void AssetManager::Shutdown()
 	{
+		SaveAssetRegistry();
+	}
+
+	void AssetManager::LoadAssetRegistry()
+	{
+		const auto& assetRegistryPath = Project::GetAssetRegistryPath();
+		if(!std::filesystem::exists(assetRegistryPath))
+		{
+			AT_CORE_WARN("[AssetManager] Asset Registry file does not exist...");
+			return;
+		}
+
+		AssetRegistrySerializer serializer = AssetRegistrySerializer(&s_AssetRegistry);
+		serializer.Deserialize(assetRegistryPath);
+	}
+
+	void AssetManager::SaveAssetRegistry()
+	{
+		if(&s_AssetRegistry == nullptr)
+		{
+			return;
+		}
+
+		const auto& assetRegistryPath = Project::GetAssetRegistryPath();
+
+		AssetRegistrySerializer serializer = AssetRegistrySerializer(&s_AssetRegistry);
+		serializer.Serialize(assetRegistryPath);
 	}
 
 }

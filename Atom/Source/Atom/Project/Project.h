@@ -8,6 +8,7 @@ namespace Atom
 #define ATOM_USE_LEGACY_PROJECT_SERIALIZATION 0
 
 #define ATOM_PROJECT_CACHE_DIRECTORY "Cache"
+#define ATOM_PROJECT_ASSET_REGISTRY_FILE_NAME "AssetRegistry.atre"
 
 	struct ProjectConfig
 	{
@@ -79,8 +80,14 @@ namespace Atom
 			AT_CORE_ASSERT(s_ActiveProject);
 			return s_ActiveProject->m_Config.ProjectDirectory / ATOM_PROJECT_CACHE_DIRECTORY;
 		}
+		
+		static std::filesystem::path GetAssetRegistryPath()
+		{
+			AT_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->m_Config.ProjectDirectory / ATOM_PROJECT_ASSET_REGISTRY_FILE_NAME;
+		}
 
-		static void SetActiveProject(Project* project) { s_ActiveProject = project; AssetManager::Initialize(); }
+		static void SetActiveProject(Project* project);
 		static Project* GetActiveProject() { return s_ActiveProject; }
 
 		ProjectConfig& GetConfig() { return m_Config; }

@@ -40,4 +40,15 @@ namespace Atom
 	}
 #endif 
 
+	void Project::SetActiveProject(Project* project)
+	{
+		s_ActiveProject = project; 
+
+		if(!s_ActiveProject)
+		{
+			return;
+		}
+		AssetManager::Initialize();
+	}
+
 }

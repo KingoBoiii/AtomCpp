@@ -141,16 +141,16 @@ namespace Atom
 
 	void Application::OnEvent(Event& e)
 	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(AT_BIND_EVENT_FN(Application::OnWindowCloseEvent));
-		dispatcher.Dispatch<WindowResizeEvent>(AT_BIND_EVENT_FN(Application::OnWindowResizeEvent));
-
 		for(auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			(*it)->OnEvent(e);
 			if(e.Handled)
 				break;
 		}
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(AT_BIND_EVENT_FN(Application::OnWindowCloseEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(AT_BIND_EVENT_FN(Application::OnWindowResizeEvent));
 	}
 
 	void Application::SubmitToMainThread(const std::function<void()>& function)
