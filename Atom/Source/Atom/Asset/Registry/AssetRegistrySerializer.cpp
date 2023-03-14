@@ -68,11 +68,6 @@ namespace Atom
 		strStream << stream.rdbuf();
 
 		YAML::Node data = YAML::Load(strStream.str());
-		if(!data["AssetRegistry"])
-		{
-			AT_CORE_ERROR("AssetRegistry file '{0}' is not valid!", filepath);
-			return false;
-		}
 
 		auto assets = data["Assets"];
 		if(!assets)
@@ -90,7 +85,6 @@ namespace Atom
 
 			(*m_AssetRegistry)[metadata.Handle] = metadata;
 		}
-
 
 		return true;
 	}

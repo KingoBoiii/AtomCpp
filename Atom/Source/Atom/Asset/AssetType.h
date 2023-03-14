@@ -8,6 +8,7 @@ namespace Atom
 	{
 		None = 0,
 		Scene,
+		Texture,
 		Script
 	};
 
@@ -18,7 +19,8 @@ namespace Atom
 		{
 			if(assetType == "None")				return AssetType::None;
 			if(assetType == "Scene")			return AssetType::Scene;
-			if(assetType == "Script")			return AssetType::Scene;
+			if(assetType == "Texture")			return AssetType::Texture;
+			if(assetType == "Script")			return AssetType::Script;
 
 			AT_CORE_ASSERT(false, "Unknown Asset Type");
 			return AssetType::None;
@@ -30,6 +32,7 @@ namespace Atom
 			{
 				case Atom::AssetType::None:		return "None";
 				case Atom::AssetType::Scene:	return "Scene";
+				case Atom::AssetType::Texture:	return "Texture";
 				case Atom::AssetType::Script:	return "Script";
 			}
 

@@ -1,49 +1,55 @@
 Assets:
-  - Handle: 844252010683112426
+  - Handle: 10865228757214853793
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\CatchGame\Player.cs
-  - Handle: 9974511965690729690
+    Filepath: Scripts\Collision2DTest.cs
+  - Handle: 9726703064758471649
     Type: Scene
-    Filepath: SandboxProject\Assets\Scenes\Examples\CatchGame.atsc
-  - Handle: 7300485821723735642
+    Filepath: Scenes\Examples\CatchGame.atsc
+  - Handle: 11939833873961156295
     Type: Scene
-    Filepath: SandboxProject\Assets\Scenes\TopDown2DTest.atsc
-  - Handle: 1930863191886502811
+    Filepath: Scenes\Physics2D.atsc
+  - Handle: 15182757248986214463
+    Type: Script
+    Filepath: Scripts\Camera.cs
+  - Handle: 11257722198223462726
+    Type: Script
+    Filepath: Scripts\Examples\CatchGame\Ground.cs
+  - Handle: 10309215146547302406
     Type: Scene
-    Filepath: SandboxProject\Assets\Scenes\Physics2D.atsc
-  - Handle: 15330116533899178988
+    Filepath: Scenes\TextComponent.atsc
+  - Handle: 7376033236210309246
     Type: Scene
-    Filepath: SandboxProject\Assets\Scenes\TextComponent2.atsc
-  - Handle: 4466294579040866548
+    Filepath: Scenes\TopDown2DTest.atsc
+  - Handle: 6414704172773978104
+    Type: Script
+    Filepath: Scripts\CatchGame\Catch.cs
+  - Handle: 9743816627276946616
+    Type: Script
+    Filepath: Scripts\Tests\TextComponentTest.cs
+  - Handle: 14919237113463483376
     Type: Scene
-    Filepath: SandboxProject\Assets\Scenes\TextComponent.atsc
-  - Handle: 9469530500531675039
+    Filepath: Scenes\TextComponent2.atsc
+  - Handle: 12847661586616079443
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Player.cs
-  - Handle: 7680964968349594271
+    Filepath: Scripts\CatchGame\Player.cs
+  - Handle: 6456081866172569487
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Camera.cs
-  - Handle: 11039682180469223397
+    Filepath: Scripts\CatchGame\Score.cs
+  - Handle: 18340170138471284111
+    Type: Texture
+    Filepath: Textures\Test.jpg
+  - Handle: 15751185643216599826
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\CatchGame\Catch.cs
-  - Handle: 3505031339863217378
+    Filepath: Scripts\Examples\CatchGame\Player.cs
+  - Handle: 15084229164510960325
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\CatchGame\Score.cs
-  - Handle: 11305932990488675477
+    Filepath: Scripts\Examples\CatchGame\Spawner.cs
+  - Handle: 7114150814150790583
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Collision2DTest.cs
-  - Handle: 7655832861039910179
+    Filepath: Scripts\Player.cs
+  - Handle: 3670012626076347332
     Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Examples\CatchGame\Ground.cs
-  - Handle: 10567663266362555916
-    Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Examples\CatchGame\Player.cs
-  - Handle: 8801171007695047815
-    Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Examples\CatchGame\Spawner.cs
-  - Handle: 14468158696569079117
-    Type: Script
-    Filepath: SandboxProject\Assets\Scripts\Tests\TextComponentTest.cs
-  - Handle: 1957526240656335987
-    Type: Script
-    Filepath: SandboxProject\Assets\Scripts\TopDown2DTest\Player.cs
+    Filepath: Scripts\TopDown2DTest\Player.cs
+  - Handle: 16481788326097875166
+    Type: Texture
+    Filepath: Textures\20220502211647_1.jpg

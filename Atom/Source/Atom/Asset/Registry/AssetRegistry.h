@@ -17,8 +17,8 @@ namespace Atom
 		size_t Remove(const AssetHandle handle);
 		void Clear();
 
-		std::unordered_map<AssetHandle, AssetMetadata>::const_iterator begin() { return m_AssetMetadataMap.begin(); }
-		std::unordered_map<AssetHandle, AssetMetadata>::const_iterator end() { return m_AssetMetadataMap.end(); }
+		std::unordered_map<AssetHandle, AssetMetadata>::iterator begin() { return m_AssetMetadataMap.begin(); }
+		std::unordered_map<AssetHandle, AssetMetadata>::iterator end() { return m_AssetMetadataMap.end(); }
 		std::unordered_map<AssetHandle, AssetMetadata>::const_iterator begin() const { return m_AssetMetadataMap.cbegin(); }
 		std::unordered_map<AssetHandle, AssetMetadata>::const_iterator end() const { return m_AssetMetadataMap.cend(); }
 	private:
