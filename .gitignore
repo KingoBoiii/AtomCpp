@@ -18,3 +18,4 @@ Intermediates/
 
 # Directories
 scripts/__pycache__
+/Atomic/MonoDebugger.txt
